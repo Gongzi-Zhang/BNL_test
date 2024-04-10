@@ -2,7 +2,9 @@
 # coding: utf-8
 
 '''
-read and parse raw (ADC) data, convert to a pkl file
+read and parse raw (ADC) data, convert to a root/pkl file
+
+select good (complete) events, don't do any cut on events here
 
 usage: ./convert.py input.txt [-o output.pkl] 
 '''
@@ -12,14 +14,21 @@ import sys
 import pandas as pd
 import uproot
 
+''' units '''
+us = 1
+ms = 1000*us
+s = 1000*ms
+
+
 class convert:
-    nChannels = 64
+    nBoards = 1
+    nChannels = 64*nBoards
     inFile = ''
     outFile = ''
     outFormats = {'root', 'pkl'}
     outFormat = 'root'  # default root output
-    nEvent = 0
-    nGood = 0
+    nEvents = 0
+    nGoods = 0
 
     data = {}
 
@@ -39,7 +48,7 @@ class convert:
         print(f'INFO\twill process {fin}')
 
         if fmt:
-            if fmt not in outFormat:
+            if fmt not in outFormats:
                 print(f'ERROR\tunknown output file format: {fmt}')
                 print(f'INFO\tavailable data format: {outFormats}')
                 exit(4)
@@ -58,23 +67,28 @@ class convert:
         for ch in range(0, self.nChannels):
             for gain in ['LG', 'HG']:
                 self.columns.append(f'Ch_{ch}_{gain}') 
-        self.columns.append('TimeStamps') 
+        self.columns.append('TS')   # timestamps
         for col in self.columns:
             self.data[col] = []
+
+    def setNboards(self, n):
+        self.nBoards = n
+        self.nChannels = 64*n
 
     def fillEvent(self):
         for col in self.columns:
             self.data[col].append(self.dataBuf[col])
 
     def convert(self):
+        timeDiff = 20*ms*(nBoards+1)
         with open(self.inFile, 'r') as fin:
             ''' skip the first 9 lines '''
             for l in range(9):
                 next(fin)
 
             nch = 0 # number of good channels in an event
+            times = []
 
-            time = 0
             event = 0
             ch = 0
             bd = 0
@@ -85,15 +99,25 @@ class convert:
                 line = line.strip()
                 values = line.split()
                 if 6 == len(values):
-                    self.nEvent += 1
-                    ''' process last event '''
-                    if 64 == nch:
-                        self.fillEvent()
-                        self.nGood += 1
+                    ts = float(values[0])
+                    if times and abs(ts - times[0]) > timeDiff:
+                        self.nEvents += 1
+                        ''' a new event '''
+                        if self.nChannels == nch:
+                            ''' good event '''
+                            self.dataBuf['TS'] = sum(times) / len(times)
+                            self.fillEvent()
+                            self.nGoods += 1
+                        else:
+                            ''' bad event '''
+                            ''' do nothing, discard it'''
+                            print(f'WARNING--bad event in event {event}, {nch}/{self.nChannels} recorded')
 
-                    nch = 0
+                        nch = 0
+                        times = []
 
-                    self.dataBuf['TimeStamps'] = (float(values[0]))
+
+                    times.append(ts)
                     event = int(values[1])
                     bd = int(values[2])
                     ch = int(values[3])
@@ -115,12 +139,12 @@ class convert:
                 self.dataBuf[f'Ch_{ch}_HG'] = HG
 
             ''' the last event '''
-            if 64 == nch:
+            if self.nChannels == nch:
                 self.fillEvent()
-                self.nGood += 1
+                self.nGoods += 1
 
     def write(self):
-        print(f'INFO:\t{self.nGood}/{self.nEvent} good events processed')
+        print(f'INFO:\t{self.nGoods}/{self.nEvents} good events processed')
         if 'root' == self.outFormat:
             with uproot.recreate(self.outFile) as fout:                            
                 fout['events'] = self.data
@@ -130,11 +154,19 @@ class convert:
             print(f'ERROR\tunknown output file format: {self.outFormat}')
             exit(4)
 
+def usage():
+    print(sys.argv[0] + ' [-hofb] dataFile')
+    print('\t-h: print this help message')
+    print('\t-o: output file name')
+    print('\t-f: output file format: root, pkl [default root]')
+    print('\t-b: number of boards [default 1]')
+
 if __name__ == '__main__':
     # read in command line arguments
     inName = ''
     outName = ''
     outFormat = ''
+    nBoards = 0
     i=1
     while i<len(sys.argv):
         if '-h' == sys.argv[i]:
@@ -146,11 +178,16 @@ if __name__ == '__main__':
         elif '-f' == sys.argv[i]:
             outFormat = sys.argv[i+1]
             i+=1
+        elif '-b' == sys.argv[i]:
+            nBoards = int(sys.argv[i+1])
+            i+=1
         else:
             inName = sys.argv[i]
         i+=1
 
     f = convert(inName, outName, outFormat)
     f.init()
+    if nBoards:
+        f.setNboards(nBoards)
     f.convert()
     f.write()
