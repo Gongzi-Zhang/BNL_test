@@ -1,0 +1,22 @@
+# 20240419
+    Add the Rad monitor tile on the front: bottom left
+
+# 20240418
+    Connect Layer 9 (only 3 PCBs, the top right block is occupied by the trigger tiles)
+	12 channels
+    Connect the top right PCB of layer 11
+	4 channels
+    replace P3CH3 and P3CH5
+    192/192 good/channels
+
+    Switch the bias cable 7 and 8 for one of the showermax trigger tile
+    Add 2 trigger tiles on the front (tile 1 and 2, 6 mm SiPMs): bottom right
+    Add one Ketek module, it is not working
+
+# 20240417
+    Connect layer 3, 4, 5, 6, 7 and 8 (28+28+16+16+16+16=120 channels)
+    174/176 good/channels
+
+# 20240322
+    Connect the first 2 layers
+    54/56 good/channels (channel P3CH3 and P3CH5 are broken) 
