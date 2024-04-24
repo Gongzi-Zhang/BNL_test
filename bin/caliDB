@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+import sys
+import argparse
+
+from db_lib import *
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest='subcommand', required=True)
+    
+    '''init command'''
+    parser_insert = subparsers.add_parser('init', help='Initialize the database')
+
+    ''' insert command '''
+    parser_insert = subparsers.add_parser('insert', help='Insert record from a csv file')
+    parser_insert.add_argument('--file',    dest='iFile',  help='which csv file to read from')
+    parser_insert.add_argument('--Id',      dest='iId', help='run id of each record; will be assigned by the system if not specifie')
+    parser_insert.add_argument('--Type',    dest='iType', choices=TYPES, required=True, help='type of the test')
+    parser_insert.add_argument('--StartTime',   dest='iStartTime',  required=True)
+    parser_insert.add_argument('--StopTime',    dest='iStopTime',   required=True)
+    parser_insert.add_argument('--Length',      dest='iLength',     help='elapsed time in hour')
+    parser_insert.add_argument('--Geometry',    dest='iGeometry',   required=True,  help='geometry used for this run')
+    parser_insert.add_argument('--Channels',    dest='iChannels',   help='number of good channels')
+    parser_insert.add_argument('--Trigger',     dest='iTrigger',    required=True,  help='trigger logic')
+    parser_insert.add_argument('--Events',      dest='iEvents',     help='number of events')
+    parser_insert.add_argument('--Size',        dest='iSize',       help='list file size')
+    parser_insert.add_argument('--Note',        dest='iNote',       help='other info')
+
+    ''' query command '''
+    parser_list = subparsers.add_parser('query', help='query related record')
+    parser_list.add_argument('--fields', dest='qFields', default='*', help='what you want to grep')
+    parser_list.add_argument('--condition', dest='qCondition', default='1=1', help='filters')
+
+    ''' get latest run id '''
+    parser_list = subparsers.add_parser('latest', help='get latest run id')
+
+    args = parser.parse_args()
+
+    if not create_connection(gDB):
+        print('Error! cannot create the database connection.')
+        exit(4)
+
+    if args.subcommand == 'init':
+        if not create_table():
+            exit(2)
+    elif args.subcommand == 'insert':
+        if args.iFile:
+            if not insert_records(args.iFile):
+                exit(3)
+        else:
+            record = {}
+            if args.iId:
+                record['Id'] = int(args.iId)
+            record['Type'] = args.iType
+            record['StartTime'] = args.iStartTime
+            record['StartTime'] = args.iStartTime
+            if args.iLength:
+                record['Length'] = args.iLength
+            record['Geometry'] = args.iGeometry
+            if args.iChannels:
+                record['Channels'] = args.iChannels
+            record['Trigger'] = args.iTrigger
+            if args.iEvents:
+                record['Events'] = args.iEvents
+            if args.iSize:
+                record['Size'] = args.iSize
+            if args.iNote:
+                record['Note'] = args.iNote
+            if not insert_record(record):
+                exit(5)
+    elif args.subcommand == 'query':
+        fields = args.qFields
+        show_query(query_records(args.qCondition, args.qFields))
+    elif args.subcommand == 'latest':
+        sql = f'SELECT Id FROM {gTABLE} ORDER BY Id DESC LIMIT 1;'
+        logger.debug(sql)
+        result = execute_sql(sql)
+        for Id in result.fetchone():
+            print("Latest Run Id: ", Id)
+
+    close_connection() 
+    exit(0)
