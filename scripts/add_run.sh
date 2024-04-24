@@ -37,7 +37,7 @@ StartTime=$(extract_datetime "$StartTime")
 StopTime=$(grep 'Stop Time' $input_file | cut -d ':' -f2-)
 StopTime=$(extract_datetime "$StopTime")
 Length=$(grep 'Elapsed time' $input_file | cut -d ' ' -f4)
-Length=$(perl -e "printf(\"%.1f\", $length/3600)")
+Length=$(perl -e "printf(\"%.1f\", $Length/3600)")
 Geometry=$(grep 'Geometry' ${config} | cut -d':' -f2)
 Channels=$(grep 'Channels' ${config} | cut -d':' -f2)
 Trigger=$(grep 'Trigger' ${config} | cut -d':' -f2)
@@ -51,8 +51,8 @@ echo -e "INFO\trun ${input_file} will be insert as run $((latestId+1))"
 
 caliDB insert \
     --Type $run_type \
-    --StartTime $StartTime  \
-    --StopTime $StopTime    \
+    --StartTime "$StartTime" \
+    --StopTime "$StopTime"   \
     --Length $Length	    \
     --Geometry $Geometry    \
     --Channels $Channels    \
@@ -60,10 +60,15 @@ caliDB insert \
     --Events $Events	    \
     --Size $Size    \
     --Note "$Note"
+if [ $? -ne 0 ]; then
+   echo -e "Failed to insert the record"
+   exit 4
+fi
+echo -e "INFO\tsuccessfully insert run ${input_file} into database as run $((latestId+1))"
 
 fdir=$(dirname -- $input_file)
 fname=$(basename -- $input_file)
-old=$(fname%_Info.txt)
-latestId=$(caliDB latest | cut -d':' -f2)
-new="Run$latestId" ${fdir}/${fname}_*.txt
-rename "s/$old/$new" 
+old=${fname%_Info.txt}
+latestId=$(caliDB latest | cut -d':' -f2 | tr -d ' ')
+new="${CALIROOT}/data/Run$latestId" 
+rename "s#${fdir}/$old#$new#" ${fdir}/${old}_{Info,list,sync}.txt

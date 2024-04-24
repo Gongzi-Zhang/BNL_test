@@ -31,7 +31,7 @@ FIELD_WIDTH = {
     'Trigger': 7,   # trigger logic
     'Events': 6,    # number of events
     'Size':   4,    # raw data file size in GB
-    'Note': 20, 
+    'Note': 30, 
     }
 
 
@@ -197,7 +197,7 @@ def query_records(conditions='1=1', col="*"):
     return execute_sql(sql)
 
 def insert_record(record):
-    if record['Id']:
+    if 'Id' in record:
         result = query_records(f"Id={record['Id']}")
         if result.fetchone():
             logger.warning(f'''record for Id={record['Id']} already exist, will skip it''')

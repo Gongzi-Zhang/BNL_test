@@ -53,15 +53,15 @@ if __name__ == '__main__':
                 record['Id'] = int(args.iId)
             record['Type'] = args.iType
             record['StartTime'] = args.iStartTime
-            record['StartTime'] = args.iStartTime
+            record['StopTime'] = args.iStopTime
             if args.iLength:
-                record['Length'] = args.iLength
+                record['Length'] = float(args.iLength)
             record['Geometry'] = args.iGeometry
             if args.iChannels:
-                record['Channels'] = args.iChannels
-            record['Trigger'] = args.iTrigger
+                record['Channels'] = int(args.iChannels)
+            record['Trigger'] = int(args.iTrigger, 16)
             if args.iEvents:
-                record['Events'] = args.iEvents
+                record['Events'] = int(args.iEvents)
             if args.iSize:
                 record['Size'] = args.iSize
             if args.iNote:
