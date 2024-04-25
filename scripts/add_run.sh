@@ -1,6 +1,9 @@
 #!/bin/bash
 
 script=$(realpath -- ${BASH_SOURCE[0]})
+ROOT=$(dirname $script)/..
+source ${ROOT}/setup.sh
+
 function usage
 {
     echo -e "$script run_Info.txt [run_type] [note]"
