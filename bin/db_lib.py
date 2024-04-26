@@ -29,7 +29,7 @@ FIELD_WIDTH = {
     'Geometry': 8,
     'Channels': 8,  # number of good channels
     'Trigger': 7,   # trigger logic
-    'Events': 6,    # number of events
+    'Events': 7,    # number of events
     'Size':   4,    # raw data file size in GB
     'Note': 30, 
     }
@@ -320,13 +320,12 @@ def update():
     print('record after updating:')
     show_query(query_records(conditions))
 
-def export_records():
-    out_name = input('what is the output file name: ')
-    if os.path.exists(out_name):
-        print('ERROR\t{out_name} already exists, please backup it')
+def export_records(fname):
+    if os.path.exists(fname):
+        print('ERROR\t{fname} already exists, please backup it')
         return False
     db_df = pd.read_sql_query(f'SELECT * from {gTABLE};', gCONN)
-    db_df.to_csv(out_name, index=False)
+    db_df.to_csv(fname, index=False)
 
 ''' use the function carefully '''
 def do_query():
@@ -357,7 +356,8 @@ if __name__ == '__main__':
         elif command == 'u':
             update()
         elif command == 'e':
-            export_records()
+            fname = input('what is the output file name: ')
+            export_records(fname)
         elif command == 'd':
             kvalue = int(input('input the Id you want to delete: '))
             delete_record(kvalue)

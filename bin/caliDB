@@ -9,7 +9,11 @@ if __name__ == '__main__':
     subparsers = parser.add_subparsers(dest='subcommand', required=True)
     
     '''init command'''
-    parser_insert = subparsers.add_parser('init', help='Initialize the database')
+    parser_init = subparsers.add_parser('init', help='Initialize the database')
+
+    '''show command'''
+    parser_show = subparsers.add_parser('show', help='show the last 10 records')
+    parser_show.add_argument('--all', action='store_true', required=False, help='show all records')
 
     ''' insert command '''
     parser_insert = subparsers.add_parser('insert', help='Insert record from a csv file')
@@ -32,7 +36,11 @@ if __name__ == '__main__':
     parser_list.add_argument('--condition', dest='qCondition', default='1=1', help='filters')
 
     ''' get latest run id '''
-    parser_list = subparsers.add_parser('latest', help='get latest run id')
+    parser_latest = subparsers.add_parser('latest', help='get latest run id')
+
+    ''' export csv to a file '''
+    parser_export = subparsers.add_parser('export', help='export the database to a csv file')
+    parser_export.add_argument('--file', dest='eFile', required=True, help='file to export the db to')
 
     args = parser.parse_args()
 
@@ -43,6 +51,12 @@ if __name__ == '__main__':
     if args.subcommand == 'init':
         if not create_table():
             exit(2)
+    elif args.subcommand == 'show':
+        sql = f'''SELECT * FROM {gTABLE} ORDER BY Id DESC LIMIT 10'''
+        if args.all:
+            sql = f'''SELECT * FROM {gTABLE} ORDER BY Id DESC'''
+        show_query(execute_sql(sql))
+            
     elif args.subcommand == 'insert':
         if args.iFile:
             if not insert_records(args.iFile):
@@ -77,6 +91,10 @@ if __name__ == '__main__':
         result = execute_sql(sql)
         for Id in result.fetchone():
             print("Latest Run Id: ", Id)
+    elif args.subcommand == 'export':
+        if not export_records(args.eFile):
+            exit(6)
+
 
     close_connection() 
     exit(0)

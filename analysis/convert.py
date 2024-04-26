@@ -29,6 +29,7 @@ class convert:
     outFormat = 'root'  # default root output
     nEvents = 0
     nGoods = 0
+    split = 0   # split the raw file into smaller ones
 
     data = {}
 
@@ -48,7 +49,7 @@ class convert:
         print(f'INFO\twill process {fin}')
 
         if fmt:
-            if fmt not in outFormats:
+            if fmt not in self.outFormats:
                 print(f'ERROR\tunknown output file format: {fmt}')
                 print(f'INFO\tavailable data format: {outFormats}')
                 exit(4)
@@ -57,9 +58,8 @@ class convert:
 
         self.outFile = fout
         if '' == fout:
-            outName = fin.replace('.txt', f'.{self.outFormat}')
-            outName = outName.replace('_list', '')
-            self.outFile = outName
+            # outName = fin.replace('.txt', f'.{self.outFormat}')
+            self.outFile = fin.replace('_list.txt', '')
         print(f'INFO\toutput file: {self.outFile}')
 
     def init(self):
@@ -111,6 +111,10 @@ class convert:
                             self.dataBuf['TS'] /= s     # output TS unit: s
                             self.fillEvent()
                             self.nGoods += 1
+
+                            if (self.nGoods % 500000) == 0:
+                                self.split += 1
+                                self.write()
                         else:
                             ''' bad event '''
                             ''' do nothing, discard it'''
@@ -148,16 +152,25 @@ class convert:
                 self.nEvents += 1
                 self.nGoods += 1
 
+            if self.split:
+                self.split += 1
+
     def write(self):
         print(f'INFO\t{self.nGoods}/{self.nEvents} good events processed')
+        fname = self.outFile
+        if self.split:
+            fname = f'{fname}_{self.split}'
         if 'root' == self.outFormat:
-            with uproot.recreate(self.outFile) as fout:                            
+            with uproot.recreate(f'{fname}.root') as fout:                            
                 fout['events'] = self.data
         elif 'pkl' == self.outFormat:
-            df.to_pickle(self.outFile)
+            df = pd.DataFrame(self.data)
+            df.to_pickle(f'{fname}.pkl')
         else:
             print(f'ERROR\tunknown output file format: {self.outFormat}')
             exit(4)
+        for col in self.columns:
+            self.data[col] = []
 
 def usage():
     print(sys.argv[0] + ' [-hofb] dataFile')

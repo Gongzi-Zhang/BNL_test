@@ -1,4 +1,5 @@
-const int nChannels = 64;
+const int nBoards = 3;
+const int nChannels = 64*nBoards;
 
 void make_hist(string inFile, string outFile = "")
 {
@@ -26,7 +27,7 @@ void make_hist(string inFile, string outFile = "")
     {
 	chName[ch] = Form("Ch_%d_LG", ch);
 	tin->SetBranchAddress(chName[ch].c_str(), &LG[ch]);
-	h1[chName[ch]] = new TH1F(chName[ch].c_str(), Form("Ch_%d_LG;ADC;Count", ch), 100, 0, 100);
+	h1[chName[ch]] = new TH1F(chName[ch].c_str(), Form("Ch_%d_LG;ADC;Count", ch), 100, 0, 200);
     }
 
     for (int i=0; i<tin->GetEntries(); i++)
