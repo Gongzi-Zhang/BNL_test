@@ -21,7 +21,7 @@ s = 1000*ms
 
 
 class convert:
-    nBoards = 1
+    nBoards = 3
     nChannels = 64*nBoards
     inFile = ''
     outFile = ''
@@ -80,7 +80,7 @@ class convert:
             self.data[col].append(self.dataBuf[col])
 
     def convert(self):
-        timeDiff = 20*ms*(nBoards+1)
+        timeDiff = 20*ms*self.nBoards
         with open(self.inFile, 'r') as fin:
             ''' skip the first 9 lines '''
             for l in range(9):
@@ -88,6 +88,7 @@ class convert:
 
             nch = 0 # number of good channels in an event
             times = []
+            boards = []
 
             event = 0
             ch = 0
@@ -100,12 +101,14 @@ class convert:
                 values = line.split()
                 if 6 == len(values):
                     ts = float(values[0])
-                    if times and abs(ts - times[0]) > timeDiff:
+                    bd = int(values[2])
+                    if bd in boards or (times and abs(ts - times[0]) > timeDiff):
                         self.nEvents += 1
                         ''' a new event '''
                         if self.nChannels == nch:
                             ''' good event '''
-                            self.dataBuf['TS'] = sum(times) / len(times)
+                            self.dataBuf['TS'] = sum(times) / len(times)    
+                            self.dataBuf['TS'] /= s     # output TS unit: s
                             self.fillEvent()
                             self.nGoods += 1
                         else:
@@ -115,11 +118,12 @@ class convert:
 
                         nch = 0
                         times = []
+                        boards = []
 
 
-                    times.append(ts)
+                    times.append(ts)    # input TS unit: us
+                    boards.append(bd)
                     event = int(values[1])
-                    bd = int(values[2])
                     ch = int(values[3])
                     LG = int(values[4])
                     HG = int(values[5])
@@ -141,10 +145,11 @@ class convert:
             ''' the last event '''
             if self.nChannels == nch:
                 self.fillEvent()
+                self.nEvents += 1
                 self.nGoods += 1
 
     def write(self):
-        print(f'INFO:\t{self.nGoods}/{self.nEvents} good events processed')
+        print(f'INFO\t{self.nGoods}/{self.nEvents} good events processed')
         if 'root' == self.outFormat:
             with uproot.recreate(self.outFile) as fout:                            
                 fout['events'] = self.data
