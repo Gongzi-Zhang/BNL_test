@@ -1,3 +1,12 @@
+# 20240429
+    Align the prototype to the designed position
+
+# 20240426
+    JANUS -> Spectroscopy:
+    change LG Gain to 40 and Pedestal Position to 100
+    old: HG Gain: 50; LG Gain: 50; Pedestal Position: 50
+    new: HG Gain: 50; LG Gain: 40; Pedestal Position: 100
+
 # 20240422
     Set the output voltage of Ketek unit 2 to 29.07V, it is working now
 

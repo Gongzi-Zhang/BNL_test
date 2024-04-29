@@ -1,4 +1,12 @@
 # geometry
+* 20240429
+    * align the prototype
+    * old: 
+	Layer 0: 69 cm
+   	Layer 11: 71 cm
+    * new:
+	~47 cm (measure it again)
+
 * 20240418
     * First 9 layers connected + top right of Layer 11 (the one after the showermax 
       trigger tiles)

@@ -18,14 +18,14 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 FIELDS = [ 'Id', 'Type', 'StartTime', 'StopTime', 'Length', 'Geometry', 'Channels', 'Trigger', 'Events', 'Size', 'Note' ]
-TYPES = ['ptrg', 'cosmic', 'data']
+TYPES = ['ptrg', 'cosmic', 'data', 'junk']
 
 FIELD_WIDTH = {
     'Id': 4, 
-    'Type': 8, 
-    'StartTime': 16, 
-    'StopTime': 16, 
-    'Length': 8,    # elapsed time in h
+    'Type': 6, 
+    'StartTime': 14, 
+    'StopTime': 14, 
+    'Length': 6,    # elapsed time in h
     'Geometry': 8,
     'Channels': 8,  # number of good channels
     'Trigger': 7,   # trigger logic
@@ -283,6 +283,7 @@ def insert_to_table():
         values['Channels'] = int(input('#Channels: '))
         values['Trigger'] = int(input('Trigger Logic: '))
         values['Events'] = int(input('#Events: '))
+        values['Size'] = input('Size: ').strip()
         values['Note'] = input('Note: ').strip()
         if not insert_record(values):
             return False
