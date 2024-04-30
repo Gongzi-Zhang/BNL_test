@@ -27,7 +27,7 @@ void make_hist(string inFile, string outFile = "")
     {
 	chName[ch] = Form("Ch_%d_LG", ch);
 	tin->SetBranchAddress(chName[ch].c_str(), &LG[ch]);
-	h1[chName[ch]] = new TH1F(chName[ch].c_str(), Form("Ch_%d_LG;ADC;Count", ch), 100, 0, 200);
+	h1[chName[ch]] = new TH1F(chName[ch].c_str(), Form("Ch_%d_LG;ADC;Count", ch), 100, 0, 300);
     }
 
     for (int i=0; i<tin->GetEntries(); i++)

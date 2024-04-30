@@ -1,3 +1,9 @@
+# 20240430
+    JANUS -> Spectroscopy:
+    change Pedestal Position to 160
+    old: HG Gain: 50; LG Gain: 40; Pedestal Position: 100
+    new: HG Gain: 50; LG Gain: 40; Pedestal Position: 160
+
 # 20240429
     Align the prototype to the designed position
 
