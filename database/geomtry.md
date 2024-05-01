@@ -28,14 +28,20 @@
 
 
 # PCB map (counterclockwise, starts from top right)
-Layer 1: 1,  2,  3,  4
-Layer 2: 5,  6,  7,  8
-Layer 3: 10, 9,  11, 12
-Layer 4: 26, 13, 25, 28
-Layer 5: 30, 41, 14, 37
-Layer 6: 38, 54, 21, 18
-Layer 7: 44, 22, 58, 47
-Layer 8: 50, 57, 33, 31
-Layer 9:     15, 46, can't read it
+Layer 1:  1,  2,  3,  4
+Layer 2:  5,  6,  7,  8
+Layer 3:  10, 9,  11, 12
+Layer 4:  26, 13, 25, 28
+Layer 5:  30, 41, 14, 37
+Layer 6:  38, 54, 21, 18
+Layer 7:  44, 22, 58, 47
+Layer 8:  50, 57, 33, 31
+Layer 9:      15, 46, 35
 Layer 10:
 Layer 11: 42
+
+## Channels connection
+* Bd 14: this is a 7-channel PCB on the left, but only SiPM 1-4 are connected
+* bd 37: A 7-channel PCB on the right, connect the top 4 SiPMs (top down)
+* Bd 15, 21, 46: 4-channel PCB on the left, No SiPM labelling, connect channel 0-3 top down
+* Bd 18, 35, 38: 4-channel PCB on the right, channel 0-3 top down
