@@ -13,7 +13,8 @@ if __name__ == '__main__':
 
     '''show command'''
     parser_show = subparsers.add_parser('show', help='show the last 10 records')
-    parser_show.add_argument('--all', action='store_true', required=False, help='show all records')
+    parser_show.add_argument('--entries', '-e', dest='sEntries', help='number of latest entries to show')
+    parser_show.add_argument('--all', '-a', action='store_true', required=False, help='show all records')
 
     ''' insert command '''
     parser_insert = subparsers.add_parser('insert', help='Insert record from a csv file')
@@ -52,7 +53,10 @@ if __name__ == '__main__':
         if not create_table():
             exit(2)
     elif args.subcommand == 'show':
-        sql = f'''SELECT * FROM {gTABLE} ORDER BY Id DESC LIMIT 10'''
+        entries = 10
+        if args.sEntries:
+            entries = int(args.sEntries)
+        sql = f'''SELECT * FROM {gTABLE} ORDER BY Id DESC LIMIT {entries}'''
         if args.all:
             sql = f'''SELECT * FROM {gTABLE} ORDER BY Id DESC'''
         show_query(execute_sql(sql))

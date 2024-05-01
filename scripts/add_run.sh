@@ -44,6 +44,9 @@ Length=$(perl -e "printf(\"%.1f\", $Length/3600)")
 Geometry=$(grep 'Geometry' ${config} | cut -d':' -f2)
 Channels=$(grep 'Channels' ${config} | cut -d':' -f2)
 Trigger=$(grep 'Trigger' ${config} | cut -d':' -f2)
+if [ "$run_type" = "ptrg" ]; then
+    Trigger=0
+fi
 sync_file=${input_file/Info/sync}
 Events=$(tail -n1 $sync_file | awk '{print $3}')
 list_file=${input_file/Info/list}

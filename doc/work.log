@@ -4,6 +4,11 @@
     old: HG Gain: 50; LG Gain: 40; Pedestal Position: 100
     new: HG Gain: 50; LG Gain: 40; Pedestal Position: 160
 
+    DRS:
+    change trigger tile thresholds: tile 2: 0.005 -> 0.1 V; tile 3: 0.005 -> 0.05 V
+    old: tile 2: 0.005 V; tile 3: 0.005 V
+    new: tile 2: 0.1 V;   tile 3: 0.05 V
+
 # 20240429
     Align the prototype to the designed position
 
