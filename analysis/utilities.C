@@ -30,13 +30,13 @@ const int maxChannel = 192 - 1;
 int mm = 1;
 int cm = 10*mm;
 
-typedef struct _SiPM_ {
+typedef struct {
     int layer;	
     int board;	
     int sipm;
 } SiPM;
 
-typedef struct _pos_ {
+typedef struct {
     double x;
     double y;
 } SipmPos;
