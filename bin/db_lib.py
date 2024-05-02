@@ -25,13 +25,19 @@ FIELD_WIDTH = {
     'Type': 6, 
     'StartTime': 14, 
     'StopTime': 14, 
-    'Length': 6,    # elapsed time in h
+    'Length': 5,    # elapsed time in h
     'Geometry': 8,
-    'Channels': 8,  # number of good channels
-    'Trigger': 7,   # trigger logic
+    'Channels': 3,  # number of good channels
+    'Trigger': 3,   # trigger logic
     'Events': 7,    # number of events
     'Size':   4,    # raw data file size in GB
     'Note': 30, 
+    }
+
+FIELD_TITLE = {
+    'Length':   'Len',
+    'Channels': 'Chs',
+    'Trigger':  'Trg',
     }
 
 
@@ -109,6 +115,8 @@ def print_header(fields):
         width = len(f)
         if f in FIELD_WIDTH:
             width = FIELD_WIDTH[f]
+        if f in FIELD_TITLE:
+            f = FIELD_TITLE[f]
         header += ' {value:<{width}} '.format(value=f, width=width)
         header += '|'
     print(header)
@@ -302,7 +310,7 @@ def update():
         return False
 
     print('record before updating:')
-    show_query(result)
+    show_query(query_records(conditions))
 
     field_prompt = f'0[quit]'
     for i in range(1, len(FIELDS)):
@@ -323,7 +331,7 @@ def update():
 
 def export_records(fname):
     if os.path.exists(fname):
-        print('ERROR\t{fname} already exists, please backup it')
+        print(f'ERROR\t{fname} already exists, please backup it')
         return False
     db_df = pd.read_sql_query(f'SELECT * from {gTABLE};', gCONN)
     db_df.to_csv(fname, index=False)

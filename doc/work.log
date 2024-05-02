@@ -1,3 +1,9 @@
+# 20240502
+    JANUS -> Spectroscopy:
+    change LG to 30 to prevent saturation (not tested)
+    old: HG Gain: 50; LG Gain: 40; Pedestal Position: 160
+    new: HG Gain: 50; LG Gain: 30; Pedestal Position: 160
+
 # 20240430
     JANUS -> Spectroscopy:
     change Pedestal Position to 160
