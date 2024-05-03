@@ -1,3 +1,19 @@
+# 20240503
+    JANUS -> Spectroscopy:
+    change HG to 55 (starting from run 119)
+    old: HG Gain: 50; LG Gain: 30; Pedestal Position: 160
+    new: HG Gain: 55; LG Gain: 30; Pedestal Position: 160
+
+    JANUS -> HV_bias:
+    change HV IMax to 1.2 mA (starting from run 122)
+    old: HV IMax: 1.0 mA
+    new: HV IMax: 1.2 mA
+
+    DRS:
+    change trigger tile thresholds: tile 3: 0.1 -> 0.2 V (staring from run 124)
+    old: tile 3: 0.1 V
+    new: tile 3: 0.2 V
+
 # 20240502
     JANUS -> Spectroscopy:
     change LG to 30 to prevent saturation (not tested)
