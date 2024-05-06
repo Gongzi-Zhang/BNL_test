@@ -10,16 +10,21 @@ To create the local database, use the command:
 caliDB init
 ```
 
-To insert the database from the db file, use the commnad:
+To insert/update the database from the db file, use the commnad:
 ```
 caliDB insert --file database/db.csv
 ```
-
 Now, one can show the runs:
 ```
 caliDB show	# show the last 10 runs
 caliDB show --all	# show all runs
 ```
+# analysis
+To convert the raw txt file into a root file:
+```
+analysis/convert.py -o output.root data/RunXX_list.txt
+```
+
 
 # package dependency
 * sqlite3
@@ -29,3 +34,5 @@ caliDB show --all	# show all runs
 * python:
   * pandas
   * uproot
+  * datetime
+  * copy

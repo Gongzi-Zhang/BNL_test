@@ -17,20 +17,42 @@ formatter = logging.Formatter('%(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-FIELDS = [ 'Id', 'Type', 'StartTime', 'StopTime', 'Length', 'Geometry', 'Channels', 'Trigger', 'Events', 'Size', 'Note' ]
+FIELDS = [ 'Id', 'Type', 'Flag', 
+    'StartTime', 'StopTime', 'Length', 
+    'Geometry', 'Channels', 
+    'Trigger', 'T1', 'T2', 'T3', 'T4', 
+    'Events', 'LG', 'HG', 'Ped','Size', 
+    'PedRun',
+    'Note' ]
+TextFields = ['Type', 'Flag', 'StartTime', 'StopTime', 'Geometry', 'Size', 'Note']
+FreFields = [ 'Id', 'Type', 'Flag', 
+    'StartTime', 'StopTime', 'Length', 
+    'Trigger', 
+    'Events', 'Size', 
+    'Note' ]
 TYPES = ['ptrg', 'cosmic', 'data', 'junk']
+FLAGS = ['good', 'bad', 'susp']
 
 FIELD_WIDTH = {
     'Id': 4, 
     'Type': 6, 
+    'Flag': 4,
     'StartTime': 14, 
     'StopTime': 14, 
     'Length': 5,    # elapsed time in h
     'Geometry': 8,
     'Channels': 3,  # number of good channels
     'Trigger': 3,   # trigger logic
+    'T1': 5,
+    'T2': 5,
+    'T3': 5,
+    'T4': 5,
     'Events': 7,    # number of events
+    'LG': 2,
+    'HG': 2,
+    'Ped': 3,
     'Size':   4,    # raw data file size in GB
+    'PedRun': 4,
     'Note': 30, 
     }
 
@@ -38,6 +60,7 @@ FIELD_TITLE = {
     'Length':   'Len',
     'Channels': 'Chs',
     'Trigger':  'Trg',
+    'PedRun': 'PRun'
     }
 
 
@@ -182,14 +205,23 @@ def create_table():
     sql = f''' CREATE TABLE IF NOT EXISTS {gTABLE} (
                 Id integer PRIMARY KEY,
                 Type text,
+                Flag text,
                 StartTime text,
                 StopTime text,
                 Length real,
                 Geometry text,
                 Channels integer,
                 Trigger integer,
+                T1 float,
+                T2 float,
+                T3 float,
+                T4 float,
                 Events integer,
+                LG integer,
+                HG integer,
+                Ped Integer,
                 Size text,
+                PedRun integer,
                 Note text
             );'''
     logger.debug(sql)
@@ -241,7 +273,13 @@ def insert_records(filename):
 
 ''' update a record in the table '''
 def update_record(kvalue, field, value):
-    sql = f'''UPDATE {gTABLE} SET {field} = {value} WHERE Id = {kvalue};'''
+    if field == 'Id':
+        logger.warning("Can't update primary key: Id")
+        return False
+    if field in TextFields:
+        sql = f'''UPDATE {gTABLE} SET {field} = '{value}' WHERE Id = {kvalue};'''
+    else:
+        sql = f'''UPDATE {gTABLE} SET {field} = {value} WHERE Id = {kvalue};'''
     logger.debug(sql)
     if execute_sql(sql):
         gCONN.commit()
@@ -283,15 +321,24 @@ def insert_to_table():
         print(f'''please input the following fields for table '{gTABLE}':''')
         values = {}
         values['Id'] = int(input('Run id: '))
-        values['Type'] = input(f'Type {TYPES}: ').strip()
+        values['Type'] = input(f'Type {TYPES}: ').strip() or 'data'
+        values['Flag'] = input(f'Flag {FLAGS}: ').strip() or 'good'
         values['StartTime'] = input('StartTime: ').strip()
         values['StopTime'] = input('StopTime: ').strip()
         values['Length'] = float(input('Length/h: '))
         values['Geometry'] = input('Geometry: ').strip()
         values['Channels'] = int(input('#Channels: '))
         values['Trigger'] = int(input('Trigger Logic: '))
+        values['T1'] = float(input('T1: ') or 0.005)
+        values['T2'] = float(input('T2: ') or 0.005)
+        values['T3'] = float(input('T3: ') or 0.005)
+        values['T4'] = float(input('T4: ') or 0.005)
         values['Events'] = int(input('#Events: '))
         values['Size'] = input('Size: ').strip()
+        values['LG'] = int(input('LG: ') or 30)
+        values['HG'] = int(input('HG: ') or 55)
+        values['Ped'] = int(input('Ped: ') or 160)
+        values['PedRun'] = int(input('PedRun: '))
         values['Note'] = input('Note: ').strip()
         if not insert_record(values):
             return False

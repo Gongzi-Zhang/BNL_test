@@ -1,9 +1,9 @@
 /* channel: global channel count: 0-192
- * pcb:	    global board count: 0-44
+ * quadrant:   global quadrant count: 0-44
  * layer:   global layer count: 0-11
  *
- * board:   local board count: 0-3
- * sipm:    local board SiPM count: 0-6
+ * quadrant: local quadrant count: 0-3
+ * sipm:    local quadrant SiPM count: 0-6
  *
  * -- Weibin 20240430
  */
@@ -30,16 +30,27 @@ const int maxChannel = 192 - 1;
 int mm = 1;
 int cm = 10*mm;
 
+const double gapX = 0*mm;
+const double gapY = 2.54*mm;	// 0.1 in
+const double pcbX = 131.92*mm;	// 177.64 - 45.72
+const double pcbY = 97.99*mm;	// 130.91 - 32.92
+const double layerZ = 27.1526*mm;
+
 typedef struct {
     int layer;	
-    int board;	
+    int quadrant;	
     int sipm;
 } SiPM;
 
-typedef struct {
-    double x;
-    double y;
-} SipmPos;
+struct Pos{
+    double x, y;
+    
+    inline void	operator=(Pos a)    { x=a.x; y=a.y; }
+    inline Pos  operator-()	    { return {-x, -y}; }
+    inline Pos  operator-(Pos a)    { return {x-a.x, y-a.y}; }
+    inline Pos  operator+(Pos a)    { return {x+a.x, y+a.y}; }
+    inline bool	operator==(Pos a)   { return (x == a.x) && (y == a.y); }
+};
 
 int boardLabel[][4] = {
 // top right, top left, bottom left, bottom right
@@ -57,8 +68,15 @@ int boardLabel[][4] = {
     {17, 52, 19, 51},   // square
     {55, 43, 32, 39},   // square
 };
+
+Pos pcbAnchor[] = {
+    {-gapX/2, gapY/2 + pcbY},
+    { gapX/2, gapY/2},
+    { gapX/2, -(gapY/2 + pcbY)},
+    {-gapX/2, -gapY/2},
+};
                                         
-SipmPos hexBoardSipmPos[nHexBoardChannels] = {
+Pos hexBoardSipmPos[nHexBoardChannels] = {
     {50.01*mm, 80.90*mm},
     {77.64*mm, 64.95*mm},
     {22.37*mm, 64.95*mm},
@@ -67,13 +85,13 @@ SipmPos hexBoardSipmPos[nHexBoardChannels] = {
     {22.37*mm, 33.04*mm},
     {50.01*mm, 17.08*mm},
 };
-SipmPos sqaBoardSipmPos[nSqaBoardChannels] = {
+Pos sqaBoardSipmPos[nSqaBoardChannels] = {
     {73.9*mm, 72.89*mm},
     {26.1*mm, 72.89*mm},
     {73.9*mm, 25.09*mm},
     {26.1*mm, 25.09*mm},
 };
-SipmPos otherHexBoardSipmPos[nHexBoardChannels] = {
+Pos otherHexBoardSipmPos[nHexBoardChannels] = {
     {50.01*mm, 80.90*mm},
     {22.37*mm, 64.95*mm},
     {77.64*mm, 64.95*mm},
@@ -82,7 +100,7 @@ SipmPos otherHexBoardSipmPos[nHexBoardChannels] = {
     {22.37*mm, 33.04*mm},
     {50.01*mm, 17.08*mm},
 };
-SipmPos otherSqaBoardSipmPos[nSqaBoardChannels] = {
+Pos otherSqaBoardSipmPos[nSqaBoardChannels] = {
     {26.1*mm, 72.89*mm},
     {73.9*mm, 72.89*mm},
     {26.1*mm, 25.09*mm},
@@ -99,48 +117,46 @@ bool getSipm(const int ch, SiPM& re)
     }
 
     int restCh = 0;
-    int pcb = -1;
+    int board = -1;
     int sipm = -1;
     if (ch < nHexChannels)
     {
-	pcb = ch / nHexBoardChannels;
+	board = ch / nHexBoardChannels;
 	sipm = ch % nHexBoardChannels;
     }
     else if (ch < nEightLayerChannels)
     {
 	restCh = ch - nHexChannels;
-	pcb = nHexBoards + restCh / nSqaBoardChannels;
+	board = nHexBoards + restCh / nSqaBoardChannels;
 	sipm = restCh % nSqaBoardChannels;
     }
     else if (ch < nNineLayerChannels)
     {
 	restCh = ch - nEightLayerChannels;
-	pcb = 8*nLayerBoards + 1 + restCh / nSqaBoardChannels;
+	board = 8*nLayerBoards + 1 + restCh / nSqaBoardChannels;
 	sipm = restCh % nSqaBoardChannels;
     }
     else
     {	// no 10th layer right now
 	restCh = ch - nNineLayerChannels;
-	pcb = 10*nLayerBoards + restCh / nSqaBoardChannels;
+	board = 10*nLayerBoards + restCh / nSqaBoardChannels;
 	sipm = restCh % nSqaBoardChannels;
     }
 
-    int layer = pcb / nLayerBoards;
-    int bd = pcb % nLayerBoards;
-    re.layer = layer;
-    re.board = bd;
+    re.layer = board / nLayerBoards;
+    re.quadrant = board % nLayerBoards;
     re.sipm = sipm;
 
     return true;
 }
 
-bool getSipmPos(const int ch, SipmPos& pos)
+bool getSipmPos(const int ch, Pos& pos)
 {
     SiPM sp;
     if (! getSipm(ch, sp))
 	return false;
 
-    int bl = boardLabel[sp.layer][sp.board];
+    int bl = boardLabel[sp.layer][sp.quadrant];
     if (25 == bl)   // left side hexagonal
 	pos = otherHexBoardSipmPos[sp.sipm];
     else if (28 == bl || 37 == bl)	// right side hexagonal, flip the index
@@ -154,5 +170,20 @@ bool getSipmPos(const int ch, SipmPos& pos)
     else    // general square tile
 	pos = sqaBoardSipmPos[sp.sipm];
 
+    if (0 == sp.quadrant || 3 == sp.quadrant)
+	pos = -pos;
+
+    pos = pos + pcbAnchor[sp.quadrant];
     return true;
+}
+
+void printSipmPos(const int chMin = 0, const int chMax = maxChannel)
+{
+    assert(chMin <= chMax);
+    Pos pos;
+    for (int ch=chMin; ch<=chMax; ch++) 
+    {
+	getSipmPos(ch, pos);
+	printf("%3d\t%.2f\t%.2f\n", ch, pos.x, pos.y);
+    }
 }
