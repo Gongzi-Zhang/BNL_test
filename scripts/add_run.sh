@@ -24,47 +24,73 @@ if [ $# -lt 1 ]; then
     usage
     exit
 fi
-input_file=$1
+input_file=$1; shift
 run_type=data
-if [ $# -ge 2 ]; then
-    run_type=$2
+if [ $# -ge 1 ]; then
+    run_type=$1
+    shift
+fi
+Flag='good'
+if [ $# -ge 1 ]; then
+    Flag=$1
+    shift
 fi
 Note=''
-if [ $# -ge 3 ]; then
-    Note=$3
+if [ $# -ge 1 ]; then
+    Note=$1
+    shift
 fi
 config=${CALIROOT}/data/config.cfg
 
-StartTime=$(grep 'Start Time' $input_file | cut -d ':' -f2-)
+StartTime=$(grep '\<Start Time\>' $input_file | cut -d ':' -f2-)
 StartTime=$(extract_datetime "$StartTime")
-StopTime=$(grep 'Stop Time' $input_file | cut -d ':' -f2-)
+StopTime=$(grep '\<Stop Time\>' $input_file | cut -d ':' -f2-)
 StopTime=$(extract_datetime "$StopTime")
-Length=$(grep 'Elapsed time' $input_file | cut -d ' ' -f4)
+Length=$(grep '\<Elapsed time\>' $input_file | cut -d ' ' -f4)
 Length=$(perl -e "printf(\"%.1f\", $Length/3600)")
-Geometry=$(grep 'Geometry' ${config} | cut -d':' -f2)
-Channels=$(grep 'Channels' ${config} | cut -d':' -f2)
-Trigger=$(grep 'Trigger' ${config} | cut -d':' -f2)
+Geometry=$(grep '\<Geometry\>' ${config} | cut -d':' -f2)
+Channels=$(grep '\<Channels\>' ${config} | cut -d':' -f2)
+Trigger=$(grep '\<Trigger\>' ${config} | cut -d':' -f2)
 if [ "$run_type" = "ptrg" ]; then
     Trigger=0
 fi
+T1=$(grep '\<T1\>' ${config} | cut -d':' -f2)
+T2=$(grep '\<T2\>' ${config} | cut -d':' -f2)
+T3=$(grep '\<T3\>' ${config} | cut -d':' -f2)
+T4=$(grep '\<T4\>' ${config} | cut -d':' -f2)
 sync_file=${input_file/Info/sync}
 Events=$(tail -n1 $sync_file | awk '{print $3}')
+LG=$(grep '\<LG\>' ${config} | cut -d':' -f2)
+HG=$(grep '\<HG\>' ${config} | cut -d':' -f2)
+Ped=$(grep '\<Ped\>' ${config} | cut -d':' -f2)
 list_file=${input_file/Info/list}
 Size=$(ls -lh $list_file | awk '{print $5}')
+PedRun=$(grep '\<PedRun\>' ${config} | cut -d':' -f2)
+TrgRate=$(grep '\<TrgRate\>' ${config} | cut -d':' -f2)
 latestId=$(caliDB latest | cut -d':' -f2)
 
 echo -e "INFO\trun ${input_file} will be insert as run $((latestId+1))"
 
 caliDB insert \
-    --Type $run_type \
+    --Type $run_type	\
+    --Flag $Flag	\
     --StartTime "$StartTime" \
     --StopTime "$StopTime"   \
     --Length $Length	    \
     --Geometry $Geometry    \
     --Channels $Channels    \
     --Trigger $Trigger	    \
+    --T1 ${T1}		    \
+    --T2 ${T2}		    \
+    --T3 ${T3}		    \
+    --T4 ${T4}		    \
     --Events $Events	    \
+    --LG $LG	    \
+    --HG $HG	    \
+    --Ped $Ped	    \
     --Size $Size    \
+    --PedRun $PedRun	    \
+    --TrgRate $TrgRate	    \
     --Note "$Note"
 if [ $? -ne 0 ]; then
    echo -e "Failed to insert the record"

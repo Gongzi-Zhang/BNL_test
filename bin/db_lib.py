@@ -22,7 +22,7 @@ FIELDS = [ 'Id', 'Type', 'Flag',
     'Geometry', 'Channels', 
     'Trigger', 'T1', 'T2', 'T3', 'T4', 
     'Events', 'LG', 'HG', 'Ped','Size', 
-    'PedRun',
+    'PedRun', 'TrgRate',
     'Note' ]
 TextFields = ['Type', 'Flag', 'StartTime', 'StopTime', 'Geometry', 'Size', 'Note']
 FreFields = [ 'Id', 'Type', 'Flag', 
@@ -43,7 +43,7 @@ FIELD_WIDTH = {
     'Geometry': 8,
     'Channels': 3,  # number of good channels
     'Trigger': 3,   # trigger logic
-    'T1': 5,
+    'T1': 5,        # in V
     'T2': 5,
     'T3': 5,
     'T4': 5,
@@ -53,6 +53,7 @@ FIELD_WIDTH = {
     'Ped': 3,
     'Size':   4,    # raw data file size in GB
     'PedRun': 4,
+    'TrgRate': 8,   # in MHz
     'Note': 30, 
     }
 
@@ -222,6 +223,7 @@ def create_table():
                 Ped Integer,
                 Size text,
                 PedRun integer,
+                TrgRate float,
                 Note text
             );'''
     logger.debug(sql)
@@ -339,6 +341,7 @@ def insert_to_table():
         values['HG'] = int(input('HG: ') or 55)
         values['Ped'] = int(input('Ped: ') or 160)
         values['PedRun'] = int(input('PedRun: '))
+        values['TrgRate'] = float(input('TrgRate: '))
         values['Note'] = input('Note: ').strip()
         if not insert_record(values):
             return False
