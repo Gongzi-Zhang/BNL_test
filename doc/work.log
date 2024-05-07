@@ -1,3 +1,12 @@
+# 20240507
+    DRS: (starting from run 154)
+    tile 1 output voltage: 28.98 V -> 29.30 V
+    tile 2 output voltage: 29.10 V -> 29.6 V
+    tile 4 output voltage: 29.08 V -> 29.33 V
+
+    move the front 2 trigger tiles from bottom right to the center position
+    move the rad monitor tiles from bottom left to bottom right
+
 # 20240503
     JANUS -> Spectroscopy:
     change HG to 55 (starting from run 119)
