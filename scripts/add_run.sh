@@ -67,6 +67,9 @@ list_file=${input_file/Info/list}
 Size=$(ls -lh $list_file | awk '{print $5}')
 PedRun=$(grep '\<PedRun\>' ${config} | cut -d':' -f2)
 TrgRate=$(grep '\<TrgRate\>' ${config} | cut -d':' -f2)
+if [ "$run_type" = "ptrg" ] || [ "$run_type" = "cosmic" ]; then
+    TrgRate=0
+fi
 latestId=$(caliDB latest | cut -d':' -f2)
 
 echo -e "INFO\trun ${input_file} will be insert as run $((latestId+1))"
