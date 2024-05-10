@@ -27,6 +27,7 @@ analysis/convert.py -o output.root data/RunXX_list.txt
 
 
 # package dependency
+* root
 * sqlite3
 * rename
 * c++
@@ -36,3 +37,4 @@ analysis/convert.py -o output.root data/RunXX_list.txt
   * uproot
   * datetime
   * copy
+  * json

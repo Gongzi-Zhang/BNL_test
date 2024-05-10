@@ -10,15 +10,18 @@ void plot(string inFile)
 
     TCanvas *c = new TCanvas("c", "c", 3200, 3200);
     c->Divide(8, 8);
-    for (int bd=0; bd<nBoards; bd++)
+    for (const char* gain : {"LG", "HG"})
     {
-        for (int i=0; i<64; i++)
-        {
-            c->cd(i+1);
-	    int ch = i + 64*bd;
-            TH1F* h = (TH1F*) fin->Get(Form("Ch_%d_LG", ch));
-            h->Draw();
-        }
-        c->SaveAs(Form("Bd_%d_LG.png", bd));
+	for (int bd=0; bd<nBoards; bd++)
+	{
+	    for (int i=0; i<64; i++)
+	    {
+		c->cd(i+1);
+		int ch = i + 64*bd;
+		TH1F* h = (TH1F*) fin->Get(Form("Ch_%d_%s", ch, gain));
+		h->Draw();
+	    }
+	    c->SaveAs(Form("Bd_%d_%s.png", bd, gain));
+	}
     }
 }
