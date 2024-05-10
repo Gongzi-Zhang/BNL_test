@@ -220,7 +220,7 @@ def create_table():
                 Events integer,
                 LG integer,
                 HG integer,
-                Ped Integer,
+                Ped integer,
                 Size text,
                 PedRun integer,
                 TrgRate float,
