@@ -20,17 +20,22 @@ function extract_datetime
 }
 
 if [ $# -lt 1 ]; then
-    echo -e "ERROR\tAt least 1 arguments needed"
+    echo -e "ERROR\tAt least 1 arguments needed" >&2
     usage
     exit
 fi
 
 # info parameters
 info_file=$1; shift
-list_file=${info_file/Info/list/}
+list_file=${info_file/Info/list}
 if ! [ -f $list_file ]; then
-    echo -e "FATAL\tno list file"
+    echo -e "FATAL\tno list file for run $info_file" >&2
     exit 4
+fi
+nline=$(wc -l $list_file)
+if [ $nline -lt 100 ]; then
+    echo -e "WARNING\tno event recorded in run $info_file, skip it" >&2
+    exit 0
 fi
 
 run_type=data
@@ -117,7 +122,7 @@ caliDB insert \
     --TrgRate $TrgRate	    \
     --Note "$Note"
 if [ $? -ne 0 ]; then
-   echo -e "ERROR\tFailed to insert the record"
+   echo -e "ERROR\tFailed to insert the record" >&2
    exit 4
 fi
 echo -e "INFO\tsuccessfully insert run ${info_file} into database as run $((latestId+1))"

@@ -1,3 +1,14 @@
+# operation
+* Take ptrg run every day and add it to the database/analyze it manually
+```
+scripts/add_run.sh /path/to/ptrg/run_Info.txt ptrg
+analyse/convert_ptrg.py data/Run[ptrg_run]_list.txt
+```
+Modify the PedRun value in the [config file](data/config.cfg)
+
+* Trigger tile threshold
+Whenever you modify the trigger tile threshold value, make the same modification in the [config file](data/config.cfg)
+
 # data
 One can download the raw data from [google drive](https://drive.google.com/drive/folders/1SGtYnyDEmv8edpGVumi8tztlmNIQ3xuf?usp=sharing)
 
