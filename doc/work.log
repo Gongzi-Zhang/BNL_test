@@ -1,3 +1,15 @@
+# 20240512
+    JANUS -> HV_bias:
+    change 'HV IMax' to 2 mA (starting from run 227)
+    old: HV IMax: 1.2 mA
+    new: HV IMax: 2 mA
+
+# 20240507
+    JANUS -> RunCtrl:
+    change 'Event Building Mode' to TRGTIMING_SORTING (run 158)
+    old: Event Building Mode: DISABLED 
+    new: Event Building Mode: TRGTIMING_SORTING 
+
 # 20240507
     DRS: (starting from run 154)
     tile 1 output voltage: 28.98 V -> 29.30 V
@@ -9,12 +21,12 @@
 
 # 20240503
     JANUS -> Spectroscopy:
-    change HG to 55 (starting from run 119)
+    change 'HG' to 55 (starting from run 119)
     old: HG Gain: 50; LG Gain: 30; Pedestal Position: 160
     new: HG Gain: 55; LG Gain: 30; Pedestal Position: 160
 
     JANUS -> HV_bias:
-    change HV IMax to 1.2 mA (starting from run 122)
+    change 'HV IMax' to 1.2 mA (starting from run 122)
     old: HV IMax: 1.0 mA
     new: HV IMax: 1.2 mA
 
@@ -25,13 +37,13 @@
 
 # 20240502
     JANUS -> Spectroscopy:
-    change LG to 30 to prevent saturation (not tested)
+    change 'LG' to 30 to prevent saturation (not tested)
     old: HG Gain: 50; LG Gain: 40; Pedestal Position: 160
     new: HG Gain: 50; LG Gain: 30; Pedestal Position: 160
 
 # 20240430
     JANUS -> Spectroscopy:
-    change Pedestal Position to 160
+    change 'Pedestal Position' to 160
     old: HG Gain: 50; LG Gain: 40; Pedestal Position: 100
     new: HG Gain: 50; LG Gain: 40; Pedestal Position: 160
 
@@ -45,7 +57,7 @@
 
 # 20240426
     JANUS -> Spectroscopy:
-    change LG Gain to 40 and Pedestal Position to 100
+    change 'LG Gain' to 40 and 'Pedestal Position' to 100
     old: HG Gain: 50; LG Gain: 50; Pedestal Position: 50
     new: HG Gain: 50; LG Gain: 40; Pedestal Position: 100
 

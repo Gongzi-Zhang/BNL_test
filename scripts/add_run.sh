@@ -32,7 +32,7 @@ if ! [ -f $list_file ]; then
     echo -e "FATAL\tno list file for run $info_file" >&2
     exit 4
 fi
-nline=$(wc -l $list_file)
+nline=$(wc -l < $list_file)
 if [ $nline -lt 100 ]; then
     echo -e "WARNING\tno event recorded in run $info_file, skip it" >&2
     exit 0
@@ -132,5 +132,5 @@ fname=$(basename -- $info_file)
 old=${fname%_Info.txt}
 latestId=$(caliDB latest | cut -d':' -f2 | tr -d ' ')
 new="${CALIROOT}/data/Run$latestId" 
-rename "s#${fdir}/$old#$new#" ${fdir}/${old}_{Info,list,sync}.txt
+rename "s#${fdir}/$old#$new#" ${fdir}/${old}_*.txt
 exit 0
