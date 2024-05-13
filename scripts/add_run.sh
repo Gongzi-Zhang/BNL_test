@@ -3,6 +3,7 @@
 script=$(realpath -- ${BASH_SOURCE[0]})
 ROOT=$(dirname $script)/..
 source ${ROOT}/setup.sh
+source ${ROOT}/lib/cali.sh
 
 function usage
 {
@@ -20,7 +21,7 @@ function extract_datetime
 }
 
 if [ $# -lt 1 ]; then
-    echo -e "ERROR\tAt least 1 arguments needed" >&2
+    logger error "At least 1 arguments needed" >&2
     usage
     exit
 fi
@@ -29,12 +30,12 @@ fi
 info_file=$1; shift
 list_file=${info_file/Info/list}
 if ! [ -f $list_file ]; then
-    echo -e "FATAL\tno list file for run $info_file" >&2
+    logger fatal "no list file for run $info_file" >&2
     exit 4
 fi
 nline=$(wc -l < $list_file)
 if [ $nline -lt 100 ]; then
-    echo -e "WARNING\tno event recorded in run $info_file, skip it" >&2
+    logger warning "no event recorded in run $info_file, skip it" >&2
     exit 0
 fi
 
@@ -133,4 +134,12 @@ old=${fname%_Info.txt}
 latestId=$(caliDB latest | cut -d':' -f2 | tr -d ' ')
 new="${CALIROOT}/data/Run$latestId" 
 rename "s#${fdir}/$old#$new#" ${fdir}/${old}_*.txt
+
+# data processing
+if [ "$run_type" = "ptrg" ]; then
+    ${ROOT}/analysis/parse_ptrg.py $latestId
+else
+    ${ROOT}/analysis/convert.py $latestId
+fi
+
 exit 0

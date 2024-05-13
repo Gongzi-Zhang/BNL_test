@@ -2,11 +2,9 @@
 # coding: utf-8
 
 '''
-read and parse raw (ADC) data, convert to a root/pkl file
+parse ptrg file
 
-select good (complete) events, don't do any cut on events here
-
-usage: ./convert.py input.txt [-o output.pkl] 
+usage: ./parse_ptrg.py run_number
 '''
 
 import os
@@ -14,48 +12,46 @@ import sys
 import pandas as pd
 import json
 import ROOT
+from db_utilities import *
 
-''' units '''
-us = 1
-ms = 1000*us
-s = 1000*ms
+gains = ['LG', 'HG']
 
-nBoards = 3
-nChannels = 64*nBoards
-
-class convert:
-    def __init__(self, fin, fout):
-        if '' == fin:
-            print(f'FATAL\tno data file specified')
-            exit(2)
-
-        if not os.path.isfile(fin):
-            print(f'FATAL\tfile doesn\'t exist: {fin}')
+class parsePtrg:
+    def __init__(self, run):
+        db = caliDB()
+        runType = db.getRunType(run)
+        if runType != 'ptrg':
+            logger.fatal(f'run {run} is not a ptrg run')
             exit(4)
 
-        self.inFile = fin
-        print(f'INFO\twill process {fin}')
+        self.run = run
+        self.listFile = f'{CALIROOT}/data/Run{run}_list.txt'
+        if not os.path.isfile(self.listFile):
+            logger.fatal(f'no list file found for run {run}')
+            exit(4)
 
-        self.outFile = fout
-        if '' == fout:
-            self.outFile = fin.replace('_list.txt', '_hist.root')
-        print(f'INFO\toutput file: {self.outFile}')
+        logger.info(f'will process run: {run}')
 
-        self.pedFile = fin.replace('_list.txt', '_ped.json')
+        self.outFile = f'{CALIROOT}/data/Run{run}_hist.root'
+        logger.info(f'output file: {self.outFile}')
+
+        self.pedFile = f'{CALIROOT}/data/Run{run}_ped.json' 
 
         self.h1 = {}
+        self.gPed = {}
         self.func = {}
         xmax = {'LG': 500, 'HG': 1000}
-        for gain in ['LG', 'HG']:
+        for gain in gains:
             self.func[gain] = ROOT.TF1(gain, "gaus", 0, xmax[gain])
+            self.gPed[gain] = ROOT.TGraphErrors()
             for ch in range(0, nChannels):
                 hname = f'Ch_{ch}_{gain}'
                 self.h1[hname] = ROOT.TH1F(hname, hname, 250, 0, xmax[gain])
 
         ROOT.gROOT.SetBatch(1)
 
-    def convert(self):
-        with open(self.inFile, 'r') as fin:
+    def parse(self):
+        with open(self.listFile, 'r') as fin:
             ''' skip the first 9 lines '''
             for l in range(9):
                 next(fin)
@@ -79,8 +75,8 @@ class convert:
                     LG = int(values[2])
                     HG = int(values[3])
                 else:
-                    print(f'ERROR:\tInvalide values in event {event}')
-                    print(values)
+                    logger.error(f'Invalide values in event {event}')
+                    logger.info(values)
                     continue
 
                 ch += 64*bd
@@ -89,15 +85,22 @@ class convert:
 
     def fit(self):
         ped = {}
-        for gain in ['LG', 'HG']:
+        for gain in gains:
             ped[gain] = {}
             f = self.func[gain]
+            ipoint = 0
             for ch in range(0, nChannels):
                 name = f'Ch_{ch}_{gain}'
                 h = self.h1[name]
                 f.SetParameters(h.GetMaximum(), h.GetMean(), h.GetRMS())
                 h.Fit(f)
-                ped[gain][ch] = [f.GetParameter(1), f.GetParameter(2)]
+                mean = f.GetParameter(1)
+                rms  = f.GetParameter(2)
+                ped[gain][ch] = [mean, rms]
+                self.gPed[gain].SetPoint(ipoint, ch, mean)
+                self.gPed[gain].SetPointError(ipoint, 0, rms)
+                ipoint += 1
+
         with open(self.pedFile, 'w') as f:
             f.write(json.dumps(ped))
 
@@ -108,34 +111,33 @@ class convert:
             self.h1[h].Write()
         fout.Close()
 
+        c = ROOT.TCanvas("c", "c", 1500, 600)
+        c.cd()
+        for gain in gains:
+            self.gPed[gain].SetTitle(f'Run {self.run} {gain} pedestal;ch;ADC')
+            self.gPed[gain].GetXaxis().CenterTitle()
+            self.gPed[gain].GetYaxis().CenterTitle()
+            self.gPed[gain].SetMarkerStyle(20)
+            self.gPed[gain].Draw("AP")
+            c.SaveAs(f'{CALIROOT}/figures/Run{self.run}_{gain}_ped.png')
+
 def usage():
-    print(sys.argv[0] + ' [-hofb] dataFile')
+    print(sys.argv[0] + ' [-h] run_number')
     print('\t-h: print this help message')
-    print('\t-o: output file name')
-    print('\t-b: number of boards [default 1]')
 
 if __name__ == '__main__':
     # read in command line arguments
-    inName = ''
-    outName = ''
-    outFormat = ''
+    run = 0
     i=1
     while i<len(sys.argv):
         if '-h' == sys.argv[i]:
             usage()
             exit(0)
-        elif '-o' == sys.argv[i]:
-            outName = sys.argv[i+1]
-            i+=1
-        elif '-b' == sys.argv[i]:
-            nBoards = int(sys.argv[i+1])
-            nChannels = 64*nBoards
-            i+=1
         else:
-            inName = sys.argv[i]
-        i+=1
+            run = int(sys.argv[i])
+        i += 1
 
-    f = convert(inName, outName)
-    f.convert()
+    f = parsePtrg(run)
+    f.parse()
     f.fit()
     f.write()
