@@ -83,7 +83,12 @@ T4=$(grep '\<T4\>' ${config} | cut -d':' -f2)
 Events=-1
 sync_file=${info_file/Info/sync}
 if [ -f $sync_file ]; then
-    Events=$(tail -n1 $sync_file | awk '{print $3}')
+    Events=""
+    i=1
+    while [ -z $Events ]; do
+	Events=$(tail -n $i $sync_file | head -n1 | awk '{print $3}')
+	let i++
+    done
 fi
 LG=$(grep '\<LG\>' ${config} | cut -d':' -f2)
 HG=$(grep '\<HG\>' ${config} | cut -d':' -f2)

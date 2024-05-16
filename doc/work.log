@@ -1,3 +1,8 @@
+# 20240515
+    Change P37CH0-3 from board 42 to board 20 (run 265)
+    Add 60 cables (not connected to the CAEN unit)
+    Add the Keithley unit (not connected to the rad monitoring tile)
+
 # 20240512
     JANUS -> HV_bias:
     change 'HV IMax' to 2 mA (starting from run 227)

@@ -5,14 +5,18 @@ fi
 
 # python path
 if [ -z "${PYTHONPATH}" ]; then
-    PYTHONPATH=${CALIROOT}/lib
+    export PYTHONPATH=${CALIROOT}/lib
 else
-    PYTHONPATH=${CALIROOT}/lib:$PYTHONPATH
+    if ! [[ "$PYTHONPATH" =~ "${CALIROOT}/lib" ]]; then
+	export PYTHONPATH=${CALIROOT}/lib:$PYTHONPATH
+    fi
 fi
 
 # c include path
 if [ -z "${CPLUS_INCLUDE_PATH}" ]; then
-    CPLUS_INCLUDE_PATH=${CALIROOT}/include
+    export CPLUS_INCLUDE_PATH=${CALIROOT}/include
 else
-    CPLUS_INCLUDE_PATH=${CALIROOT}/include:$CPLUS_INCLUDE_PATH
+    if ! [[ "$CPLUS_INCLUDE_PATH" =~ "${CALIROOT}/include" ]]; then
+	export CPLUS_INCLUDE_PATH=${CALIROOT}/include:$CPLUS_INCLUDE_PATH
+    fi
 fi
