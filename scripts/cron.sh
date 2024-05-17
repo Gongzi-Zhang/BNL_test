@@ -21,6 +21,6 @@ for run in $runs; do
 	continue
     fi
 
-    ${ROOT}/scripts/add_run.sh ${info_file}
+    ${ROOT}/bin/add_run ${info_file}
     # if [ $? -ne 0 ]; then
 done

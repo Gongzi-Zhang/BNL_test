@@ -142,9 +142,10 @@ rename "s#${fdir}/$old#$new#" ${fdir}/${old}_*.txt
 
 # data processing
 if [ "$run_type" = "ptrg" ]; then
-    ${ROOT}/analysis/parse_ptrg.py $latestId
+    ${ROOT}/bin/parse_ptrg $latestId
 else
-    ${ROOT}/analysis/convert.py $latestId
+    ${ROOT}/bin/convert $latestId
+    ${ROOT}/bin/QA $latestId
 fi
 
 exit 0
