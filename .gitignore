@@ -1,0 +1,13 @@
+figures/
+report/
+data/Run*_*.txt
+data/Run*.json
+work/
+bin/QA
+bin/test
+database/BNL_test.db
+**/__pycache__/
+*.root
+*.pkl
+*.so
+.secret

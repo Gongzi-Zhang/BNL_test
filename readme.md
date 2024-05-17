@@ -42,7 +42,8 @@ analysis/convert.py -o output.root data/RunXX_list.txt
 * sqlite3
 * rename
 * c++
-  * spdlog
+  * spdlog: libspdlog-dev
+  * sqlite3: libsqlite3-dev
 * python:
   * pandas
   * uproot

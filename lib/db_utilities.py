@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-from cali import *
+from utilities import *
 from db import *
 
 class caliDB:
     def __init__(self):
-        createConnection(gDB)
+        createConnection(caliDbName)
 
     def getRunValue(self, run, field):
-        sql = f'''SELECT {field} FROM {gTABLE} WHERE Id = {run}'''
+        sql = f'''SELECT {field} FROM {caliTableName} WHERE Id = {run}'''
         cursor = executeSql(sql)
         row = cursor.fetchone()
         if row is None:
-            logging.error(f'run {run} not found in the db')
+            logger.error(f'run {run} not found in the db')
             return False
         else:
             return row[0]
@@ -32,5 +32,3 @@ if __name__ == '__main__':
     logger.info(f'run {run} has type of: {db.getRunType(run)}')
     logger.info(f'run {run} has flag of: {db.getRunFlag(run)}')
     logger.info(f'run {run} has ped run of: {db.getRunPedRun(run)}')
-
-

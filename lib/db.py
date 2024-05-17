@@ -3,7 +3,12 @@ import os
 import sys
 import sqlite3
 import pandas as pd
-from cali import *
+import cali
+from utilities import *
+
+caliDbName = f'{cali.CALIROOT}/database/BNL_test.db'
+caliTableName = 'runs'
+caliConn = ''
 
 FIELDS = [ 'Id', 'Type', 'Flag', 
     'StartTime', 'StopTime', 'Length', 
@@ -56,7 +61,7 @@ FIELD_TITLE = {
 def checkField(field):
     if field in FIELDS:
         return True
-    print(f'''ERROR\tunknown field '{field}'. Allowed fields: {FIELDS}''')
+    logger.error(f'''unknown field '{field}'. Allowed fields: {FIELDS}''')
     return False
 
 def checkValue(field, value):
@@ -64,23 +69,23 @@ def checkValue(field, value):
         if value in TYPES:
             return True
         else:
-            print(f'ERROR\tInvalid run type: {value}. Allowed types: {TYPES}')
+            logger.error(f'Invalid run type: {value}. Allowed types: {TYPES}')
     elif 'Channels' == field:
         if 1 <= value and value <= 300:
             return True
         else:
-            print(f'ERROR\tInvalid channel number: {value}. Allowed range [1, 300]')
+            logger.error(f'Invalid channel number: {value}. Allowed range [1, 300]')
 
     return False
 
 ''' create a database connection to a SQLite database '''
 def createConnection(db_file):
-    global gCONN
-    if gCONN:
+    global caliConn
+    if caliConn:
         return True
 
     try:
-        gCONN = sqlite3.connect(db_file)
+        caliConn = sqlite3.connect(db_file)
         logger.debug(f'connect to sqlite db: {db_file}')
     except sqlite3.Error as e:
         print(e)
@@ -88,16 +93,16 @@ def createConnection(db_file):
     return True
 
 def closeConnection():
-    if not gCONN:
+    if not caliConn:
         return
 
-    logger.debug(f'close connection to sqlite db: {gDB}')
-    gCONN.close()
+    logger.debug(f'close connection to sqlite db: {caliDbName}')
+    caliConn.close()
 
 ''' execute the sql statement. Return a cursor object '''
 def executeSql(sql, values=None):
     try:
-        c = gCONN.cursor()
+        c = caliConn.cursor()
         if values is None:
             return c.execute(sql)
         else:
@@ -185,7 +190,7 @@ def dropTable(table):
             sql = f'''DROP TABLE IF EXISTS {table};'''
             logger.debug(sql)
             if executeSql(sql):
-                gCONN.commit()
+                caliConn.commit()
                 return True
         else:
             print('cancel dropping')
@@ -197,7 +202,7 @@ def dropTable(table):
 ''' table specific '''
 ''' create a new table '''
 def createTable():
-    sql = f''' CREATE TABLE IF NOT EXISTS {gTABLE} (
+    sql = f''' CREATE TABLE IF NOT EXISTS {caliTableName} (
                 Id integer PRIMARY KEY,
                 Type text,
                 Flag text,
@@ -223,12 +228,12 @@ def createTable():
     logger.debug(sql)
     if not executeSql(sql):
         return False
-    gCONN.commit()
+    caliConn.commit()
     return True
 
 ''' query data in the table: return all records as a list'''
 def queryRecords(conditions='1=1', col="*"):
-    sql = f'''SELECT {col} FROM {gTABLE} WHERE {conditions};'''
+    sql = f'''SELECT {col} FROM {caliTableName} WHERE {conditions};'''
     logger.debug(sql)
     return executeSql(sql)
 
@@ -251,10 +256,10 @@ def insertRecord(record):
 
     columns = ', '.join(record.keys())
     placeholders = ':' + ', :'.join(record.keys())
-    sql = f'''INSERT INTO {gTABLE}({columns}) VALUES({placeholders});'''
+    sql = f'''INSERT INTO {caliTableName}({columns}) VALUES({placeholders});'''
     logger.debug(sql)
     executeSql(sql, record)
-    gCONN.commit()
+    caliConn.commit()
 
     return True
 
@@ -273,12 +278,12 @@ def updateRecord(kvalue, field, value):
         logger.warning("Can't update primary key: Id")
         return False
     if field in TextFields:
-        sql = f'''UPDATE {gTABLE} SET {field} = '{value}' WHERE Id = {kvalue};'''
+        sql = f'''UPDATE {caliTableName} SET {field} = '{value}' WHERE Id = {kvalue};'''
     else:
-        sql = f'''UPDATE {gTABLE} SET {field} = {value} WHERE Id = {kvalue};'''
+        sql = f'''UPDATE {caliTableName} SET {field} = {value} WHERE Id = {kvalue};'''
     logger.debug(sql)
     if executeSql(sql):
-        gCONN.commit()
+        caliConn.commit()
         return True
 
 ''' delete a record in a table using primary key values '''
@@ -286,18 +291,18 @@ def deleteRecord(kvalue):
     conditions = f'Id = {kvalue}'
     result = queryRecords(conditions)
     if not result:
-        print('WARNING\tindicated record does not exist in table {gTABLE}')
+        print('WARNING\tindicated record does not exist in table {caliTableName}')
         return False
     showQuery(result)
-    yesno = input(f'''are you sure you want to delete above record in table '{gTABLE}': y[es], n[o]\n''')
+    yesno = input(f'''are you sure you want to delete above record in table '{caliTableName}': y[es], n[o]\n''')
     if 'y' == yesno:
-        yesno2 = input(f'confirm deleting record (Id = {kvalue}) in table {gTABLE}: y[es], n[o]\n')
+        yesno2 = input(f'confirm deleting record (Id = {kvalue}) in table {caliTableName}: y[es], n[o]\n')
         if 'y' == yesno2:
-            sql = f'DELETE FROM {gTABLE} WHERE Id = {kvalue};'
+            sql = f'DELETE FROM {caliTableName} WHERE Id = {kvalue};'
             logger.debug(sql)
             if executeSql(sql):
                 logger.info('successfully delete the record')
-                gCONN.commit()
+                caliConn.commit()
                 return True
         else:
             print('cancel deletion')
@@ -314,7 +319,7 @@ def insertToTable():
         if not insertRecords(filename):
             return False
     elif 2 == mode:
-        print(f'''please input the following fields for table '{gTABLE}':''')
+        print(f'''please input the following fields for table '{caliTableName}':''')
         values = {}
         values['Id'] = int(input('Run id: '))
         values['Type'] = input(f'Type {TYPES}: ').strip() or 'data'
@@ -340,7 +345,7 @@ def insertToTable():
         if not insertRecord(values):
             return False
     else:
-        print(f'ERROR\tunrecognised mode {mode}')
+        logger.error(f'unrecognised mode {mode}')
         return False
     return True
 
@@ -350,7 +355,7 @@ def update():
     conditions = f'Id = {kvalue}'
     result = queryRecords(conditions)
     if not result.fetchone():
-        print(f'''ERROR\tindicated record (Id = {kvalue}) does not exist in table '{gTABLE}' ''')
+        logger.error(f'''indicated record (Id = {kvalue}) does not exist in table '{caliTableName}' ''')
         return False
 
     print('record before updating:')
@@ -361,7 +366,7 @@ def update():
         field_prompt += f', {i}[{FIELDS[i]}]'
     index = int(input(f'which field you want to update: {field_prompt}: '))
     if index < 0 or index >= len(FIELDS):
-        print(f'ERROR\tinvalid index {index}')
+        logger.error(f'invalid index {index}')
         return False
     if index == 0:
         print(f'quit the update')
@@ -375,9 +380,9 @@ def update():
 
 def exportRecords(fname):
     if os.path.exists(fname):
-        print(f'ERROR\t{fname} already exists, please backup it')
+        logger.error(f'{fname} already exists, please backup it')
         return False
-    db_df = pd.read_sql_query(f'SELECT * from {gTABLE};', gCONN)
+    db_df = pd.read_sql_query(f'SELECT * from {caliTableName};', caliConn)
     db_df.to_csv(fname, index=False)
 
 ''' use the function carefully '''
@@ -387,7 +392,7 @@ def doQuery():
 
 
 if __name__ == '__main__':
-    if not createConnection(gDB):
+    if not createConnection(caliDbName):
         print('Error! cannot create the database connection.')
         exit()
 
@@ -417,6 +422,6 @@ if __name__ == '__main__':
         elif command == 'E':
             doQuery()
         elif command == 'D':
-            dropTable(gTABLE)
+            dropTable(caliTableName)
 
     closeConnection()

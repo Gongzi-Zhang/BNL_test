@@ -1,14 +1,15 @@
 script=$(basename -- ${BASH_SOURCE[0]})
 
-grey="\033[30;20m"
+black="\033[30;20m"
+red="\033[31;20m"
 green="\033[32;20m"
 yellow="\033[33;20m"
-red="\033[31;20m"
+blue="\033[34;20m"
 bold_red="\033[31;1m"
 reset="\033[0m"
 
 declare -A color=( \
-    [debug]=$grey \
+    [debug]=$blue \
     [info]=$green \
     [warning]=$yellow \
     [error]=$red \

@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if not createConnection(gDB):
+    if not createConnection(caliDbName):
         print('Error! cannot create the database connection.')
         exit(4)
 
@@ -80,9 +80,9 @@ if __name__ == '__main__':
         fields = ','.join(FreFields)
         if args.fields:
             fields = '*'
-        sql = f'''SELECT {fields} FROM {gTABLE} ORDER BY Id DESC LIMIT {entries}'''
+        sql = f'''SELECT {fields} FROM {caliTableName} ORDER BY Id DESC LIMIT {entries}'''
         if args.all:
-            sql = f'''SELECT * FROM {gTABLE} ORDER BY Id DESC'''
+            sql = f'''SELECT * FROM {caliTableName} ORDER BY Id DESC'''
         showQuery(executeSql(sql))
     elif args.subcommand == 'insert':
         record = {}
@@ -133,11 +133,11 @@ if __name__ == '__main__':
             print(f'ERROR:\tinvalid field: {field}')
             print(f'INFO:\tavailables fields: {FIELDS}')
             exit(6)
-        sql = f'SELECT Id,{field} FROM {gTABLE} WHERE Id = {args.uId};'
+        sql = f'SELECT Id,{field} FROM {caliTableName} WHERE Id = {args.uId};'
         print(f'Values before updating: ')
         showQuery(executeSql(sql))
         updateRecord(args.uId, field, args.uValue)
-        sql = f'SELECT Id,{field} FROM {gTABLE} WHERE Id = {args.uId};'
+        sql = f'SELECT Id,{field} FROM {caliTableName} WHERE Id = {args.uId};'
         print(f'Values after updating: ')
         showQuery(executeSql(sql))
     elif args.subcommand == 'query':
@@ -147,7 +147,7 @@ if __name__ == '__main__':
             cond = f'Id={args.qId}'
         showQuery(queryRecords(cond, args.qFields))
     elif args.subcommand == 'latest':
-        sql = f'SELECT Id FROM {gTABLE} ORDER BY Id DESC LIMIT 1;'
+        sql = f'SELECT Id FROM {caliTableName} ORDER BY Id DESC LIMIT 1;'
         logger.debug(sql)
         result = executeSql(sql)
         for Id in result.fetchone():
