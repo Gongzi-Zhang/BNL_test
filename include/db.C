@@ -22,7 +22,7 @@ const char* caliDB::getRunValue(const int run, const char* field)
 {
     sqlite3_stmt* stmt;
     char sql[1024];
-    sprintf(sql, "SELECT %s FROM %s WHERE Id = %d", field, caliTableName, run);
+    sprintf(sql, "SELECT %s FROM %s WHERE Run = %d", field, caliTableName, run);
     const char* errMsg = 0;
     int rc = sqlite3_prepare_v2(db, sql, strlen(sql), &stmt, &errMsg);
     if (rc != SQLITE_OK)

@@ -19,9 +19,9 @@ if __name__ == '__main__':
 
     ''' insert command '''
     parser_insert = subparsers.add_parser('insert', help='Insert record from a csv file')
-    parser_insert.add_argument('--Id',      dest='iId', help='run id of each record; will be assigned by the system if not specifie')
-    parser_insert.add_argument('--Type',    dest='iType', choices=TYPES, required=True, help='type of the run')
-    parser_insert.add_argument('--Flag',    dest='iFlag', choices=FLAGS, help='flag of the run')
+    parser_insert.add_argument('--Run',         dest='iRun', help='run number of each record; will be assigned by the system if not specifie')
+    parser_insert.add_argument('--Type',        dest='iType', choices=TYPES, required=True, help='type of the run')
+    parser_insert.add_argument('--Flag',        dest='iFlag', choices=FLAGS, help='flag of the run')
     parser_insert.add_argument('--StartTime',   dest='iStartTime',  required=True)
     parser_insert.add_argument('--StopTime',    dest='iStopTime',   required=True)
     parser_insert.add_argument('--Length',      dest='iLength',     help='elapsed time in hour')
@@ -47,18 +47,18 @@ if __name__ == '__main__':
 
     ''' update a record '''
     parser_update = subparsers.add_parser('update', help='Update a record')
-    parser_update.add_argument('--id', dest='uId', required=True, help='which record to update')
+    parser_update.add_argument('--run', dest='uRun', required=True, help='which record to update')
     parser_update.add_argument('--field', dest='uField', required=True, help='which field to update')
     parser_update.add_argument('--value', dest='uValue', required=True, help='updated value')
 
     ''' query command '''
     parser_query = subparsers.add_parser('query', help='query related record')
-    parser_query.add_argument('--id', dest='qId', help='run Id')
+    parser_query.add_argument('--run', dest='qRun', help='run number')
     parser_query.add_argument('--fields', '-f', dest='qFields', default='*', help='what you want to grep')
     parser_query.add_argument('--condition', '-c', dest='qCondition', default='1=1', help='filters')
 
-    ''' get latest run id '''
-    parser_latest = subparsers.add_parser('latest', help='get latest run id')
+    ''' get latest run number '''
+    parser_latest = subparsers.add_parser('latest', help='get latest run number')
 
     ''' export csv to a file '''
     parser_export = subparsers.add_parser('export', help='export the database to a csv file')
@@ -80,14 +80,14 @@ if __name__ == '__main__':
         fields = ','.join(FreFields)
         if args.fields:
             fields = '*'
-        sql = f'''SELECT {fields} FROM {caliTableName} ORDER BY Id DESC LIMIT {entries}'''
+        sql = f'''SELECT {fields} FROM {caliTableName} ORDER BY Run DESC LIMIT {entries}'''
         if args.all:
-            sql = f'''SELECT * FROM {caliTableName} ORDER BY Id DESC'''
+            sql = f'''SELECT * FROM {caliTableName} ORDER BY Run DESC'''
         showQuery(executeSql(sql))
     elif args.subcommand == 'insert':
         record = {}
-        if args.iId:
-            record['Id'] = int(args.iId)
+        if args.iRun:
+            record['Run'] = int(args.iRun)
         record['Type'] = args.iType
         record['Flag'] = args.iFlag
         record['StartTime'] = args.iStartTime
@@ -133,25 +133,25 @@ if __name__ == '__main__':
             print(f'ERROR:\tinvalid field: {field}')
             print(f'INFO:\tavailables fields: {FIELDS}')
             exit(6)
-        sql = f'SELECT Id,{field} FROM {caliTableName} WHERE Id = {args.uId};'
+        sql = f'SELECT Run,{field} FROM {caliTableName} WHERE Run = {args.uRun};'
         print(f'Values before updating: ')
         showQuery(executeSql(sql))
-        updateRecord(args.uId, field, args.uValue)
-        sql = f'SELECT Id,{field} FROM {caliTableName} WHERE Id = {args.uId};'
+        updateRecord(args.uRun, field, args.uValue)
+        sql = f'SELECT Run,{field} FROM {caliTableName} WHERE Run = {args.uRun};'
         print(f'Values after updating: ')
         showQuery(executeSql(sql))
     elif args.subcommand == 'query':
         fields = args.qFields
         cond = args.qCondition
-        if args.qId:
-            cond = f'Id={args.qId}'
+        if args.qRun:
+            cond = f'Run={args.qRun}'
         showQuery(queryRecords(cond, args.qFields))
     elif args.subcommand == 'latest':
-        sql = f'SELECT Id FROM {caliTableName} ORDER BY Id DESC LIMIT 1;'
+        sql = f'SELECT Run FROM {caliTableName} ORDER BY Run DESC LIMIT 1;'
         logger.debug(sql)
         result = executeSql(sql)
-        for Id in result.fetchone():
-            print("Latest Run Id: ", Id)
+        for Run in result.fetchone():
+            print("Latest Run: ", Run)
     elif args.subcommand == 'export':
         if not exportRecords(args.eFile):
             exit(6)

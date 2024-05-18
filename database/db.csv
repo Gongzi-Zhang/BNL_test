@@ -1,4 +1,4 @@
-Id,Type,Flag,StartTime,StopTime,Length,Geometry,Channels,Trigger,T1,T2,T3,T4,Events,LG,HG,Ped,Size,PedRun,TrgRate,Note
+Run,Type,Flag,StartTime,StopTime,Length,Geometry,Channels,Trigger,T1,T2,T3,T4,Events,LG,HG,Ped,Size,PedRun,TrgRate,Note
 1,cosmic,good,20240325 16:00,20240326 09:41,17.7,20240322,54,12,0.005,0.005,0.005,0.005,4282,50,50,50,16M,,,
 2,cosmic,good,20240326 17:48,20240401 14:14,140.4,20240322,54,12,0.005,0.005,0.005,0.005,35579,50,50,50,129M,,,
 3,cosmic,good,20240417 19:35,20240418 15:19,19.7,20240417,174,12,0.005,0.005,0.005,0.005,4693,50,50,50,51M,,,

@@ -7,7 +7,7 @@ class caliDB:
         createConnection(caliDbName)
 
     def getRunValue(self, run, field):
-        sql = f'''SELECT {field} FROM {caliTableName} WHERE Id = {run}'''
+        sql = f'''SELECT {field} FROM {caliTableName} WHERE Run = {run}'''
         cursor = executeSql(sql)
         row = cursor.fetchone()
         if row is None:

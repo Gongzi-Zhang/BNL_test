@@ -10,7 +10,7 @@ caliDbName = f'{cali.CALIROOT}/database/BNL_test.db'
 caliTableName = 'runs'
 caliConn = ''
 
-FIELDS = [ 'Id', 'Type', 'Flag', 
+FIELDS = [ 'Run', 'Type', 'Flag', 
     'StartTime', 'StopTime', 'Length', 
     'Geometry', 'Channels', 
     'Trigger', 'T1', 'T2', 'T3', 'T4', 
@@ -18,7 +18,7 @@ FIELDS = [ 'Id', 'Type', 'Flag',
     'PedRun', 'TrgRate',
     'Note' ]
 TextFields = ['Type', 'Flag', 'StartTime', 'StopTime', 'Geometry', 'Size', 'Note']
-FreFields = [ 'Id', 'Type', 'Flag', 
+FreFields = [ 'Run', 'Type', 'Flag', 
     'StartTime', 'StopTime', 'Length', 
     'Trigger', 
     'Events', 'Size', 
@@ -27,7 +27,7 @@ TYPES = ['ptrg', 'cosmic', 'data', 'junk']
 FLAGS = ['good', 'bad', 'susp']
 
 FIELD_WIDTH = {
-    'Id': 4, 
+    'Run': 4, 
     'Type': 6, 
     'Flag': 4,
     'StartTime': 14, 
@@ -203,7 +203,7 @@ def dropTable(table):
 ''' create a new table '''
 def createTable():
     sql = f''' CREATE TABLE IF NOT EXISTS {caliTableName} (
-                Id integer PRIMARY KEY,
+                Run integer PRIMARY KEY,
                 Type text,
                 Flag text,
                 StartTime text,
@@ -238,10 +238,10 @@ def queryRecords(conditions='1=1', col="*"):
     return executeSql(sql)
 
 def insertRecord(record):
-    if 'Id' in record:
-        result = queryRecords(f"Id={record['Id']}")
+    if 'Run' in record:
+        result = queryRecords(f"Run={record['Run']}")
         if result.fetchone():
-            logger.warning(f'''record for Id={record['Id']} already exist, will skip it''')
+            logger.warning(f'''record for Run={record['Run']} already exist, will skip it''')
             printRecord(record)
             return False
 
@@ -274,13 +274,13 @@ def insertRecords(filename):
 
 ''' update a record in the table '''
 def updateRecord(kvalue, field, value):
-    if field == 'Id':
-        logger.warning("Can't update primary key: Id")
+    if field == 'Run':
+        logger.warning("Can't update primary key: Run")
         return False
     if field in TextFields:
-        sql = f'''UPDATE {caliTableName} SET {field} = '{value}' WHERE Id = {kvalue};'''
+        sql = f'''UPDATE {caliTableName} SET {field} = '{value}' WHERE Run = {kvalue};'''
     else:
-        sql = f'''UPDATE {caliTableName} SET {field} = {value} WHERE Id = {kvalue};'''
+        sql = f'''UPDATE {caliTableName} SET {field} = {value} WHERE Run = {kvalue};'''
     logger.debug(sql)
     if executeSql(sql):
         caliConn.commit()
@@ -288,7 +288,7 @@ def updateRecord(kvalue, field, value):
 
 ''' delete a record in a table using primary key values '''
 def deleteRecord(kvalue):
-    conditions = f'Id = {kvalue}'
+    conditions = f'Run = {kvalue}'
     result = queryRecords(conditions)
     if not result:
         print('WARNING\tindicated record does not exist in table {caliTableName}')
@@ -296,9 +296,9 @@ def deleteRecord(kvalue):
     showQuery(result)
     yesno = input(f'''are you sure you want to delete above record in table '{caliTableName}': y[es], n[o]\n''')
     if 'y' == yesno:
-        yesno2 = input(f'confirm deleting record (Id = {kvalue}) in table {caliTableName}: y[es], n[o]\n')
+        yesno2 = input(f'confirm deleting record (Run = {kvalue}) in table {caliTableName}: y[es], n[o]\n')
         if 'y' == yesno2:
-            sql = f'DELETE FROM {caliTableName} WHERE Id = {kvalue};'
+            sql = f'DELETE FROM {caliTableName} WHERE Run = {kvalue};'
             logger.debug(sql)
             if executeSql(sql):
                 logger.info('successfully delete the record')
@@ -321,7 +321,7 @@ def insertToTable():
     elif 2 == mode:
         print(f'''please input the following fields for table '{caliTableName}':''')
         values = {}
-        values['Id'] = int(input('Run id: '))
+        values['Run'] = int(input('Run number: '))
         values['Type'] = input(f'Type {TYPES}: ').strip() or 'data'
         values['Flag'] = input(f'Flag {FLAGS}: ').strip() or 'good'
         values['StartTime'] = input('StartTime: ').strip()
@@ -351,11 +351,11 @@ def insertToTable():
 
 ''' update a record in the table '''
 def update():
-    kvalue = int(input(f'select the record `Id` that you want to update: '))
-    conditions = f'Id = {kvalue}'
+    kvalue = int(input(f'select the record `Run` that you want to update: '))
+    conditions = f'Run = {kvalue}'
     result = queryRecords(conditions)
     if not result.fetchone():
-        logger.error(f'''indicated record (Id = {kvalue}) does not exist in table '{caliTableName}' ''')
+        logger.error(f'''indicated record (Run = {kvalue}) does not exist in table '{caliTableName}' ''')
         return False
 
     print('record before updating:')
@@ -417,7 +417,7 @@ if __name__ == '__main__':
             fname = input('what is the output file name: ')
             exportRecords(fname)
         elif command == 'd':
-            kvalue = int(input('input the Id you want to delete: '))
+            kvalue = int(input('input the Run you want to delete: '))
             deleteRecord(kvalue)
         elif command == 'E':
             doQuery()
