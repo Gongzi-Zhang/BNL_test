@@ -1,4 +1,7 @@
 # geometry
+* 20240515
+    * change P36Ch0-3 to P37Ch0-3, and move them from board 42 to 20.
+
 * 20240429
     * align the prototype
     * old: 

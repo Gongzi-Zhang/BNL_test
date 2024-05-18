@@ -6,6 +6,7 @@ work/
 bin/QA
 bin/test
 database/BNL_test.db
+raw/
 **/__pycache__/
 *.root
 *.pkl

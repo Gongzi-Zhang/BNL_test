@@ -1,5 +1,5 @@
 # 20240515
-    Change P37CH0-3 from board 42 to board 20 (run 265)
+    Change P37CH0-3 from board 42 to board 20 (run 265) -- new geometry
     Add 60 cables (not connected to the CAEN unit)
     Add the Keithley unit (not connected to the rad monitoring tile)
 

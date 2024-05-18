@@ -3,7 +3,7 @@
 ```
 scripts/add_run.sh /path/to/ptrg/run_Info.txt ptrg
 ```
-    * Update the PedRun value in the [config file](data/config.cfg)
+  * Update the PedRun value in the [config file](data/config.cfg)
 
 * Trigger tile threshold:
 
