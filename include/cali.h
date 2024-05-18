@@ -14,12 +14,12 @@ namespace cali {
 	? getenv("CALIROOT")
 	: ".";
 
-    /* CEAN:	  CAEN unit
+    /* CAEN:	  CAEN unit
      * channel:   channel count: 0-192
      * layer:	  sampling layers
      * board:	  PCB count: 0-44
-     * quadrant: local quadrant count: 0-3
-     * sipm:    local quadrant SiPM count: 0-6
+     * quadrant:  quadrant count in a layer: 0-3
+     * sipm:      SiPM count in a PCB: 0-6
      */
 
 	  int run = -1;

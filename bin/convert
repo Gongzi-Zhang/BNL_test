@@ -129,6 +129,7 @@ class convert:
             startTime = ' '.join(line.split()[4:-1])
             startTime = datetime.strptime(startTime, "%a %b %d %H:%M:%S %Y")
             self.startTime = startTime.timestamp()
+            self.startTime -= 4*3600    # convert to local (NY) timezone
 
             for l in range(2):
                 next(fin)
