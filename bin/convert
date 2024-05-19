@@ -197,7 +197,7 @@ class convert:
                         break
                     diff = ts0 - ts
                     for td in tdCandidate[i]:
-                        if abs(diff - td) < td/20:
+                        if abs(diff - td) < 1500*us:
                             foundMatch = True
                             break
                     if foundMatch:
