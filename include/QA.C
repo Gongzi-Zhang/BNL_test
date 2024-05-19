@@ -6,6 +6,7 @@
 #include <vector>
 #include "TFile.h"
 #include "TTree.h"
+#include "TChain.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TCanvas.h"
@@ -64,15 +65,25 @@ int main(int argc, char *argv[])
 	exit(2);
     }
 
-    const char* runFile = Form("%s/data/Run%d.root", cali::CALIROOT, run);
-    TFile* fin = new TFile(runFile, "read");
-    if (!fin->IsOpen())
+    TChain *tin = new TChain("raw");
+    char runFile[1024];
+    sprintf(runFile, "%s/data/Run%d.root", cali::CALIROOT, run);
+    if (fileExists(runFile))
     {
-	cerr << FATAL << "can't open the root file for run: " << run << endl;
-	exit(4);
+	tin->Add(runFile);
+    }
+    else
+    {
+	int i=1;
+	sprintf(runFile, "%s/data/Run%d_%d.root", cali::CALIROOT, run, i);
+	while (fileExists(runFile))
+	{
+	    tin->Add(runFile);
+	    i++;
+	    sprintf(runFile, "%s/data/Run%d_%d.root", cali::CALIROOT, run, i);
+	}
     }
     
-    TTree *tin = (TTree*) fin->Get("raw");
     if (!tin->GetEntries())
     {
 	cerr << FATAL << "no entry in the root file: " << runFile << endl;
