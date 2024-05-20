@@ -10,6 +10,7 @@ if 'CALIROOT' not in os.environ:
     exit(4)
 
 CALIROOT=os.environ['CALIROOT']
+backupDir = '/media/arratialab/CALI/BNL_test/'
 
 # constants
 '''

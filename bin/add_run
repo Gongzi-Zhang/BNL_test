@@ -132,6 +132,7 @@ if [ $? -ne 0 ]; then
    exit 4
 fi
 echo -e "INFO\tsuccessfully insert run ${info_file} into database as run $((latestId+1))"
+scp ${ROOT}/database/BNL_test.db weibin@138.23.151.181:public/cali/BNL_test/
 
 fdir=$(dirname -- $info_file)
 fname=$(basename -- $info_file)

@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
 	    i++;
 	    sprintf(runFile, "%s/data/Run%d_%d.root", cali::CALIROOT, run, i);
 	}
+	cout << INFO << "find " << i-1 << " root files for run " << run << endl ;
     }
     
     if (!tin->GetEntries())

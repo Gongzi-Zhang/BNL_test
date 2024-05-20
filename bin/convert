@@ -62,8 +62,10 @@ class convert:
         ''' variables '''
         self.listFile = f'{cali.CALIROOT}/data/Run{run}_list.txt'
         if not os.path.isfile(self.listFile):
-            logger.fatal(f'no list file found for run {run}')
-            exit(4)
+            self.listFile =  f'{cali.backupDir}/data/Run{run}_list.txt'
+            if not os.path.isfile(self.listFile):
+                logger.fatal(f'no list file found for run {run}')
+                exit(4)
 
         logger.info(f'will process run {run}')
 
@@ -265,6 +267,8 @@ class convert:
                     self.TS[i].pop(0)
                     self.board[i].pop(0)
 
+        for i in range(1, cali.nCAENs):
+            self.TS[i] = [x - self.tdActual[i] for x in self.TS[i]] # avoid repeatted correction
     #################################################
     def write(self):
         logger.info(f'find {self.nGoods}/{self.nEvents} good events')
