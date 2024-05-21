@@ -142,11 +142,14 @@ new="${CALIROOT}/data/Run$latestId"
 rename "s#${fdir}/$old#$new#" ${fdir}/${old}_*.txt
 
 # data processing
+export SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
 if [ "$run_type" = "ptrg" ]; then
     ${ROOT}/bin/parse_ptrg $latestId
+    scp ${ROOT}/figures/ptrg/run${latestId}_{LG,HG}_ped.png weibin@cali:public/cali/BNL_test/ptrg/
 else
     ${ROOT}/bin/convert $latestId
     ${ROOT}/bin/QA $latestId
+    scp -r ${ROOT}/figures/QA/run${latestId}/ weibin@cali:public/cali/BNL_test/QA/
 fi
 
 exit 0

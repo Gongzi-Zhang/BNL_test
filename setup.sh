@@ -20,3 +20,12 @@ else
 	export CPLUS_INCLUDE_PATH=${CALIROOT}/include:$CPLUS_INCLUDE_PATH
     fi
 fi
+
+# C lib path
+if [ -z "${LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=${CALIROOT}/lib
+else
+    if ! [[ "$LD_LIBRARY_PATH" =~ "${CALIROOT}/lib" ]]; then
+	export LD_LIBRARY_PATH=${CALIROOT}/lib:$LD_LIBRARY_PATH
+    fi
+fi

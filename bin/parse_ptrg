@@ -119,7 +119,7 @@ class parsePtrg:
             self.gPed[gain].GetYaxis().CenterTitle()
             self.gPed[gain].SetMarkerStyle(20)
             self.gPed[gain].Draw("AP")
-            c.SaveAs(f'{cali.CALIROOT}/figures/Run{self.run}_{gain}_ped.png')
+            c.SaveAs(f'{cali.CALIROOT}/figures/ptrg/run{self.run}_{gain}_ped.png')
 
 def usage():
     print(sys.argv[0] + ' [-h] run_number')
