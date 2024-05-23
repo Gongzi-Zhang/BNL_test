@@ -4,25 +4,27 @@ VPATH	    := include
 
 root_libs    = `root-config --libs --glibs --cflags`
 sqlite3_libs = -l sqlite3
+cali_libs  = -Llib/ -ldb
 
 # include file
 cali 	:= cali.h
 db	:= db.C
 
 # libraries
-libdb	:= lib/libdb.so
+libdb	:= libdb.so
 
 
 $(libdb): $(db) $(cali)
 	g++ $(CXXFLAGS) -fPIC --shared -o $@ $< $(sqlite3_libs)
+	mv $@ lib/
 
 
 test: test.C $(libdb) 
 	g++ $(CXXFLAGS) -o $@ $^ $(sqlite3_libs)
 	mv $@ bin/
 
-QA: QA.C $(libdb) 
-	g++ $(CXXFLAGS) -o $@ $^ $(sqlite3_libs) $(root_libs)
+QA: QA.C 
+	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
 
 all: $(libdb)

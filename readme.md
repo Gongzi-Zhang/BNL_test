@@ -1,7 +1,7 @@
 # operation
 * Take at least one ptrg run every day and add it to the database/analyze it manually
 ```
-scripts/add_run.sh /path/to/ptrg/run_Info.txt ptrg
+bin/add_run /path/to/ptrg/run_Info.txt ptrg
 ```
   * Update the PedRun value in the [config file](data/config.cfg)
 
@@ -9,7 +9,7 @@ scripts/add_run.sh /path/to/ptrg/run_Info.txt ptrg
 
 Whenever you modify the trigger tile threshold value, add the old runs to the database first:
 ```
-scripts/add_run.sh /path/to/data/run_Info.txt [data|cosmic]
+bin/add_run /path/to/data/run_Info.txt [data|cosmic]
 ```
 then update the trigger tile threshold values in the [config file](data/config.cfg), 
 which will affect all following runs.

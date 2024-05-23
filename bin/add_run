@@ -26,6 +26,9 @@ if [ $# -lt 1 ]; then
     exit
 fi
 
+export SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+config=${CALIROOT}/data/config.cfg
+
 # info parameters
 info_file=$1; shift
 list_file=${info_file/Info/list}
@@ -40,6 +43,9 @@ if [ $nline -lt 100 ]; then
 fi
 
 run_type=data
+if grep -q '\<Type\>' ${config}; then
+    run_type=$(grep '\<Type\>' ${config} | cut -d':' -f2)
+fi
 if [ $# -ge 1 ]; then
     run_type=$1
     shift
@@ -55,7 +61,6 @@ if [ $# -ge 1 ]; then
     Note=$1
     shift
 fi
-config=${CALIROOT}/data/config.cfg
 
 StartTime='00'
 StopTime=$(ls -l --time-style='+%Y%m%d %H:%M' $list_file | cut -d' ' -f6-7)
@@ -106,7 +111,7 @@ latestId=$(caliDB latest | cut -d':' -f2)
 
 echo -e "INFO\trun ${info_file} will be insert as run $((latestId+1))"
 
-caliDB insert \
+${ROOT}/bin/caliDB insert \
     --Type $run_type	\
     --Flag $Flag	\
     --StartTime "$StartTime" \
@@ -132,7 +137,11 @@ if [ $? -ne 0 ]; then
    exit 4
 fi
 echo -e "INFO\tsuccessfully insert run ${info_file} into database as run $((latestId+1))"
-scp ${ROOT}/database/BNL_test.db weibin@138.23.151.181:public/cali/BNL_test/
+pushd ${ROOT}
+${ROOT}/bin/caliDB export -f db.csv && mv db.csv database/
+git add database/BNL_test.db database/db.csv
+scp database/BNL_test.db weibin@cali:public/cali/BNL_test/
+popd
 
 fdir=$(dirname -- $info_file)
 fname=$(basename -- $info_file)
@@ -142,7 +151,6 @@ new="${CALIROOT}/data/Run$latestId"
 rename "s#${fdir}/$old#$new#" ${fdir}/${old}_*.txt
 
 # data processing
-export SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
 if [ "$run_type" = "ptrg" ]; then
     ${ROOT}/bin/parse_ptrg $latestId
     scp ${ROOT}/figures/ptrg/run${latestId}_{LG,HG}_ped.png weibin@cali:public/cali/BNL_test/ptrg/

@@ -1,3 +1,6 @@
+# 20240522
+    connect the rad monitoring SiPM to the Keithley unit (run 379)
+
 # 20240515
     Change P37CH0-3 from board 42 to board 20 (run 265) -- new geometry
     Add 60 cables (not connected to the CAEN unit)

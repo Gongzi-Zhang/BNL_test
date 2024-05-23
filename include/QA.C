@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
     TCanvas* c = new TCanvas("c", "c", 1000, 600);
     for (auto const & x : h1)
     {
-	x.second->Draw();
+	x.second->Draw("HIST");
 	c->SaveAs(Form("%s/%s.png", dir, x.first.c_str()));
 	x.second->Delete();
     }
