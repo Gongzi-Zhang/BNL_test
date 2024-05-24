@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 
     // formats
     h1["event_rate"]->GetXaxis()->SetTimeDisplay(1);
-    h1["event_rate"]->GetXaxis()->SetTimeOffset(0, "gmt");
+    // h1["event_rate"]->GetXaxis()->SetTimeOffset(0, "gmt");
     h1["event_rate"]->GetXaxis()->SetTimeFormat("%H:%M");
     h1["event_rate"]->SetStats(false);
 
