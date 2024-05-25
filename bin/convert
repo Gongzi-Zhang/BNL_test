@@ -183,9 +183,9 @@ class convert:
 
     #################################################
     def getTimeDiff(self):
-        tdCandidate = {
-            1: [20*ms, 24*ms], 
-            2: [40*ms, 44*ms]
+        tdRange = {
+            1: {'min': 17.5*ms, 'max': 24.5*ms}, 
+            2: {'min': 36*ms, 'max': 44*ms},
         }
         ei = [0 for i in range(0, cali.nCAENs)]
         while ei[0] < len(self.TS[0]):
@@ -198,11 +198,8 @@ class convert:
                     if ts > ts0:
                         break
                     diff = ts0 - ts
-                    for td in tdCandidate[i]:
-                        if abs(diff - td) < 2*ms:
-                            foundMatch = True
-                            break
-                    if foundMatch:
+                    if tdRange[i]['min'] <= diff and diff <= tdRange[i]['max']:
+                        foundMatch = True
                         break
                     ei[i] += 1
 

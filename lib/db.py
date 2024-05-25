@@ -171,6 +171,8 @@ def showQuery(cursor):
         printRecord(dict(zip(fields, row)))
         printSepLine(fields)
 
+    return True
+
 ''' show all tables in the db '''
 def showTables():
     sql = f'''SELECT name AS tables FROM sqlite_master WHERE type='table';'''
@@ -384,6 +386,7 @@ def exportRecords(fname):
         return False
     db_df = pd.read_sql_query(f'SELECT * from {caliTableName};', caliConn)
     db_df.to_csv(fname, index=False)
+    return True
 
 ''' use the function carefully '''
 def doQuery():

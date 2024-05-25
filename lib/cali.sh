@@ -1,5 +1,7 @@
 script=$(basename -- ${BASH_SOURCE[0]})
 
+export SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+
 black="\033[30;20m"
 red="\033[31;20m"
 green="\033[32;20m"

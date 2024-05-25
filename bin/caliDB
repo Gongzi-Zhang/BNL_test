@@ -83,7 +83,8 @@ if __name__ == '__main__':
         sql = f'''SELECT {fields} FROM {caliTableName} ORDER BY Run DESC LIMIT {entries}'''
         if args.all:
             sql = f'''SELECT * FROM {caliTableName} ORDER BY Run DESC'''
-        showQuery(executeSql(sql))
+        if not showQuery(executeSql(sql)):
+            exit(3)
     elif args.subcommand == 'insert':
         record = {}
         if args.iRun:
@@ -136,7 +137,8 @@ if __name__ == '__main__':
         sql = f'SELECT Run,{field} FROM {caliTableName} WHERE Run = {args.uRun};'
         print(f'Values before updating: ')
         showQuery(executeSql(sql))
-        updateRecord(args.uRun, field, args.uValue)
+        if not updateRecord(args.uRun, field, args.uValue):
+            exit(3)
         sql = f'SELECT Run,{field} FROM {caliTableName} WHERE Run = {args.uRun};'
         print(f'Values after updating: ')
         showQuery(executeSql(sql))
@@ -145,7 +147,8 @@ if __name__ == '__main__':
         cond = args.qCondition
         if args.qRun:
             cond = f'Run={args.qRun}'
-        showQuery(queryRecords(cond, args.qFields))
+        if not showQuery(queryRecords(cond, args.qFields)):
+            exit(3)
     elif args.subcommand == 'latest':
         sql = f'SELECT Run FROM {caliTableName} ORDER BY Run DESC LIMIT 1;'
         logger.debug(sql)

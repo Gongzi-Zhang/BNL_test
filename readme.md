@@ -18,8 +18,8 @@ which will affect all following runs.
 One can download the raw data from [google drive](https://drive.google.com/drive/folders/1SGtYnyDEmv8edpGVumi8tztlmNIQ3xuf?usp=sharing)
 
 # database
-A sqlite3 database is employed locally for run management, which is not
-synced to the github. A csv file is, which can be found [here](database/db.csv)
+A sqlite3 [database](database/BNL_test.db) is employed locally for run management. 
+Meanwhile, a [csv file](database/db.csv) is also created for quick search.
 
 To create the local database, use the command:
 ```

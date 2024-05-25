@@ -7,7 +7,7 @@ source ${ROOT}/lib/cali.sh
 
 function usage
 {
-    echo -e "$script run_Info.txt [run_type] [note]"
+    logger info "usage:\n\t$script run_Info.txt [run_type] [note]"
 }
 
 function extract_datetime
@@ -26,7 +26,6 @@ if [ $# -lt 1 ]; then
     exit
 fi
 
-export SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
 config=${CALIROOT}/data/config.cfg
 
 # info parameters
@@ -109,7 +108,7 @@ if [ "$run_type" = "ptrg" ] || [ "$run_type" = "cosmic" ]; then
 fi
 latestId=$(caliDB latest | cut -d':' -f2)
 
-echo -e "INFO\trun ${info_file} will be insert as run $((latestId+1))"
+logger info "run ${info_file} will be insert as run $((latestId+1))"
 
 ${ROOT}/bin/caliDB insert \
     --Type $run_type	\
@@ -133,10 +132,10 @@ ${ROOT}/bin/caliDB insert \
     --TrgRate $TrgRate	    \
     --Note "$Note"
 if [ $? -ne 0 ]; then
-   echo -e "ERROR\tFailed to insert the record" >&2
+   logger error "Failed to insert the record" >&2
    exit 4
 fi
-echo -e "INFO\tsuccessfully insert run ${info_file} into database as run $((latestId+1))"
+logger info "successfully insert run ${info_file} into database as run $((latestId+1))"
 pushd ${ROOT}
 ${ROOT}/bin/caliDB export -f db.csv && mv db.csv database/
 git add database/BNL_test.db database/db.csv
@@ -150,14 +149,5 @@ latestId=$(caliDB latest | cut -d':' -f2 | tr -d ' ')
 new="${CALIROOT}/data/Run$latestId" 
 rename "s#${fdir}/$old#$new#" ${fdir}/${old}_*.txt
 
-# data processing
-if [ "$run_type" = "ptrg" ]; then
-    ${ROOT}/bin/parse_ptrg $latestId
-    scp ${ROOT}/figures/ptrg/run${latestId}_{LG,HG}_ped.png weibin@cali:public/cali/BNL_test/ptrg/
-else
-    ${ROOT}/bin/convert $latestId
-    ${ROOT}/bin/QA $latestId
-    scp -r ${ROOT}/figures/QA/run${latestId}/ weibin@cali:public/cali/BNL_test/QA/
-fi
-
+${ROOT}/bin/parse ${latestId}
 exit 0

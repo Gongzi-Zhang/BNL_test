@@ -29,11 +29,20 @@ class customFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-# logger.setLevel(logging.DEBUG)
+class _excludeErrorsFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno < logging.ERROR
 
-handler = logging.StreamHandler(sys.stdout)
-# formatter = logging.Formatter('%(levelname)s - %(message)s')
-handler.setFormatter(customFormatter())
-logger.addHandler(handler)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+h1 = logging.StreamHandler(sys.stdout)
+h1.setLevel(logging.DEBUG)
+h1.addFilter(lambda record: record.levelno <= logging.INFO)
+h1.setFormatter(customFormatter())
+h2 = logging.StreamHandler(sys.stderr)
+h2.setLevel(logging.WARNING)
+h2.setFormatter(customFormatter())
+
+logger.addHandler(h1)
+logger.addHandler(h2)
