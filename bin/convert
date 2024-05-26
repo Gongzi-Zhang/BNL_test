@@ -185,7 +185,7 @@ class convert:
     def getTimeDiff(self):
         tdRange = {
             1: {'min': 17.5*ms, 'max': 24.5*ms}, 
-            2: {'min': 36*ms, 'max': 44*ms},
+            2: {'min': 36*ms, 'max': 44.5*ms},
         }
         ei = [0 for i in range(0, cali.nCAENs)]
         while ei[0] < len(self.TS[0]):

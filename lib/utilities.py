@@ -34,7 +34,7 @@ class _excludeErrorsFilter(logging.Filter):
         return record.levelno < logging.ERROR
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 h1 = logging.StreamHandler(sys.stdout)
 h1.setLevel(logging.DEBUG)
