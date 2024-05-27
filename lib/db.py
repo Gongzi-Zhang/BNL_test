@@ -30,8 +30,8 @@ FIELD_WIDTH = {
     'Run': 4, 
     'Type': 6, 
     'Flag': 4,
-    'StartTime': 14, 
-    'StopTime': 14, 
+    'StartTime': 16, 
+    'StopTime': 16, 
     'Length': 5,    # elapsed time in h
     'Geometry': 8,
     'Channels': 3,  # number of good channels
@@ -210,8 +210,8 @@ def createTable():
                 Flag text,
                 StartTime text,
                 StopTime text,
-                Length real,
-                Geometry text,
+                Length integer,
+                Geometry integer,
                 Channels integer,
                 Trigger integer,
                 T1 float,
@@ -222,7 +222,7 @@ def createTable():
                 LG integer,
                 HG integer,
                 Ped integer,
-                Size text,
+                Size integer,
                 PedRun integer,
                 TrgRate float,
                 Note text

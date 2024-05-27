@@ -17,7 +17,7 @@ function extract_datetime
     month=$(echo $dt | cut -d'/' -f2)
     year=$(echo $dt | cut -d' ' -f1 | cut -d'/' -f3)
     time=$(echo $dt | cut -d' ' -f2)
-    echo "$year$month$day $time"
+    echo "$year-$month-$day $time"
 }
 
 if [ $# -lt 1 ]; then
@@ -71,7 +71,7 @@ if [ -f $info_file ]; then
     StopTime=$(grep '\<Stop Time\>' $info_file | cut -d ':' -f2-)
     StopTime=$(extract_datetime "$StopTime")
     Length=$(grep '\<Elapsed time\>' $info_file | cut -d ' ' -f4)
-    Length=$(perl -e "printf(\"%.1f\", $Length/3600)")
+    Length=$(perl -e "printf(\"%d\", $Length/60)")
 fi
 
 Geometry=$(grep '\<Geometry\>' ${config} | cut -d':' -f2)
@@ -97,7 +97,7 @@ fi
 LG=$(grep '\<LG\>' ${config} | cut -d':' -f2)
 HG=$(grep '\<HG\>' ${config} | cut -d':' -f2)
 Ped=$(grep '\<Ped\>' ${config} | cut -d':' -f2)
-Size=$(ls -lh $list_file | awk '{print $5}')
+Size=$(ls -lh --block-size=1MiB $list_file | awk '{print $5}')
 PedRun=$(grep '\<PedRun\>' ${config} | cut -d':' -f2)
 if [ "$run_type" = "ptrg" ]; then
     PedRun=-1
@@ -137,7 +137,7 @@ if [ $? -ne 0 ]; then
 fi
 logger info "successfully insert run ${info_file} into database as run $((latestId+1))"
 pushd ${ROOT}
-${ROOT}/bin/caliDB export -f db.csv && mv db.csv database/
+sqlite3 -header -csv database/BNL_test.db "SELECT * FROM runs;" > db.csv && mv db.csv database/
 git add database/BNL_test.db database/db.csv
 scp database/BNL_test.db weibin@cali:public/cali/BNL_test/
 popd
