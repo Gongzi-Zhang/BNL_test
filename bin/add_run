@@ -137,11 +137,6 @@ if [ $? -ne 0 ]; then
    exit 4
 fi
 logger info "successfully insert run ${info_file} into database as run $((latestId+1))"
-pushd ${ROOT}
-sqlite3 -header -csv database/BNL_test.db "SELECT * FROM runs;" > db.csv && mv db.csv database/
-git add database/BNL_test.db database/db.csv
-scp database/BNL_test.db weibin@cali:public/cali/BNL_test/
-popd
 
 fdir=$(dirname -- $info_file)
 fname=$(basename -- $info_file)
@@ -151,4 +146,10 @@ new="${CALIROOT}/data/Run$latestId"
 rename "s#${fdir}/$old#$new#" ${fdir}/${old}_*.txt
 
 ${ROOT}/bin/parse ${latestId}
+
+pushd ${ROOT}
+sqlite3 -header -csv database/BNL_test.db "SELECT * FROM runs;" > db.csv && mv db.csv database/
+git add database/BNL_test.db database/db.csv
+scp database/BNL_test.db weibin@cali:public/cali/BNL_test/
+popd
 exit 0

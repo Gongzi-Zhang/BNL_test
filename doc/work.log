@@ -1,3 +1,8 @@
+# 20240527
+    change 'HV IMax' to 3 mA (starting from run 463)
+    old: HV IMax: 2 mA
+    new: HV IMax: 3 mA
+
 # 20240522
     connect the rad monitoring SiPM to the Keithley unit (run 379)
 
