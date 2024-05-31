@@ -1,3 +1,8 @@
+# 20240530
+    update the OS from Ubuntu 20.04 to 22.04 (run 500)
+    recompile Janus3.2.4 
+    update drs from 5.0.6 too drs4ed, recalibrated it in the range o f -0.05 - 0.95 V
+
 # 20240527
     change 'HV IMax' to 3 mA (starting from run 463)
     old: HV IMax: 2 mA

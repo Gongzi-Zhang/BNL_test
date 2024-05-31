@@ -58,5 +58,3 @@ bin/QA run_number
   * pandas
   * uproot
   * datetime
-  * copy
-  * json
