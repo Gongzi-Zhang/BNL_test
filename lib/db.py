@@ -57,6 +57,12 @@ FIELD_TITLE = {
     'PedRun': 'PRun'
     }
 
+formatted = True
+
+def setFormat(f):
+    global formatted
+    formatted = f
+    logger.info(f'Formatted output: {formatted}')
 
 def checkField(field):
     if field in FIELDS:
@@ -164,12 +170,18 @@ def showQuery(cursor):
 
     fields = [des[0] for des in cursor.description]
 
-    printSepLine(fields)
-    printHeader(fields)
-    printSepLine(fields)
-    for row in cursor.fetchall():
-        printRecord(dict(zip(fields, row)))
+    if formatted:
         printSepLine(fields)
+        printHeader(fields)
+        printSepLine(fields)
+        for row in cursor.fetchall():
+            printRecord(dict(zip(fields, row)))
+            printSepLine(fields)
+    else:
+        for row in cursor.fetchall():
+            for i in range(0, len(row)):
+                print(f'{row[i]}', end='\t')
+            print()
 
     return True
 

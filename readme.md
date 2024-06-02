@@ -49,11 +49,13 @@ bin/QA run_number
 ```
 
 # package dependency
-* root
+* root (install it manually to ensure python support)
 * sqlite3
 * rename
+* gnuplot: required by Janus
 * c++
   * sqlite3: libsqlite3-dev
+  * nlohmann-json3
 * python:
   * pandas
   * uproot

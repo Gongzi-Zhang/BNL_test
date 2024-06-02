@@ -6,6 +6,7 @@ from db import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--plain', '-p', action='store_true', help='use plain format')
     subparsers = parser.add_subparsers(dest='subcommand', required=True)
     
     '''init command'''
@@ -69,6 +70,9 @@ if __name__ == '__main__':
     if not createConnection(caliDbName):
         print('Error! cannot create the database connection.')
         exit(4)
+
+    if args.plain:
+        setFormat(False)
 
     if args.subcommand == 'init':
         if not createTable():

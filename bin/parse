@@ -13,13 +13,13 @@ do
 	shift
 	continue
     fi
-    run_type=$(${ROOT}/bin/caliDB query --run $run --field Type | tail -n2 | head -n1 | cut -d' ' -f2)
+    run_type=$(${ROOT}/bin/caliDB -p query --run $run --field Type | tail -n1 | xargs)
     if [ "$run_type" = "ptrg" ]; then
 	${ROOT}/bin/parse_ptrg $run
 	if [ $? -ne 0 ]; then
 	    ${ROOT}/bin/caliDB update --run $run --field Flag --value bad
 	else
-	    scp ${ROOT}/figures/ptrg/run${run}_{LG,HG}_ped.png weibin@cali:public/cali/BNL_test/ptrg/
+	    scp -r ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
 	fi
     else
 	${ROOT}/bin/convert $run
@@ -27,7 +27,7 @@ do
 	if [ $? -ne 0 ]; then
 	    ${ROOT}/bin/caliDB update --run $run --field Flag --value bad
 	else
-	    scp -r ${ROOT}/figures/QA/run${run}/ weibin@cali:public/cali/BNL_test/QA/
+	    scp -r ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
 	fi
     fi
     shift

@@ -38,11 +38,13 @@ class parsePtrg:
 
         self.h1 = {}
         self.gPed = {}
+        self.gPedRms = {}
         self.func = {}
         xmax = {'LG': 500, 'HG': 1000}
         for gain in cali.gains:
             self.func[gain] = ROOT.TF1(gain, "gaus", 0, xmax[gain])
             self.gPed[gain] = ROOT.TGraphErrors()
+            self.gPedRms[gain] = ROOT.TGraph()
             for ch in range(0, cali.nChannels):
                 hname = f'Ch_{ch}_{gain}'
                 self.h1[hname] = ROOT.TH1F(hname, hname, 250, 0, xmax[gain])
@@ -99,6 +101,7 @@ class parsePtrg:
                 ped[gain][ch] = [mean, rms]
                 self.gPed[gain].SetPoint(ipoint, ch, mean)
                 self.gPed[gain].SetPointError(ipoint, 0, rms)
+                self.gPedRms[gain].SetPoint(ipoint, ch, rms)
                 ipoint += 1
 
         with open(self.pedFile, 'w') as f:
@@ -111,15 +114,25 @@ class parsePtrg:
             self.h1[h].Write()
         fout.Close()
 
+        fdir = f'{cali.CALIROOT}/figures/{self.run}/'
+        if not os.path.exists(fdir):
+            os.mkdir(fdir)
         c = ROOT.TCanvas("c", "c", 1500, 600)
         c.cd()
         for gain in cali.gains:
-            self.gPed[gain].SetTitle(f'Run {self.run} {gain} pedestal;ch;ADC')
+            self.gPed[gain].SetTitle(f'{gain} pedestal;ch;ADC')
             self.gPed[gain].GetXaxis().CenterTitle()
             self.gPed[gain].GetYaxis().CenterTitle()
             self.gPed[gain].SetMarkerStyle(20)
             self.gPed[gain].Draw("AP")
-            c.SaveAs(f'{cali.CALIROOT}/figures/ptrg/run{self.run}_{gain}_ped.png')
+            c.SaveAs(f'{fdir}/{gain}_ped.png')
+
+            self.gPedRms[gain].SetTitle(f'{gain} pedestal RMS;ch;ADC')
+            self.gPedRms[gain].GetXaxis().CenterTitle()
+            self.gPedRms[gain].GetYaxis().CenterTitle()
+            self.gPedRms[gain].SetMarkerStyle(20)
+            self.gPedRms[gain].Draw("AP")
+            c.SaveAs(f'{fdir}/{gain}_ped_rms.png')
 
 def usage():
     print(sys.argv[0] + ' [-h] run_number')
