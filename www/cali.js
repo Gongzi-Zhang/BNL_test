@@ -58,20 +58,15 @@ function launchDate(date = '')
 	    else
 	    {
 		document.getElementById("runs").innerHTML = this.responseText;
-		var run;
+		var run = null;
 		if (document.getElementById('runs').hasAttribute('title'))
 		{
 		    var ele = document.getElementById('runs');
 		    run = ele.title;
 		    ele.removeAttribute('title');
 		}
-		else
-		{
-		    if (document.querySelector('#runs a'))
-			run = document.getElementById('runs').lastElementChild.innerText;
-		    else 
-			return;
-		}
+		else if (document.querySelectorAll('#runs a').length > 0)
+		    run = document.getElementById('runs').lastElementChild.innerText;
 		launchRun(run);
 	    }
 	}
@@ -83,8 +78,6 @@ function launchDate(date = '')
 
 function launchRun(run)
 {
-    changeRunBgColor(run);
-
     var page = document.getElementById('self').text;
     var func = '';
     var id = '';
@@ -98,6 +91,15 @@ function launchRun(run)
 	func = 'getRunPtrg';
 	id = 'ptrg-plots';
     }
+
+    if (!run)
+    {
+	document.getElementById(id).innerText = "";
+	return;
+    }
+
+    changeRunBgColor(run);
+
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
