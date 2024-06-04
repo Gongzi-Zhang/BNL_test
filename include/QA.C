@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include "TStyle.h"
+#include "TError.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TChain.h"
@@ -48,6 +49,7 @@ int main(int argc, char *argv[])
 	exit(4);
     }
 
+    gErrorIgnoreLevel = kWarning;
     gStyle->SetOptStat(111110);
     const int run = atoi(argv[1]);
     cali::setRun(run);
