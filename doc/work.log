@@ -1,3 +1,10 @@
+# 20240604
+    Problem: the LG readout increases monotonically along with the channel number
+    Solution: disable the TRGTIME_SORTING and reboot everything (run 559)
+    Effect: the LG pedestal is scattering in the later 2 CAEN units again
+    old: Event Building Mode: TRGTIME_SORTING 
+    new: Event Building Mode: DISABLED 
+
 # 20240530
     update the OS from Ubuntu 20.04 to 22.04 (run 500)
     recompile Janus3.2.4 
@@ -24,9 +31,9 @@
 
 # 20240507
     JANUS -> RunCtrl:
-    change 'Event Building Mode' to TRGTIMING_SORTING (run 158)
+    change 'Event Building Mode' to TRGTIME_SORTING (run 158)
     old: Event Building Mode: DISABLED 
-    new: Event Building Mode: TRGTIMING_SORTING 
+    new: Event Building Mode: TRGTIME_SORTING 
 
 # 20240507
     DRS: (starting from run 154)

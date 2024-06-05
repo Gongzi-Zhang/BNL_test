@@ -90,10 +90,7 @@ function getDatePtrgs($date)
 
     $res = 'Run: ';
     foreach ($runs as $run )
-    {
-	foreach ($runs as $run )
-	    $res .= "<a id='$run' href='#' onclick='launchRun({$run})'> {$run} </a>";
-    }
+	$res .= "<a id='$run' href='#' onclick='launchRun({$run})'> {$run} </a>";
 
     return $res;
 }
