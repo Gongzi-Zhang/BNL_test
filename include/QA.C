@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     }
 
     gErrorIgnoreLevel = kWarning;
-    gStyle->SetOptStat(111110);
+    gStyle->SetOptStat(1110);
     const int run = atoi(argv[1]);
     cali::setRun(run);
     caliDB db;
@@ -135,17 +135,39 @@ int main(int argc, char *argv[])
     map<string, map<string, vector<TH1F*>>> h1Layer;
     map<string, map<string, vector<TH1F*>>> h1Channel;
     map<string, map<string, double>> xmax = {
-	{"hit_e", {{"LG", 1000}, {"HG", 1000}}},
+	{"hit_e",	{{"LG", 8500}, {"HG", 8500}}},
+	{"event_e",	{{"LG", 1e5},  {"HG", 6e5}}},
+	{"event_mul",	{{"LG", 200},  {"HG", 200}}},
+	{"event_mul1",	{{"LG", 200},  {"HG", 200}}},
+	{"event_mul2",	{{"LG", 200},  {"HG", 200}}},
+	{"ch_raw_e",    {{"LG", 2000}, {"HG", 8500}}},
+	{"ch_cor_e",    {{"LG", 2000}, {"HG", 8500}}},
     };
+    if (runType == "cosmic")
+    {
+	xmax["hit_e"]["LG"] = 2000;
+	xmax["event_e"]["LG"] = 2000;
+	xmax["event_e"]["HG"] = 50000;
+	xmax["event_mul"]["LG"] = 100;
+	xmax["event_mul"]["HG"] = 100;
+	xmax["event_mul1"]["LG"] = 50;
+	xmax["event_mul1"]["HG"] = 50;
+	xmax["event_mul2"]["LG"] = 50;
+	xmax["event_mul2"]["HG"] = 50;
+	xmax["ch_raw_e"]["LG"] = 300;
+	xmax["ch_raw_e"]["HG"] = 800;
+	xmax["ch_raw_e"]["LG"] = 100;
+	xmax["ch_raw_e"]["HG"] = 800;
+    }
     for (auto gain : cali::gains)
     {
 	h1[gain]["hit_e"] = new TH1F(Form("%s_hit_e", gain), Form("%s: hit energy;ADC", gain), 100, 0, xmax["hit_e"][gain]);
 
 	h1[gain]["event_rate"]  = new TH1F(Form("%s_event_rate", gain),  Form("%s: rate", gain), 100, startTS, endTS);
-	h1[gain]["event_mul"]   = new TH1F(Form("%s_event_mul",  gain),  Form("%s: mul", gain), 100, 0, 300);
-	h1[gain]["event_mul1"]  = new TH1F(Form("%s_event_mul1", gain),  Form("%s: mul (3#sigma)", gain), 100, 0, 300);
-	h1[gain]["event_mul2"]  = new TH1F(Form("%s_event_mul2", gain),  Form("%s: mul (5#sigma)", gain), 100, 0, 300);
-	h1[gain]["event_e"] = new TH1F(Form("%s_event_e", gain),  Form("%s: event energy;ADC", gain), 100, 0, xmax["hit_e"][gain]*cali::nChannels/3);
+	h1[gain]["event_mul"]   = new TH1F(Form("%s_event_mul",  gain),  Form("%s: mul", gain), 100, 0, xmax["event_mul"][gain]);
+	h1[gain]["event_mul1"]  = new TH1F(Form("%s_event_mul1", gain),  Form("%s: mul (3#sigma)", gain), 100, 0, xmax["event_mul1"][gain]);
+	h1[gain]["event_mul2"]  = new TH1F(Form("%s_event_mul2", gain),  Form("%s: mul (5#sigma)", gain), 100, 0, xmax["event_mul2"][gain]);
+	h1[gain]["event_e"] = new TH1F(Form("%s_event_e", gain),  Form("%s: event energy;ADC", gain), 100, 0, xmax["event_e"][gain]);
 	h1[gain]["event_x"] = new TH1F(Form("%s_event_x", gain),  Form("%s: COG X;cm", gain), 100, -10, 10);
 	h1[gain]["event_y"] = new TH1F(Form("%s_event_y", gain),  Form("%s: COG Y;cm", gain), 100, -10, 10);
 	h1[gain]["event_z"] = new TH1F(Form("%s_event_z", gain),  Form("%s: COG Z;layer", gain), 100, 0, cali::nLayers);
@@ -160,8 +182,8 @@ int main(int argc, char *argv[])
 
 	for (int ch=0; ch<cali::nChannels; ch++)
 	{
-	    h1Channel[gain]["raw"].push_back(new TH1F(Form("%s_raw_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["hit_e"][gain]));
-	    h1Channel[gain]["cor"].push_back(new TH1F(Form("%s_cor_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["hit_e"][gain]));
+	    h1Channel[gain]["raw"].push_back(new TH1F(Form("%s_raw_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["channel_raw_e"][gain]));
+	    h1Channel[gain]["cor"].push_back(new TH1F(Form("%s_cor_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["channel_cor_e"][gain]));
 	}
 
 	h2[gain]["hit_xy"] = new TH2F(Form("%s_hit_xy", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
@@ -170,7 +192,7 @@ int main(int argc, char *argv[])
 	h1[gain]["event_rate"]->GetXaxis()->SetTimeDisplay(1);
 	// h1["event_rate"]->GetXaxis()->SetTimeOffset(0, "gmt");
 	h1[gain]["event_rate"]->GetXaxis()->SetTimeFormat("%H:%M");
-	// h1[gain]["event_rate"]->SetStats(false);
+	h1[gain]["event_rate"]->SetStats(false);
 
 	h2[gain]["hit_xy"]->SetStats(false);
 
@@ -305,7 +327,7 @@ int main(int argc, char *argv[])
 	TCanvas* c2 = new TCanvas("c2", "c2", 6000, 2000);
 	for (auto const & x : h1Channel[gain])
 	{
-	    for (int cn=0; cn<ceil(cali::nChannels/cali::nCAENChannels); cn++)
+	    for (int cn=0; cn<cali::nCAENs; cn++)
 	    {
 		c2->Clear();
 		c2->SetTopMargin(0.12);
@@ -319,6 +341,8 @@ int main(int argc, char *argv[])
 		for (int ch=0; ch<cali::nCAENChannels; ch++)
 		{
 		    int gCh = ch + cn*cali::nCAENChannels;
+		    if (gCh >= cali::nChannels)
+			continue;
 		    TVirtualPad *p = c2->cd(ch+1);
 		    p->SetLogy(1);
 		    x.second[gCh]->SetStats(false);

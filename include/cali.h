@@ -28,15 +28,15 @@ namespace cali {
 	  int nChannels = nCAENs*nCAENChannels;
           int nLayers = 11;
     const int layerMax = 20;
-    const int nHexLayers = 4;
+	  int nHexLayers = 4;
 	  int nSqaLayers = 9;
     const int nLayerBoards = 4;
-    const int nHexBoards = nHexLayers*nLayerBoards;
+          int nHexBoards = nHexLayers*nLayerBoards;
           int nSqaBoards = nSqaLayers*nLayerBoards;
     const int nHexBoardChannels = 7;
     const int nSqaBoardChannels = 4;
-    const int nHexChannels = nHexBoards*nHexBoardChannels;
-    const int nSqaChannels = nSqaBoards*nSqaBoardChannels;
+          int nHexChannels = nHexBoards*nHexBoardChannels;
+          int nSqaChannels = nSqaBoards*nSqaBoardChannels;
 
     const int nEightLayerBoards = 8*nLayerBoards;
     const int nNineLayerBoards  = 9*nLayerBoards;
@@ -62,6 +62,28 @@ namespace cali {
     void setRun(const int r)
     {
 	run = r;
+	if (run < 3)
+	{
+	    nCAENs = 1;
+	    nChannels = 56;
+	    nHexLayers = 2;
+	    nHexBoards = 8;
+	    nHexChannels = 56;
+	    nSqaLayers = 0;
+	    nSqaBoards = 0;
+	    nSqaChannels = 0;
+	}
+	else if (run < 4)
+	{
+	    nCAENs = 3;
+	    nChannels = 176;
+	    nHexLayers = 4;
+	    nHexBoards = 16;
+	    nHexChannels = 112;
+	    nSqaLayers = 4;
+	    nSqaBoards = 16;
+	    nSqaChannels = 64;
+	}
 	// if (run > 500)
 	// {
 	//     nCAENs = 4;

@@ -1,3 +1,10 @@
+# 20240605
+    See LG saturation
+    JANUS -> Spectroscopy:
+    change 'LG' to 27 (run 572)
+    old: HG Gain: 55; LG Gain: 30; Pedestal Position: 160
+    new: HG Gain: 55; LG Gain: 27; Pedestal Position: 160
+    
 # 20240604
     Problem: the LG readout increases monotonically along with the channel number
     Solution: disable the TRGTIME_SORTING and reboot everything (run 559)

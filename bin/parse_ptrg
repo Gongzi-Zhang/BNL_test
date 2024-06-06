@@ -26,8 +26,10 @@ class parsePtrg:
         self.run = run
         self.listFile = f'{cali.CALIROOT}/data/Run{run}_list.txt'
         if not os.path.isfile(self.listFile):
-            logger.fatal(f'no list file found for run {run}')
-            exit(4)
+            self.listFile =  f'{cali.backupDir}/data/Run{run}_list.txt'
+            if not os.path.isfile(self.listFile):
+                logger.fatal(f'no list file found for run {run}')
+                exit(4)
 
         logger.info(f'will process run: {run}')
 
@@ -94,9 +96,12 @@ class parsePtrg:
                 name = f'Ch_{ch}_{gain}'
                 h = self.h1[name]
                 f.SetParameters(h.GetMaximum(), h.GetMean(), h.GetRMS())
-                h.Fit(f)
+                h.Fit(f, "q")
                 mean = f.GetParameter(1)
                 rms  = f.GetParameter(2)
+                if (mean < 50):
+                    logger.warning(f"low pedestal mean in channel {ch}: {mean}")
+
                 # ped[gain][ch] = {"m": mean, "r": rms}
                 ped[gain][ch] = [mean, rms]
                 self.gPed[gain].SetPoint(ipoint, ch, mean)

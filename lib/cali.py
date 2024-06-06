@@ -54,7 +54,33 @@ gains = ["LG", "HG"]
 
 def setRun(r):
     run = r
-    if (run > 5000):
+    global nCAENs
+    global nChannels
+    global nHexLayers
+    global nHexBoards
+    global nHexChannels
+    global nSqaLayers
+    global nSqaBoards
+    global nSqaChannels
+    if run < 3:
+	    nCAENs = 1
+	    nChannels = 56
+	    nHexLayers = 2
+	    nHexBoards = 8
+	    nHexChannels = 56
+	    nSqaLayers = 0
+	    nSqaBoards = 0
+	    nSqaChannels = 0
+    elif run < 4:
+	    nCAENs = 3
+	    nChannels = 176
+	    nHexLayers = 4
+	    nHexBoards = 16
+	    nHexChannels = 112
+	    nSqaLayers = 4
+	    nSqaBoards = 16
+	    nSqaChannels = 64
+    elif (run > 5000):
         nCAENs = 4
         nChannels = nCAENs*nCAENChannels
 

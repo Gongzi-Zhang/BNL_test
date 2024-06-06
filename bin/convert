@@ -58,6 +58,7 @@ class convert:
 
     def __init__(self, run, fout, fmt='root'):
         self.run = run
+        cali.setRun(run)
 
         ''' variables '''
         self.listFile = f'{cali.CALIROOT}/data/Run{run}_list.txt'
@@ -84,7 +85,7 @@ class convert:
         logger.info(f'output file: {self.outFile}')
 
         self.columns = []
-        for ch in range(0, cali.nChannels):
+        for ch in range(0, cali.nCAENChannels*cali.nCAENs):
             for gain in ['LG', 'HG']:
                 self.columns.append(f'Ch_{ch}_{gain}') 
         self.columns.append('TS')   # timestamps
@@ -151,7 +152,7 @@ class convert:
                     self.addBoard(board)
                     board.clear()
                     ''' split large files '''
-                    if len(self.TS[0]) % 100000 == 0:
+                    if len(self.TS[0]) and len(self.TS[0]) % 100000 == 0:
                         self.buildEvent()
 
                     ts = float(values[0]) 
