@@ -19,7 +19,7 @@ do
 	if [ $? -ne 0 ]; then
 	    ${ROOT}/bin/caliDB update --run $run --field Flag --value bad
 	else
-	    scp -r ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
+	    scp -qr ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
 	fi
     else
 	${ROOT}/bin/convert $run
@@ -27,7 +27,7 @@ do
 	if [ $? -ne 0 ]; then
 	    ${ROOT}/bin/caliDB update --run $run --field Flag --value bad
 	else
-	    scp -r ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
+	    scp -qr ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
 	fi
     fi
     shift

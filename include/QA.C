@@ -145,28 +145,28 @@ int main(int argc, char *argv[])
     };
     if (runType == "cosmic")
     {
-	xmax["hit_e"]["LG"] = 2000;
-	xmax["event_e"]["LG"] = 2000;
-	xmax["event_e"]["HG"] = 50000;
+	xmax["hit_e"]["LG"] = 1000;
+	xmax["event_e"]["LG"] = 1000;
+	xmax["event_e"]["HG"] = 25000;
 	xmax["event_mul"]["LG"] = 100;
 	xmax["event_mul"]["HG"] = 100;
-	xmax["event_mul1"]["LG"] = 50;
-	xmax["event_mul1"]["HG"] = 50;
-	xmax["event_mul2"]["LG"] = 50;
-	xmax["event_mul2"]["HG"] = 50;
+	xmax["event_mul1"]["LG"] = 20;
+	xmax["event_mul1"]["HG"] = 20;
+	xmax["event_mul2"]["LG"] = 20;
+	xmax["event_mul2"]["HG"] = 20;
 	xmax["ch_raw_e"]["LG"] = 300;
 	xmax["ch_raw_e"]["HG"] = 800;
-	xmax["ch_raw_e"]["LG"] = 100;
-	xmax["ch_raw_e"]["HG"] = 800;
+	xmax["ch_cor_e"]["LG"] = 100;
+	xmax["ch_cor_e"]["HG"] = 800;
     }
     for (auto gain : cali::gains)
     {
 	h1[gain]["hit_e"] = new TH1F(Form("%s_hit_e", gain), Form("%s: hit energy;ADC", gain), 100, 0, xmax["hit_e"][gain]);
 
-	h1[gain]["event_rate"]  = new TH1F(Form("%s_event_rate", gain),  Form("%s: rate", gain), 100, startTS, endTS);
-	h1[gain]["event_mul"]   = new TH1F(Form("%s_event_mul",  gain),  Form("%s: mul", gain), 100, 0, xmax["event_mul"][gain]);
-	h1[gain]["event_mul1"]  = new TH1F(Form("%s_event_mul1", gain),  Form("%s: mul (3#sigma)", gain), 100, 0, xmax["event_mul1"][gain]);
-	h1[gain]["event_mul2"]  = new TH1F(Form("%s_event_mul2", gain),  Form("%s: mul (5#sigma)", gain), 100, 0, xmax["event_mul2"][gain]);
+	h1[gain]["event_rate"]  = new TH1F(Form("%s_event_rate", gain),  Form("%s: rate;Time", gain), 100, startTS, endTS);
+	h1[gain]["event_mul"]   = new TH1F(Form("%s_event_mul",  gain),  Form("%s: mul", gain), xmax["event_mul"][gain], 0, xmax["event_mul"][gain]);
+	h1[gain]["event_mul1"]  = new TH1F(Form("%s_event_mul1", gain),  Form("%s: mul (3#sigma)", gain), xmax["event_mul1"][gain], 0, xmax["event_mul1"][gain]);
+	h1[gain]["event_mul2"]  = new TH1F(Form("%s_event_mul2", gain),  Form("%s: mul (5#sigma)", gain), xmax["event_mul2"][gain], 0, xmax["event_mul2"][gain]);
 	h1[gain]["event_e"] = new TH1F(Form("%s_event_e", gain),  Form("%s: event energy;ADC", gain), 100, 0, xmax["event_e"][gain]);
 	h1[gain]["event_x"] = new TH1F(Form("%s_event_x", gain),  Form("%s: COG X;cm", gain), 100, -10, 10);
 	h1[gain]["event_y"] = new TH1F(Form("%s_event_y", gain),  Form("%s: COG Y;cm", gain), 100, -10, 10);
@@ -182,8 +182,8 @@ int main(int argc, char *argv[])
 
 	for (int ch=0; ch<cali::nChannels; ch++)
 	{
-	    h1Channel[gain]["raw"].push_back(new TH1F(Form("%s_raw_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["channel_raw_e"][gain]));
-	    h1Channel[gain]["cor"].push_back(new TH1F(Form("%s_cor_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["channel_cor_e"][gain]));
+	    h1Channel[gain]["raw"].push_back(new TH1F(Form("%s_raw_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["ch_raw_e"][gain]));
+	    h1Channel[gain]["cor"].push_back(new TH1F(Form("%s_cor_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["ch_cor_e"][gain]));
 	}
 
 	h2[gain]["hit_xy"] = new TH2F(Form("%s_hit_xy", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
