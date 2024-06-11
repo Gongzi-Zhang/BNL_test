@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 	cout << WARNING << "not a data/cosmic run: " << run << endl;
 	exit(1);
     }
+    cout << INFO << "processing run: " << run << endl;
 
     const int pedRun = db.getPedRun(run);
     pedestal ped;
@@ -154,13 +155,16 @@ int main(int argc, char *argv[])
 	xmax["event_mul1"]["HG"] = 20;
 	xmax["event_mul2"]["LG"] = 20;
 	xmax["event_mul2"]["HG"] = 20;
-	xmax["ch_raw_e"]["LG"] = 300;
+	xmax["ch_raw_e"]["LG"] = 400;
 	xmax["ch_raw_e"]["HG"] = 800;
-	xmax["ch_cor_e"]["LG"] = 100;
+	xmax["ch_cor_e"]["LG"] = 200;
 	xmax["ch_cor_e"]["HG"] = 800;
     }
+    TFile *fout = new TFile(Form("%s/data/Run%d_hist.root", cali::CALIROOT, run), "recreate");
     for (auto gain : cali::gains)
     {
+	cout << INFO << "reading " << gain << endl;
+
 	h1[gain]["hit_e"] = new TH1F(Form("%s_hit_e", gain), Form("%s: hit energy;ADC", gain), 100, 0, xmax["hit_e"][gain]);
 
 	h1[gain]["event_rate"]  = new TH1F(Form("%s_event_rate", gain),  Form("%s: rate;Time", gain), 100, startTS, endTS);
@@ -183,7 +187,7 @@ int main(int argc, char *argv[])
 	for (int ch=0; ch<cali::nChannels; ch++)
 	{
 	    h1Channel[gain]["raw"].push_back(new TH1F(Form("%s_raw_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["ch_raw_e"][gain]));
-	    h1Channel[gain]["cor"].push_back(new TH1F(Form("%s_cor_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, 0, xmax["ch_cor_e"][gain]));
+	    h1Channel[gain]["cor"].push_back(new TH1F(Form("%s_cor_ch%d", gain, ch), Form("%s: Ch %d", gain, ch), 100, -100, xmax["ch_cor_e"][gain]));
 	}
 
 	h2[gain]["hit_xy"] = new TH2F(Form("%s_hit_xy", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
@@ -281,6 +285,7 @@ int main(int argc, char *argv[])
 	    h1[gain]["event_mul2"]->Fill(mul2);
 	}
 
+	fout->cd();
 	TCanvas* c = new TCanvas("c", "c", 1000, 600);
 	for (auto const & x : h1[gain])
 	{
@@ -288,7 +293,7 @@ int main(int argc, char *argv[])
 		c->SetLogy(1);
 	    x.second->Draw("HIST");
 	    c->SaveAs(Form("%s/%s_%s.png", fdir, gain, x.first.c_str()));
-	    x.second->Delete();
+	    x.second->Write();
 	    c->SetLogy(0);
 	}
 	for (auto const & x : h2[gain])
@@ -296,7 +301,7 @@ int main(int argc, char *argv[])
 	    x.second->Draw("text");
 	    reverseXAxis(x.second);
 	    c->SaveAs(Form("%s/%s_%s.png", fdir, gain, x.first.c_str()));
-	    x.second->Delete();
+	    x.second->Write();
 	}
 	delete c;
 
@@ -318,6 +323,7 @@ int main(int argc, char *argv[])
 	    {
 		c1->cd(l+1);
 		x.second[l]->Draw();
+		x.second[l]->Write();
 	    }
 	    c1->SaveAs(Form("%s/%s_layer_%s.png", fdir, gain, x.first.c_str()));
 	}
@@ -347,12 +353,14 @@ int main(int argc, char *argv[])
 		    p->SetLogy(1);
 		    x.second[gCh]->SetStats(false);
 		    x.second[gCh]->Draw();
+		    x.second[gCh]->Write();
 		}
 		c2->SaveAs(Form("%s/%s_channel_%s_%d.png", fdir, gain, x.first.c_str(), cn));
 	    }
 	}
 	delete c2;
     }
-    // tout->write();
     tin->Delete();
+    fout->Write();
+    fout->Close();
 }
