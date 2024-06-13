@@ -21,7 +21,7 @@ declare -A color=( \
 logger()
 {
     level=$1; shift
-    echo -e "($script:$LINENO) ${color[$level]} ${level^^} $reset" $@
+    echo -e "($script:$LINENO) ${color[$level]} ${level^^}$reset -" $@
 }
 
 test()

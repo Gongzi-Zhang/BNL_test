@@ -197,7 +197,11 @@ class convert:
                 while ei[i] < len(self.TS[i]):
                     ts = self.TS[i][ei[i]]
                     if ts > ts0:
-                        break
+                        if ts > ts0*1000:   # some insane value
+                            ei[i] += 1
+                            continue
+                        else:
+                            break
                     diff = ts0 - ts
                     if tdRange[i]['min'] <= diff and diff <= tdRange[i]['max']:
                         foundMatch = True
@@ -240,6 +244,11 @@ class convert:
             event = {}
             for i in range(0, cali.nCAENs):
                 ts = self.TS[i][0]
+                while (ts > ts0*1000):
+                    self.TS[i].pop(0)
+                    self.board[i].pop(0)
+                    ts = self.TS[i][0]
+
                 if ts - ts0 < 10*us:
                     event[i] = ts
             self.nEvents += 1
