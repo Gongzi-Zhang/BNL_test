@@ -45,4 +45,29 @@ bool getPedestal(const int pedRun, pedestal &res)
     return true;
 }
 
+bool getPedestal(const char* pedFileName, pedestal &res)
+{
+    if (!fileExists(pedFileName))
+    {
+	cerr << FATAL << "ped file doesn't exist" << pedFileName << endl;
+	return false;
+    }
+
+    ifstream pedFile(pedFileName);
+    auto ped = nlohmann::json::parse(pedFile);
+    pedFile.close();
+
+    for (auto gain : cali::gains)
+    {
+	for (int ch=0; ch<cali::nChannels; ch++)
+	{
+	    const char* chName = to_string(ch).c_str();
+	    double mean = ped[gain][chName][0];
+	    double rms = ped[gain][chName][1];
+	    res[gain][ch] = {mean, rms};
+	}
+    }
+
+    return true;
+}
 #endif

@@ -27,9 +27,16 @@ QA: QA.C QA.h
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
 
-makeTree: makeTree.C makeTree.h buildEvent.h
+makeTree: makeTree.C makeTree.h 
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
+
+makeCosmic: makeCosmic.C makeCosmic.h buildEvent.h
+	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
+	mv $@ bin/
+
+makeTree1: makeTree1.C makeTree.h buildEvent.h
+	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 
 all: $(libdb)
 # vim: set shiftwidth=4 softtabstop=4 tabstop=8: #

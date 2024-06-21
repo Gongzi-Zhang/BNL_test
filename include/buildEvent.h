@@ -68,7 +68,7 @@ class buildEvent {
 void buildEvent::addBoard(boardReadout *b)
 {
     int bid = b->getId();
-    if (b->getnChannels() != cali::nCAENChannels)
+    if (b->getnChannels() != cali::nCAENChannels && b->getnChannels() != cali::nChannels)
     {
 	cerr << WARNING << "bad board record in board " << bid << ", "
 	     << b->getnChannels() << "/" << cali::nCAENChannels << "recorded; timestamps: " << b->getTS() << endl;
