@@ -59,62 +59,62 @@ class QA {
 void QA::init()
 {
     map<string, double[2]> xmax;
-    xmax["hitADC"][0]	= 8500; xmax["hitADC"][1]   = 8500;
-    xmax["eventADC"][0]	= 1e5;	xmax["eventADC"][1] = 6e5;
-    xmax["eventMul"][0]	= 200;	xmax["eventMul"][1] = 200;
-    xmax["eventMul1"][0] = 200; xmax["eventMul1"][1] = 200;
-    xmax["eventMul2"][0] = 200; xmax["eventMul2"][1] = 200;
-    xmax["chRawADC"][0]	= 2000; xmax["chRawADC"][1]  = 8500;
-    xmax["chCorADC"][0]	= 2000; xmax["chCorADC"][1]  = 8500;
+    xmax["hit_ADC"][0]	= 8500;	    xmax["hit_ADC"][1]   = 8500;
+    xmax["event_ADC"][0]  = 1e5;    xmax["event_ADC"][1] = 6e5;
+    xmax["event_mul"][0]  = 200;    xmax["event_mul"][1] = 200;
+    xmax["event_mul1"][0] = 200;    xmax["event_mul1"][1] = 200;
+    xmax["event_mul2"][0] = 200;    xmax["event_mul2"][1] = 200;
+    xmax["ch_raw_ADC"][0] = 2000;   xmax["ch_raw_ADC"][1]  = 8500;
+    xmax["ch_cor_ADC"][0] = 2000;   xmax["ch_cor_ADC"][1]  = 8500;
 
     if (runType == "cosmic")
     {
-	xmax["hitADC"][0] = 1000;	xmax["hitADC"][1] = 1000;
-	xmax["eventADC"][0] = 1000;	xmax["eventADC"][1] = 1000;
-	xmax["eventMul"][0] = 100;	xmax["eventMul"][1] = 100;
-	xmax["eventMul1"][0] = 20;	xmax["eventMul1"][1] = 20;
-	xmax["eventMul2"][0] = 20;	xmax["eventMul2"][1] = 20;
-	xmax["chRawADC"][0] = 400;	xmax["chRawADC"][1] = 400;
-	xmax["chCorADC"][0] = 200;	xmax["chCorADC"][1] = 200;
+	xmax["hit_ADC"][0] = 1000;	xmax["hit_ADC"][1] = 1000;
+	xmax["event_ADC"][0] = 1000;	xmax["event_ADC"][1] = 1000;
+	xmax["event_mul"][0] = 100;	xmax["event_mul"][1] = 100;
+	xmax["event_mul1"][0] = 20;	xmax["event_mul1"][1] = 20;
+	xmax["event_mul2"][0] = 20;	xmax["event_mul2"][1] = 20;
+	xmax["ch_raw_ADC"][0] = 400;	xmax["ch_raw_ADC"][1] = 400;
+	xmax["ch_cor_ADC"][0] = 200;	xmax["ch_cor_ADC"][1] = 200;
     }
     for (int i=0; i<2; i++) // gain
     {
 	const char* gain = (0 == i) ? "LG" : "HG";
 
-	h1["hitADC"][i] = new TH1F(Form("hitADC_%s", gain), Form("%s: hit energy;ADC", gain), 100, 0, xmax["hitADC"][i]);
+	h1["hit_ADC"][i] = new TH1F(Form("hit_ADC_%s", gain), Form("%s: hit energy;ADC", gain), 100, 0, xmax["hit_ADC"][i]);
 
-	h1["eventRate"][i]  = new TH1F(Form("eventRate_%s", gain),  Form("%s: rate;Time", gain), 100, 0, 10);	// needs update later
-	h1["eventMul"][i]   = new TH1F(Form("eventMul_%s",  gain),  Form("%s: mul", gain), xmax["eventMul"][i], 0, xmax["eventMul"][i]);
-	h1["eventMul1"][i]  = new TH1F(Form("eventMul1_%s", gain),  Form("%s: mul (3#sigma)", gain), xmax["eventMul1"][i], 0, xmax["eventMul1"][i]);
-	h1["eventMul2"][i]  = new TH1F(Form("eventMul2_%s", gain),  Form("%s: mul (5#sigma)", gain), xmax["eventMul2"][i], 0, xmax["eventMul2"][i]);
-	h1["eventADC"][i] = new TH1F(Form("eventADC_%s", gain),  Form("%s: event energy;ADC", gain), 100, 0, xmax["eventADC"][i]);
-	h1["eventX"][i] = new TH1F(Form("eventX_%s", gain),  Form("%s: COG X;cm", gain), 100, -10, 10);
-	h1["eventY"][i] = new TH1F(Form("eventY_%s", gain),  Form("%s: COG Y;cm", gain), 100, -10, 10);
-	h1["eventZ"][i] = new TH1F(Form("eventZ_%s", gain),  Form("%s: COG Z;layer", gain), 100, 0, cali::nLayers);
+	h1["event_rate"][i]  = new TH1F(Form("event_rate_%s", gain),  Form("%s: rate;Time", gain), 100, 1e8, 1e10);	// needs update later
+	h1["event_mul"][i]   = new TH1F(Form("event_mul_%s",  gain),  Form("%s: mul", gain), xmax["event_mul"][i], 0, xmax["event_mul"][i]);
+	h1["event_mul1"][i]  = new TH1F(Form("event_mul1_%s", gain),  Form("%s: mul (3#sigma)", gain), xmax["event_mul1"][i], 0, xmax["event_mul1"][i]);
+	h1["event_mul2"][i]  = new TH1F(Form("event_mul2_%s", gain),  Form("%s: mul (5#sigma)", gain), xmax["event_mul2"][i], 0, xmax["event_mul2"][i]);
+	h1["event_ADC"][i] = new TH1F(Form("event_ADC_%s", gain),  Form("%s: event energy;ADC", gain), 100, 0, xmax["event_ADC"][i]);
+	h1["event_x"][i] = new TH1F(Form("event_x_%s", gain),  Form("%s: COG X;cm", gain), 100, -10, 10);
+	h1["event_y"][i] = new TH1F(Form("event_y_%s", gain),  Form("%s: COG Y;cm", gain), 100, -10, 10);
+	h1["event_z"][i] = new TH1F(Form("event_z_%s", gain),  Form("%s: COG Z;layer", gain), 100, 0, cali::nLayers);
 
 	for (int l=0; l<cali::nLayers; l++)
 	{
-	    h1Layer["mul"][l][i] = new TH1F(Form("layerMul_%d_%s", l, gain), Form("%s: layer %d", gain, l), 100, 0, 100);
-	    h1Layer["ADC"][l][i] = new TH1F(Form("layerADC_%d_%s", l, gain),   Form("%s: layer %d", gain, l), 100, 0, 1000);
-	    h1Layer["X"][l][i] = new TH1F(Form("layerX_%d_%s", l, gain),   Form("%s: layer %d", gain, l), 100, -10, 10);
-	    h1Layer["Y"][l][i] = new TH1F(Form("layerY_%d_%s", l, gain),   Form("%s: layer %d", gain, l), 100, -10, 10);
+	    h1Layer["mul"][l][i] = new TH1F(Form("layer%d_mul_%s", l, gain), Form("%s: layer %d", gain, l), 100, 0, 100);
+	    h1Layer["ADC"][l][i] = new TH1F(Form("layer%d_ADC_%s", l, gain), Form("%s: layer %d;ADC", gain, l), 100, 0, 1000);
+	    h1Layer["x"][l][i] = new TH1F(Form("layer%d_x_%s", l, gain),   Form("%s: layer %d;cm", gain, l), 100, -10, 10);
+	    h1Layer["y"][l][i] = new TH1F(Form("layer%d_y_%s", l, gain),   Form("%s: layer %d;cm", gain, l), 100, -10, 10);
 	}
 
 	for (int ch=0; ch<cali::nChannels; ch++)
 	{
-	    h1Channel["raw"][ch][i] = new TH1F(Form("chRaw_%d_%s", ch, gain), Form("%s: Ch %d", gain, ch), 100, 0, xmax["chRawADC"][i]);
-	    h1Channel["cor"][ch][i] = new TH1F(Form("chCor_%d_%s", ch, gain), Form("%s: Ch %d", gain, ch), 100, -100, xmax["chCorADC"][i]);
+	    h1Channel["raw"][ch][i] = new TH1F(Form("ch%d_raw_%s", ch, gain), Form("%s: Ch %d;ADC", gain, ch), 100, 0, xmax["ch_raw_ADC"][i]);
+	    h1Channel["cor"][ch][i] = new TH1F(Form("ch%d_cor_%s", ch, gain), Form("%s: Ch %d;ADC", gain, ch), 100, -100, xmax["ch_cor_ADC"][i]);
 	}
 
-	h2["hitXY"][i] = new TH2F(Form("hitXY_%s", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
+	h2["hit_xy"][i] = new TH2F(Form("hit_xy_%s", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
 
 	// formats
-	h1["eventRate"][i]->GetXaxis()->SetTimeDisplay(1);
-	// h1["eventRate"][i]->GetXaxis()->SetTimeOffset(0, "gmt");
-	h1["eventRate"][i]->GetXaxis()->SetTimeFormat("%H:%M");
-	h1["eventRate"][i]->SetStats(false);
+	h1["event_rate"][i]->GetXaxis()->SetTimeDisplay(1);
+	// h1["event_rate"][i]->GetXaxis()->SetTimeOffset(0, "gmt");
+	h1["event_rate"][i]->GetXaxis()->SetTimeFormat("%H:%M");
+	h1["event_rate"][i]->SetStats(false);
 
-	h2["hitXY"][i]->SetStats(false);
+	h2["hit_xy"][i]->SetStats(false);
     }
 }
 
@@ -160,7 +160,7 @@ void QA::fill()
     t->GetEntry(t->GetEntries() - 1);
     double endTS = TS + 10;
     for (int i=0; i<2; i++)
-	h1["eventRate"][i]->GetXaxis()->SetRangeUser(startTS, endTS);
+        h1["event_rate"][i]->GetXaxis()->SetLimits(startTS, endTS);
 
     cali::sipmXY pos[cali::channelMax];
     int layerNumber[cali::channelMax];
@@ -198,10 +198,10 @@ void QA::fill()
 		layerY[l][i] = 0;
 	    }
 
-	    h1["eventRate"][i]->Fill(TS, rate);
-	    h1["eventMul"][i]->Fill(iVal["mul"][i]);
-	    h1["eventMul1"][i]->Fill(iVal["mul1"][i]);
-	    h1["eventMul2"][i]->Fill(iVal["mul2"][i]);
+	    h1["event_rate"][i]->Fill(TS, rate);
+	    h1["event_mul"][i]->Fill(iVal["mul"][i]);
+	    h1["event_mul1"][i]->Fill(iVal["mul1"][i]);
+	    h1["event_mul2"][i]->Fill(iVal["mul2"][i]);
 
 	    for (int ch=0; ch<cali::nChannels; ch++)
 	    {
@@ -214,8 +214,8 @@ void QA::fill()
 		float adc = chCorADC[ch][i];
 		if (adc > 0)
 		{
-		    h1["hitADC"][i]->Fill(adc);
-		    h2["hitXY"][i]->Fill(x, y);
+		    h1["hit_ADC"][i]->Fill(adc);
+		    h2["hit_xy"][i]->Fill(x, y);
 		    h1Channel["cor"][ch][i]->Fill(adc);
 		    layerMul[layer][i]++;
 		    layerADC[layer][i] += adc;
@@ -234,10 +234,10 @@ void QA::fill()
 		eventX[i] /= eventADC[i];
 		eventY[i] /= eventADC[i];
 		eventZ[i] /= eventADC[i];
-		h1["eventADC"][i]->Fill(eventADC[i]);
-		h1["eventX"][i]->Fill(eventX[i]);
-		h1["eventY"][i]->Fill(eventY[i]);
-		h1["eventZ"][i]->Fill(eventZ[i]);
+		h1["event_ADC"][i]->Fill(eventADC[i]);
+		h1["event_x"][i]->Fill(eventX[i]);
+		h1["event_y"][i]->Fill(eventY[i]);
+		h1["event_z"][i]->Fill(eventZ[i]);
 	    }
 	    for (int l=0; l<cali::nLayers; l++)
 	    {
@@ -247,8 +247,8 @@ void QA::fill()
 		{
 		    layerX[l][i] /= layerADC[l][i];
 		    layerY[l][i] /= layerADC[l][i];
-		    h1Layer["X"][l][i]->Fill(layerX[l][i]);
-		    h1Layer["Y"][l][i]->Fill(layerY[l][i]);
+		    h1Layer["x"][l][i]->Fill(layerX[l][i]);
+		    h1Layer["y"][l][i]->Fill(layerY[l][i]);
 		}
 	    }
 	}
@@ -266,7 +266,7 @@ void QA::plot()
 	const char* gain = (0 == i) ? "LG" : "HG";
 	for (auto const & x : h1)
 	{
-	    if (x.first == "eventADC" || x.first == "hitADC")
+	    if (x.first == "event_ADC" || x.first == "hit_ADC")
 		c->SetLogy(1);
 	    x.second[i]->Draw("HIST");
 	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, x.first.c_str()));

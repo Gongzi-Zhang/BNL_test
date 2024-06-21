@@ -5,6 +5,7 @@ data/Run*.json
 work/
 bin/QA
 bin/test
+bin/makeTree
 raw/
 **/__pycache__/
 *.root

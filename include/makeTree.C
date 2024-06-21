@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     tm t{};
     istringstream ss(st);
     ss >> get_time(&t, "%Y-%b-%d %H:%M:%S");
-    time_t startTime = mktime(&t);
+    time_t startTime = mktime(&t) - 5*3600; // FiXME why it is 5 hours here?
 
     while (li<9)
     {
