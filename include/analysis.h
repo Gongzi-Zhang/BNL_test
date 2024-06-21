@@ -1,3 +1,6 @@
+#ifndef _ANALYSIS_
+#define _ANALYSIS_
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -26,6 +29,7 @@ bool getPedestal(const int pedRun, pedestal &res)
 
     ifstream pedFile(pedFileName);
     auto ped = nlohmann::json::parse(pedFile);
+    pedFile.close();
 
     for (auto gain : cali::gains)
     {
@@ -40,3 +44,5 @@ bool getPedestal(const int pedRun, pedestal &res)
 
     return true;
 }
+
+#endif

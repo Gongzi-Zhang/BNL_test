@@ -23,7 +23,11 @@ test: test.C $(libdb)
 	g++ $(CXXFLAGS) -o $@ $^ $(sqlite3_libs)
 	mv $@ bin/
 
-QA: QA.C 
+QA: QA.C QA.h
+	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
+	mv $@ bin/
+
+makeTree: makeTree.C makeTree.h buildEvent.h
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
 

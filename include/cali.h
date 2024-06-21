@@ -1,18 +1,24 @@
 #ifndef __CALI__
 #define __CALI__
 
+#include <iostream>
 #include <stdlib.h>
 #include <cassert>
 #include "utilities.h"
 
 // units
-int mm = 1;
-int cm = 10*mm;
+const int us = 1;
+const int ms = 1000*us;
+const int s = 1000*ms;
+
+const int mm = 1;
+const int cm = 10*mm;
 
 namespace cali {
     const char* CALIROOT = (assert(getenv("CALIROOT") != NULL), true)
 	? getenv("CALIROOT")
 	: ".";
+    const char* backupDir = "/media/arratialab/CALI/BNL_test/";
 
     /* CAEN:	  CAEN unit
      * channel:   channel count: 0-192
@@ -24,6 +30,7 @@ namespace cali {
 
 	  int run = -1;
     	  int nCAENs = 3;
+    const int CAENMax = 5;
     const int nCAENChannels = 64;
 	  int nChannels = nCAENs*nCAENChannels;
           int nLayers = 11;
@@ -33,6 +40,8 @@ namespace cali {
     const int nLayerBoards = 4;
           int nHexBoards = nHexLayers*nLayerBoards;
           int nSqaBoards = nSqaLayers*nLayerBoards;
+	  int nBoards = nHexBoards + nSqaBoards;
+    const int boardMax = 80;
     const int nHexBoardChannels = 7;
     const int nSqaBoardChannels = 4;
           int nHexChannels = nHexBoards*nHexBoardChannels;
@@ -49,15 +58,6 @@ namespace cali {
     const double layerZ = 27.1526*mm;
 
     const char* gains[] = {"LG", "HG"};
-
-    struct ADC_L {
-	long long LG;
-	long long HG;
-    };
-    struct ADC {
-	float LG;
-	float HG;
-    };
 
     void setRun(const int r)
     {
@@ -253,4 +253,3 @@ namespace cali {
 }
 
 #endif
-
