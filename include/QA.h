@@ -38,7 +38,7 @@ class QA {
     QA() {}
     ~QA() {}
     void setRunType(string rt) { runType = rt; }
-    void setRootFiles(vector<string> fin) { rootFiles = fin; }
+    void setRootFile(string fin) { rootFile = fin; }
     void setOutDir(string d) { fdir = d; }
     void init();
     void fill();
@@ -46,8 +46,9 @@ class QA {
 
   private:
     string runType = "data";
-    vector<string> rootFiles;
+    string rootFile;
     string fdir;
+    time_t deltaT = 5*3600;
 
     // histograms
     map<string, TH1F*[2]> h1;
@@ -121,15 +122,14 @@ void QA::init()
 void QA::fill()
 {
     cerr << INFO << "filling histograms" << endl;
-    TChain *t = new TChain("cor");
-    for (string rf : rootFiles)
-	t->AddFile(rf.c_str());
+    TFile *fin = new TFile(rootFile.c_str(), "read");
+    TTree *t = (TTree*) fin->Get("cor");
+    t->AddFriend("raw");
     if (!t->GetEntries())
     {
-	cerr << FATAL << "no entry in the roofile: " << rootFiles[0] << endl;
+	cerr << FATAL << "no entry in the roofile: " << rootFile << endl;
 	return;
     }
-    t->AddFriend("raw");
 
     double TS;
     float rate;

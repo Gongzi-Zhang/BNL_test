@@ -18,8 +18,7 @@ class makeTree {
     void setPed(const pedestal p) { ped = p; }
     void setBuilder(buildEvent* b) { eb = b; }
     void setStartTime(time_t t) { st = t; }
-    void setOfPrefix(string p) { ofPrefix = p; }
-    void addSplit() { split++; }
+    void setOfName(string n) { ofName = n; }
     void init();
     void fill(const int n);
     void write();
@@ -36,14 +35,15 @@ class makeTree {
     map<int, pair<float, float>> corADC;
     pair<int, int> mul, mul1, mul2;
 
+    TFile *fout;
     TTree *traw = NULL;
     TTree *tcor = NULL;
-    int split = 0;
-    string ofPrefix;
+    string ofName;
 };
 
 void makeTree::init()
 {
+    TFile *fout = new TFile(ofName.c_str(), "recreate");
     traw = new TTree("raw", "raw ADC values");
     tcor = new TTree("cor", "corrected ADC values");
 
@@ -104,7 +104,7 @@ void makeTree::fill(const int n = -1)
 
 	    }
 	    // HG
-	    if (corADC[ch].second > ped["HG"][ch].rms)
+	    if (corADC[ch].second < ped["HG"][ch].rms)
 		corADC[ch].second = 0;
 	    else
 	    {
@@ -124,13 +124,6 @@ void makeTree::fill(const int n = -1)
 
 void makeTree::write()
 {
-    string fname;
-    if (split)
-	fname = Form("%s_%d.root", ofPrefix.c_str(), split);
-    else
-	fname = Form("%s.root", ofPrefix.c_str());
-
-    TFile *fout = new TFile(fname.c_str(), "recreate");
     traw->Write();
     tcor->Write();
     fout->Close();

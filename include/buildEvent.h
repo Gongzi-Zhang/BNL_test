@@ -76,6 +76,15 @@ void buildEvent::addBoard(boardReadout *b)
     }
     boards[bid].push_back(b);
     TS[bid].push_back(b->getTS());
+
+    bool batch = true;
+    for (int ci=0; ci<cali::nCAENs; ci++)
+    {
+	if (boards[ci].size() < 50000)
+	    batch = false;
+    }
+    if (batch)
+	build();
 }
 
 void buildEvent::getTimeDiff()

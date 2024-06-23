@@ -7,12 +7,13 @@
 #include "utilities.h"
 
 // units
-const int us = 1;
-const int ms = 1000*us;
-const int s = 1000*ms;
+const double s = 1;
+const double ms = 1e-3*s;
+const double us = 1e-6*s;
 
-const int mm = 1;
-const int cm = 10*mm;
+const double m = 1;
+const double cm = 1e-2*m;
+const double mm = 1e-3*m;
 
 namespace cali {
     const char* CALIROOT = (assert(getenv("CALIROOT") != NULL), true)
@@ -120,11 +121,13 @@ namespace cali {
 	{38, 54, 21, 18},   // square
 	{44, 22, 58, 47},   // square
 	{50, 57, 33, 31},   // square
-	{ 0, 15, 46, 35},   // square
+	{ 0, 15, 46, 24},   // square, the bottom right board number is unknown, guess it to be 24
 	{ 0, 20, 45, 36},   // square
 	{42, 49, 23, 16},   // square
 	{17, 52, 19, 51},   // square
 	{55, 43, 32, 39},   // square
+	{34, 56, 35, 59},   // sauqre
+	{ 0,  0,  0, 29},   // sauqre
     };
 
     sipmXY pcbAnchor[] = {
@@ -228,7 +231,7 @@ namespace cali {
 		|| 42 == bl || 39 == bl	// right side square
 		)    
 	    pos = sqaBoardSipmXY_topdown[sp.sipm];
-	else if (18 == bl || 38 == bl || 35 == bl || 16 == bl || 17 == bl)	// right side square, flip the index
+	else if (18 == bl || 38 == bl || 24 == bl || 16 == bl || 17 == bl)	// right side square, flip the index
 	    pos = sqaBoardSipmXY_topdown[nSqaBoardChannels - 1 - sp.sipm];
 	else if (sp.layer < nHexLayers) // general hex tile
 	    pos = hexBoardSipmXY[sp.sipm];

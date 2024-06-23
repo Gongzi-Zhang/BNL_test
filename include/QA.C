@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 {
     bool runMode = true;
     int run = 0;
-    vector<string> inputFiles;
+    string inputFile;
 
     if (argc == 2)
     {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	    switch (opt)
 	    {
 		case 'i':
-		    inputFiles.push_back(optarg);
+		    inputFile = optarg;
 		    break;
 		case 'r':
 		    run = stoi(optarg);
@@ -61,39 +61,26 @@ int main(int argc, char *argv[])
 
     if (runMode)
     {
-	for (const char* dir : {cali::CALIROOT, cali::backupDir})
+	bool found = false;
+	vector<const char*> dirs = {cali::CALIROOT, cali::backupDir};
+	for (const char* dir : dirs)
 	{
-	    bool found = false;
 	    char runFile[1024];
 	    sprintf(runFile, "%s/data/Run%d.root", dir, run);
 	    if (fileExists(runFile))
 	    {
 		found = true;
-		inputFiles.push_back(runFile);
-	    }
-	    else
-	    {
-		int i=1;
-		sprintf(runFile, "%s/data/Run%d_%d.root", dir, run, i);
-		while (fileExists(runFile))
-		{
-		    found = true;
-		    inputFiles.push_back(runFile);
-		    i++;
-		    sprintf(runFile, "%s/data/Run%d_%d.root", dir, run, i);
-		}
-		cout << INFO << "find " << i-1 << " root files for run " << run << endl ;
-	    }
-	    if (found)
+		inputFile = runFile;
 		break;
-	    else
-		cout << WARNING << "no root file found for run " << run << " in dir " << dir << endl;
+	    }
 	}
-    }
-    if (!inputFiles.size())
-    {
-	cerr << FATAL << "no root file found" << endl;
-	exit(4);
+	if (!found)
+	{
+	    cerr << ERROR << "no root file found for run " << run << " in the following dirs: " << endl;
+	    for (auto dir : dirs)
+		cout << "\t" << dir << endl;
+	    exit(4);
+	}
     }
     
     char fdir[1024];
@@ -106,7 +93,7 @@ int main(int argc, char *argv[])
 
     QA *qa = new QA();
     qa->setRunType(runType.c_str());
-    qa->setRootFiles(inputFiles);
+    qa->setRootFile(inputFile);
     qa->setOutDir(fdir);
     qa->init();
     qa->fill();

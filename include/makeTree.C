@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
 	cout << WARNING << "not a data/cosmic run: " << run << endl;
 	exit(1);
     }
-    string outPrefix = cali::CALIROOT;
-    outPrefix += "/data/Run" + to_string(run);
+    string outName = cali::CALIROOT;
+    outName += "/data/Run" + to_string(run) + ".root";
 
     const int pedRun = db.getPedRun(run);
     pedestal ped;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     tm t{};
     istringstream ss(st);
     ss >> get_time(&t, "%Y-%b-%d %H:%M:%S");
-    time_t startTime = mktime(&t) - 5*3600; // FiXME why it is 5 hours here?
+    time_t startTime = mktime(&t); // UTC time
 
     while (li<9)
     {
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     maker->setStartTime(startTime);
     maker->setPed(ped);
     maker->setBuilder(builder);
-    maker->setOfPrefix(outPrefix);
+    maker->setOfName(outName);
 
     while (getline(fin, line))
     {
@@ -109,19 +109,13 @@ int main(int argc, char *argv[])
 	if (6 == n)
 	{
 	    if (board)
-		builder->addBoard(board);
-	    if (li % (64*cali::nCAENs*101000) == 0)
 	    {
-		builder->build();
-		if (builder->getnEvents() >= 100000)
-		{
-		    maker->fill(100000);
-		    maker->addSplit();
-		    maker->write();
-		}
+		builder->addBoard(board);
+		if (builder->getnEvents() >= 50000)
+		    maker->fill(50000);
 	    }
 
-	    ts  = stod(fields[0]);
+	    ts  = stod(fields[0])*us;
 	    bid = stoi(fields[2]);
 	    ch  = stoi(fields[3]);
 	    LG  = stoi(fields[4]);
