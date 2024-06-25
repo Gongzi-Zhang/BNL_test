@@ -1,8 +1,9 @@
 '''
-global settings
+global settings for CALI
 '''
 
 import os
+import calo
 from utilities import *
 
 if 'CALIROOT' not in os.environ:
@@ -17,7 +18,7 @@ backupDir = '/media/arratialab/CALI/BNL_test/'
 CAEN:       CAEN unit count: 0-2
 channel:    channel count: 0-192
 layer:      sampling layers: 0-12
-board:	    PCB count: 0-50
+board:      PCB count: 0-50
 quadrant:   quadrant count in a layer: 0-3
 sipm:       SiPM count in a PCB: 0-6
 '''
@@ -45,9 +46,9 @@ mm = 1
 cm = 10*mm
 
 gapX = 0*mm
-gapY = 2.54*mm	# 0.1 in
-pcbX = 131.92*mm	# 177.64 - 45.72
-pcbY = 97.99*mm	# 130.91 - 32.92
+gapY = 2.54*mm  # 0.1 in
+pcbX = 131.92*mm    # 177.64 - 45.72
+pcbY = 97.99*mm # 130.91 - 32.92
 layerZ = 27.1526*mm
 
 gains = ["LG", "HG"]
@@ -63,26 +64,30 @@ def setRun(r):
     global nSqaBoards
     global nSqaChannels
     if run < 3:
-	    nCAENs = 1
-	    nChannels = 56
-	    nHexLayers = 2
-	    nHexBoards = 8
-	    nHexChannels = 56
-	    nSqaLayers = 0
-	    nSqaBoards = 0
-	    nSqaChannels = 0
+        nCAENs = 1
+        nChannels = 56
+        nHexLayers = 2
+        nHexBoards = 8
+        nHexChannels = 56
+        nSqaLayers = 0
+        nSqaBoards = 0
+        nSqaChannels = 0
+        calo.setnCAENChannels([56])
     elif run < 4:
-	    nCAENs = 3
-	    nChannels = 176
-	    nHexLayers = 4
-	    nHexBoards = 16
-	    nHexChannels = 112
-	    nSqaLayers = 4
-	    nSqaBoards = 16
-	    nSqaChannels = 64
-    elif (run > 5000):
-        nCAENs = 4
-        nChannels = nCAENs*nCAENChannels
+        nCAENs = 3
+        nChannels = 176
+        nHexLayers = 4
+        nHexBoards = 16
+        nHexChannels = 112
+        nSqaLayers = 4
+        nSqaBoards = 16
+        nSqaChannels = 64
+        calo.setnCAENChannels([64, 64, 48])
+    else:
+        calo.setnCAENChannels([64, 64, 64])
+    # elif (run > 5000):
+    #     nCAENs = 4
+    #     nChannels = nCAENs*nCAENChannels
 
 class SiPM:
     layer = -1
@@ -114,15 +119,15 @@ class sipmXY:
 
 boardLabel = [
 # top right, top left, bottom left, bottom right
-    [ 1,  2,  3,  4],	# hexagon
-    [ 5,  6,  7,  8],	# hexagon
-    [10,  9, 11, 12],	# hexagon
-    [26, 13, 25, 28],	# hexagon
-    [30, 41, 14, 37],	# transition: top 2 square, bottom 2 hexagon
-    [38, 54, 21, 18],	# square
-    [44, 22, 58, 47],	# square
-    [50, 57, 33, 31],	# square
-    [ 0, 15, 46, 35],	# square
+    [ 1,  2,  3,  4],   # hexagon
+    [ 5,  6,  7,  8],   # hexagon
+    [10,  9, 11, 12],   # hexagon
+    [26, 13, 25, 28],   # hexagon
+    [30, 41, 14, 37],   # transition: top 2 square, bottom 2 hexagon
+    [38, 54, 21, 18],   # square
+    [44, 22, 58, 47],   # square
+    [50, 57, 33, 31],   # square
+    [ 0, 15, 46, 35],   # square
     [ 0, 20, 45, 36],   # square
     [42, 49, 23, 16],   # square
     [17, 52, 19, 51],   # square
@@ -205,12 +210,12 @@ def getSipmXY(ch):
     bl = boardLabel[sp.layer][sp.quadrant]
     if 25 == bl:   # left side hexagonal
         pos = otherHexBoardSipmsipmXY[sp.sipm]
-    elif bl in (28, 37):	# right side hexagonal, flip the index
+    elif bl in (28, 37):    # right side hexagonal, flip the index
         pos = otherHexBoardSipmsipmXY[nHexBoardChannels - 1 - sp.sipm]
     elif bl in (41, 21, 15, 46, 20, 45, 49, 23, 52, 19, 43, 32, # left side square
             30, 44, 47, 31, 36, 42, 39):    # right side square
         pos = otherSqaBoardSipmsipmXY[sp.sipm]
-    elif bl in (18, 38, 35, 16, 17):	# right side square, flip the index
+    elif bl in (18, 38, 35, 16, 17):    # right side square, flip the index
         pos = otherSqaBoardSipmsipmXY[nSqaBoardChannels - 1 - sp.sipm]
     elif sp.layer < nHexLayers: # general hex tile
         pos = hexBoardSipmsipmXY[sp.sipm]

@@ -2,18 +2,11 @@
 #define __CALI__
 
 #include <iostream>
+#include <vector>
 #include <stdlib.h>
 #include <cassert>
+#include "calo.h"
 #include "utilities.h"
-
-// units
-const double s = 1;
-const double ms = 1e-3*s;
-const double us = 1e-6*s;
-
-const double m = 1;
-const double cm = 1e-2*m;
-const double mm = 1e-3*m;
 
 namespace cali {
     const char* CALIROOT = (assert(getenv("CALIROOT") != NULL), true)
@@ -58,7 +51,6 @@ namespace cali {
     const double pcbY = 97.99*mm;	// 130.91 - 32.92
     const double layerZ = 27.1526*mm;
 
-    const char* gains[] = {"LG", "HG"};
 
     void setRun(const int r)
     {
@@ -73,6 +65,7 @@ namespace cali {
 	    nSqaLayers = 0;
 	    nSqaBoards = 0;
 	    nSqaChannels = 0;
+	    calo::setnCAENChannels({56});
 	}
 	else if (run < 4)
 	{
@@ -84,15 +77,20 @@ namespace cali {
 	    nSqaLayers = 4;
 	    nSqaBoards = 16;
 	    nSqaChannels = 64;
+	    calo::setnCAENChannels({64, 64, 48});
 	}
-	// if (run > 500)
-	// {
-	//     nCAENs = 4;
-	//     nChannels = nCAENs*nCAENChannels;
-	//     nSqaLayers = 
-	//     nSqaBoards = nSqaLayers*nLayerBoards;
-	//     nSqaChannels = nSqaBoards*nSqaBoardChannels;
-	// }
+	else
+	{
+            nCAENs = 3;
+	    nChannels = 192;
+	    nHexLayers = 4;
+	    nHexBoards = 16;
+	    nHexChannels = 112;
+	    nSqaLayers = 6;
+	    nSqaBoards = 20;
+	    nSqaChannels = 80;
+	    calo::setnCAENChannels({64, 64, 64});
+	}
     }
 
     typedef struct {

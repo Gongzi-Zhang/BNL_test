@@ -1,135 +1,162 @@
 #ifndef _MAKE_TREE_
 #define _MAKE_TREE_
 
+#include <fstream>
+#include <sstream>
 #include <string>
+#include <vector>
 #include <map>
 #include "TFile.h"
 #include "TTree.h"
-#include "cali.h"
 #include "analysis.h"
-#include "buildEvent.h"
 
 using namespace std;
 
-class makeTree {
+vector<string> split(string in)
+{
+    vector<string> out;
+    istringstream ss(in);
+    string word;
+    while (ss >> word)
+	out.push_back(word);
+    return out;
+}
+
+class boardReadout {
   public:
-    makeTree() {}
-    ~makeTree() {}
+    boardReadout(const int bid, const double ts) { id = bid; TS =ts; }
+    ~boardReadout() {}
+    int getId() const { return id; }
+    int getnChannels() const { return nChannels; }
+    double getTS() const { return TS; }
+    map<int, int> getLG() { return LG; }
+    map<int, int> getHG() { return HG; }
+    void addChannel(int ch, int vLG, int vHG)
+    {
+	LG[ch] = vLG;
+	HG[ch] = vHG;
+	nChannels++;
+    }
+
+  private:
+    int id = -1;
+    double TS = -1;
+    int nChannels = 0;
+    map<int, int> LG;
+    map<int, int> HG;
+};
+
+class listReader {
+  public:
+    listReader(string f) { listFile = f; }
+    ~listReader() {}
+    bool isEof() { return eof; }
+    time_t getStartTime();
+    void read(const int n);
+    void addBoard(boardReadout *b);
+    int  getBoards(const int n, vector<boardReadout*>&);
+
+  private:
+    ifstream fin;
+    string listFile;
+    string line;
+    vector<string> fields;
+    int li = 0;
+    bool eof = false;
+    boardReadout* board;
+    vector<boardReadout*> boards;
+    int nGoods = 0;
+    int nBads = 0;
+};
+
+struct event {
+    double TS;
+    map<int, int> LG;
+    map<int, int> HG;
+};
+
+class eventBuilder {
+  public:
+    eventBuilder(listReader* r) { reader = r; }
+    ~eventBuilder() {}
+    void addBoard(boardReadout*);
+    void getTimeDiff();
+    void build();
+    int  getnEvents() { return events.size(); }
+    int  getEvents(const int n, vector<event*>& ret);
+
+  private:
+    listReader* reader;
+    int nEvents = 0;
+    int nGoods = 0;
+    int nBads = 0;
+    map<int, double> timeDiff;
+    map<int, vector<boardReadout*>> boards;
+    map<int, vector<double>> TS;
+    vector<event*> events;
+};
+
+class treeMaker {
+  public:
+    treeMaker(eventBuilder* b) { builder = b; }
+    ~treeMaker() {}
     void setPed(const pedestal p) { ped = p; }
-    void setBuilder(buildEvent* b) { eb = b; }
     void setStartTime(time_t t) { st = t; }
     void setOfName(string n) { ofName = n; }
     void init();
-    void fill(const int n);
+    void fill();
     void write();
 
   private:
     pedestal ped;
-    buildEvent *eb = NULL;
+    eventBuilder *builder = NULL;
 
+    int nEvents = 0;
     time_t st;
-    double TS;
+    double TS, preTS = 1e32;
     float rate;
 
     map<int, pair<int, int>> rawADC;
     map<int, pair<float, float>> corADC;
     pair<int, int> mul, mul1, mul2;
 
-    TFile *fout;
+    string ofName;
+    TFile *fout = NULL;
     TTree *traw = NULL;
     TTree *tcor = NULL;
-    string ofName;
 };
 
-void makeTree::init()
-{
-    TFile *fout = new TFile(ofName.c_str(), "recreate");
-    traw = new TTree("raw", "raw ADC values");
-    tcor = new TTree("cor", "corrected ADC values");
+class cosmicTreeMaker {
+  public:
+    cosmicTreeMaker(listReader* r) { reader = r; }
+    ~cosmicTreeMaker() {}
+    void setPed(const pedestal p) { ped = p; }
+    void setStartTime(time_t t) { st = t; }
+    void setOfName(string n) { ofName = n; }
+    void addBoard(boardReadout*);
+    void init();
+    void fill();
+    void fill(const int ci);
+    void write();
 
-    traw->Branch("TS", &TS);
-    for (int ch=0; ch<cali::nChannels; ch++)
-    {
-	rawADC[ch] = {0, 0};
-	corADC[ch] = {0, 0};
-	traw->Branch(Form("ch_%d", ch), &rawADC[ch], "LG/I:HG/I");
-	tcor->Branch(Form("ch_%d", ch), &corADC[ch], "LG/F:HG/F");
-    }
+  private:
+    listReader* reader;
+    pedestal ped;
+    string ofName;
+    TFile *fout = NULL;
 
-    tcor->Branch("rate",  &rate);
-    tcor->Branch("mul",   &mul,  "LG/I:HG/I");
-    tcor->Branch("mul1",  &mul1, "LG/I:HG/I");
-    tcor->Branch("mul2",  &mul2, "LG/I:HG/I");
-}
+    vector<int> nEvents;
+    time_t st;
+    double TS;
+    vector<double> preTS;
+    float rate;
 
-void makeTree::fill(const int n = -1)
-{
-    if (!eb)
-    {
-	cerr << ERROR << "No event builder specified." << endl;
-	return;
-    }
-    init();
+    map<int, vector<boardReadout*>> boards;
+    map<int, pair<int, int>> rawADC;
+    map<int, pair<float, float>> corADC;
+    pair<int, int> mul, mul1, mul2;
 
-    int count = 0;
-    double preTS = 1e32;
-    for (auto &evt : eb->getEvents(n))
-    {
-	count++;
-	mul = {0, 0};
-	mul1 = {0, 0};
-	mul2 = {0, 0};
-
-	TS = evt->TS + st;
-	rate = 1/(TS - preTS);
-	preTS = TS;
-	for (int ch=0; ch<cali::nChannels; ch++)
-	{
-	    rawADC[ch].first = evt->LG[ch];
-	    rawADC[ch].second = evt->HG[ch];
-
-	    corADC[ch].first = rawADC[ch].first - ped["LG"][ch].mean;
-	    corADC[ch].second = rawADC[ch].second - ped["HG"][ch].mean;
-	    
-	    // LG
-	    if (corADC[ch].first < ped["LG"][ch].rms)
-		corADC[ch].first = 0;
-	    else
-	    {
-		mul.first++;
-		if (corADC[ch].first > 3*ped["LG"][ch].rms)
-		    mul1.first++;
-		if (corADC[ch].first > 5*ped["LG"][ch].rms)
-		    mul2.first++;
-
-	    }
-	    // HG
-	    if (corADC[ch].second < ped["HG"][ch].rms)
-		corADC[ch].second = 0;
-	    else
-	    {
-		mul.second++;
-		if (corADC[ch].second > 3*ped["HG"][ch].rms)
-		    mul1.second++;
-		if (corADC[ch].second > 5*ped["HG"][ch].rms)
-		    mul2.second++;
-	    }
-	}
-	traw->Fill();
-	tcor->Fill();
-	delete evt;
-    }
-    cout << INFO << count << " events filled" << endl;
-}
-
-void makeTree::write()
-{
-    traw->Write();
-    tcor->Write();
-    fout->Close();
-
-    delete traw;
-    delete tcor;
-    delete fout;
-}
+    vector<TTree *> traw;
+    vector<TTree *> tcor;
+};
 #endif

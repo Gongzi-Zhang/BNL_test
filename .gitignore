@@ -6,6 +6,7 @@ work/
 bin/QA
 bin/test
 bin/makeTree
+bin/convert*
 raw/
 **/__pycache__/
 *.root

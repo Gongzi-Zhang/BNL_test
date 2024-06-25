@@ -4,18 +4,25 @@ VPATH	    := include
 
 root_libs    = `root-config --libs --glibs --cflags`
 sqlite3_libs = -l sqlite3
-cali_libs  = -Llib/ -ldb
+cali_libs  = -Llib/ -ldb -lmakeTree
 
 # include file
+calo 	:= calo.h
 cali 	:= cali.h
-db	:= db.C
+utilities   := utilities.h
+db	    := db.C
+makeTree  := makeTree.C
 
 # libraries
 libdb	:= libdb.so
+libmt	:= libmakeTree.so
 
 
 $(libdb): $(db) $(cali)
 	g++ $(CXXFLAGS) -fPIC --shared -o $@ $< $(sqlite3_libs)
+	mv $@ lib/
+$(libmt): $(makeTree)
+	g++ $(CXXFLAGS) -fPIC --shared -o $@ $< $(root_libs)
 	mv $@ lib/
 
 
@@ -27,16 +34,16 @@ QA: QA.C QA.h
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
 
-makeTree: makeTree.C makeTree.h 
+convert: convert.C
+	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
+	mv $@ bin/
+convert1: convert1.C
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
 
-makeCosmic: makeCosmic.C makeCosmic.h buildEvent.h
+makeCosmic: makeCosmic.C makeCosmic.h 
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
-
-makeTree1: makeTree1.C makeTree.h buildEvent.h
-	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 
 all: $(libdb)
 # vim: set shiftwidth=4 softtabstop=4 tabstop=8: #

@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <nlohmann/json.hpp>
+#include "calo.h"
 #include "cali.h"
 
 using namespace std;
@@ -31,9 +32,9 @@ bool getPedestal(const int pedRun, pedestal &res)
     auto ped = nlohmann::json::parse(pedFile);
     pedFile.close();
 
-    for (auto gain : cali::gains)
+    for (auto gain : calo::gains)
     {
-	for (int ch=0; ch<cali::nChannels; ch++)
+	for (int ch=0; ch<calo::nChannels; ch++)
 	{
 	    const char* chName = to_string(ch).c_str();
 	    double mean = ped[gain][chName][0];
@@ -49,7 +50,7 @@ bool getPedestal(const char* pedFileName, pedestal &res)
 {
     if (!fileExists(pedFileName))
     {
-	cerr << FATAL << "ped file doesn't exist" << pedFileName << endl;
+	cerr << FATAL << "ped file doesn't exist: " << pedFileName << endl;
 	return false;
     }
 
@@ -57,9 +58,9 @@ bool getPedestal(const char* pedFileName, pedestal &res)
     auto ped = nlohmann::json::parse(pedFile);
     pedFile.close();
 
-    for (auto gain : cali::gains)
+    for (auto gain : calo::gains)
     {
-	for (int ch=0; ch<cali::nChannels; ch++)
+	for (int ch=0; ch<calo::nChannels; ch++)
 	{
 	    const char* chName = to_string(ch).c_str();
 	    double mean = ped[gain][chName][0];
