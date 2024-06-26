@@ -16,16 +16,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['func']))
     if (isset($_GET['runs']))
 	$runs = $_GET['runs'];
 
-    if ($func == 'getDateRuns')
-        echo getDateRuns($date);
+    if ($func == 'getDateRunInfo')
+        echo getDateRunInfo($date);
     else if ($func == 'getDatePtrgs')
         echo getDatePtrgs($date);
-    else if ($func == 'getDateQAs')
-        echo getDateQAs($date, $run);
+    else if ($func == 'getDateRuns')
+        echo getDateRuns($date);
     else if ($func == 'getRunQA')
 	echo getRunQA($run);
     else if ($func == 'getRunPtrg')
 	echo getRunPtrg($run);
+    else if ($func == 'getRunChannel')
+	echo getRunChannel($run);
     else if ($func == 'getRunsInfo')
     {
 	if (!$runs)
@@ -40,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['func']))
 	echo "<h2> Unknown function {$func} </h2>";
 }
 
-function getDateRuns($date)
+function getDateRunInfo($date)
 {
     $fields = array('Run', 'Type', 'Flag', 'StartTime', 'StopTime', 'Length', 'Channels', 'Trigger', 'Events', 'PedRun');
     global $cdb;
@@ -52,7 +54,7 @@ function getDateRuns($date)
     return $res;
 }
 
-function getDateQAs($date)
+function getDateRuns($date)
 {
     global $cdb;
     $runs = $cdb->getRuns("date(StartTime) = '{$date}' AND Type in ('data', 'cosmic') AND Flag = 'good'");
@@ -73,7 +75,7 @@ function getRunQA($run)
     global $cali;
     $res = '';
     $imgs = array("event_rate", "hit_xy", "event_mul", "event_mul1", "event_mul2",
-		  "hit_e", "event_e", "event_x", "event_y", "event_z");
+		  "hit_ADC", "event_ADC", "event_x", "event_y", "event_z");
     foreach ($cali::gains as $gain)
 	foreach ($imgs as $img)
 	    $res .= "<img src='figures/$run/{$gain}_{$img}.png' alt='{$gain}_{$img} does not exist' onclick='zoom(this);'/>";
@@ -91,6 +93,21 @@ function getDatePtrgs($date)
     $res = 'Run: ';
     foreach ($runs as $run )
 	$res .= "<a id='$run' href='#' onclick='launchRun({$run})'> {$run} </a>";
+
+    return $res;
+}
+
+function getRunChannel($run)
+{
+    global $cali;
+    global $cdb;
+    $res = $cdb->getRunInfo($run, 'Channels');
+    $nCh = ($res->fetchArray())['Channels'];
+
+    $res = '';
+    foreach ($cali::gains as $gain)
+	for($ch = 0; $ch < $nCh; $ch++)
+	    $res .= "<img src='figures/$run/{$gain}_ch{$ch}_raw.png' alt='{$gain}_ch{$ch}_raw does not exist' onclick='zoom(this);'/>";
 
     return $res;
 }

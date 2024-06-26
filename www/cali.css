@@ -151,6 +151,16 @@ div.calendar a#self {
     display: block;
 }
 
+#channel-plots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#channel-plots img {
+    width: 12.4%;
+    display: block;
+}
 /* for DB */
 #search {
     position: absolute;

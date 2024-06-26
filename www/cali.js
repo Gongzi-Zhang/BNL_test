@@ -42,11 +42,13 @@ function launchDate(date = '')
     var page = document.getElementById('self').text;
     var func = '';
     if (page === 'HOME')
-	func = 'getDateRuns';
+	func = 'getDateRunInfo';
     else if (page === 'QA')
-	func = 'getDateQAs';
+	func = 'getDateRuns';
     else if (page === 'PTRG')
 	func = 'getDatePtrgs';
+    else if (page === 'CHANNEL')
+	func = 'getDateRuns';
 
     var url = "api.php?func=" + func + "&date=" + date;
 
@@ -81,15 +83,20 @@ function launchRun(run)
     var page = document.getElementById('self').text;
     var func = '';
     var id = '';
-    if (page == 'QA')
+    if (page === 'QA')
     {
 	func = 'getRunQA';
 	id = 'QA-plots';
     }
-    else if (page == 'PTRG')
+    else if (page === 'PTRG')
     {
 	func = 'getRunPtrg';
 	id = 'ptrg-plots';
+    }
+    else if (page === 'CHANNEL')
+    {
+	func = 'getRunChannel';
+	id = 'channel-plots';
     }
 
     if (!run)

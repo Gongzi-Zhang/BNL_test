@@ -26,6 +26,7 @@ class _caliHtml
 	'HOME' => 'index.php',
 	'QA'   => 'QA.php',
 	'PTRG' => 'ptrg.php',
+	'CHANNEL' => 'channel.php',
 	// 'DB'   => 'db.php'
     );
 

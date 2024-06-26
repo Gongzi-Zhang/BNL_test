@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>CALI: HOME</title>
+        <title>CALI: QA</title>
 	<link rel="stylesheet" type="text/css" href="cali.css">
 	<script type="text/javascript" src="cali.js"> 
 	</script>
@@ -11,26 +11,22 @@
 	    include_once "libdb.php";
 	    include_once "cali.php";
 	    include_once "api.php";
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
 	?>
+
 	<div id="topnav">
 	    <?php 
-		echo $chtml->topNav('HOME');
+		echo $chtml->topNav('CHANNEL');
 	    ?>
 	</div>
 
-	<div id='leftnav'>
+	<div id="leftnav">
 	    <?php
-		echo $chtml->searchRuns();
-
 		$date = date('Y-m-d', time());
 		if (isset($_GET['date']))
 		    $date = $_GET['date'];
-		$Year = (int)explode('-', $date)[0];
 
-		$out .= "<div id='datenav' title='{$date}')>";
+		$Year = (int)explode('-', $date)[0];
+		$out = "<div id='datenav' title='{$date}'>";
 		$out .= $chtml->dateNav($Year);
 		$out .= "</div>";
 		echo $out;
@@ -38,6 +34,19 @@ error_reporting(E_ALL);
 	</div>
 
 	<div id='content'>
+	    <?php
+		$run = '';
+		if (isset($_GET['run']))
+		    $run = $_GET['run'];
+
+		if ($run)
+		    echo "<div id='runs' title='$run'>";
+		else
+		    echo "<div id='runs'>";
+	    ?>
+	    </div>
+	    <div id='channel-plots'>
+	    </div>
 	</div>
     </body>
 </html>
