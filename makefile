@@ -4,7 +4,7 @@ VPATH	    := include
 
 root_libs    = `root-config --libs --glibs --cflags`
 sqlite3_libs = -l sqlite3
-cali_libs  = -Llib/ -ldb -lmakeTree
+cali_libs  = -Llib/ -lmakeTree
 
 # include file
 calo 	:= calo.h
@@ -30,8 +30,8 @@ test: test.C $(libdb)
 	g++ $(CXXFLAGS) -o $@ $^ $(sqlite3_libs)
 	mv $@ bin/
 
-QA: QA.C QA.h
-	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
+QA: QA.C
+	g++ $(CXXFLAGS) -o $@ $^ $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
 
 convert: convert.C

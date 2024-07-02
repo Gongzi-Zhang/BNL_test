@@ -234,6 +234,7 @@ def createTable():
                 LG integer,
                 HG integer,
                 Ped integer,
+                Vbias float,
                 Size integer,
                 PedRun integer,
                 TrgRate float,

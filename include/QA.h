@@ -55,71 +55,69 @@ class QA {
     time_t deltaT = 5*3600;
 
     // histograms
-    map<string, TH1F*[2]> h1;
-    map<string, TH2F*[2]> h2;
-    map<string, map<int, TH1F*[2]>> h1Layer;
-    map<string, map<int, TH1F*[2]>> h1Channel;
+    map<string, map<string, TH1F*>> h1;
+    map<string, map<string, TH2F*>> h2;
+    map<int, map<string, map<string, TH1F*>>> h1Layer;
+    map<int, map<string, map<string, TH1F*>>> h1Channel;
 };
 
 void QA::init()
 {
-    map<string, double[2]> xmax;
-    xmax["hit_ADC"][0]	= 8500;	    xmax["hit_ADC"][1]   = 8500;
-    xmax["event_ADC"][0]  = 1e5;    xmax["event_ADC"][1] = 6e5;
-    xmax["event_mul"][0]  = 200;    xmax["event_mul"][1] = 200;
-    xmax["event_mul1"][0] = 200;    xmax["event_mul1"][1] = 200;
-    xmax["event_mul2"][0] = 200;    xmax["event_mul2"][1] = 200;
-    xmax["ch_raw_ADC"][0] = 2000;   xmax["ch_raw_ADC"][1]  = 8500;
-    xmax["ch_cor_ADC"][0] = 2000;   xmax["ch_cor_ADC"][1]  = 8500;
+    map<string, map<string, double>> xmax;
+    xmax["hit_ADC"]["LG"]    = 8500;   xmax["hit_ADC"]["HG"]   = 8500;
+    xmax["event_ADC"]["LG"]  = 1e5;    xmax["event_ADC"]["HG"] = 6e5;
+    xmax["event_mul"]["LG"]  = 200;    xmax["event_mul"]["HG"] = 200;
+    xmax["event_mul1"]["LG"] = 200;    xmax["event_mul1"]["HG"] = 200;
+    xmax["event_mul2"]["LG"] = 200;    xmax["event_mul2"]["HG"] = 200;
+    xmax["ch_raw_ADC"]["LG"] = 2000;   xmax["ch_raw_ADC"]["HG"]  = 8500;
+    xmax["ch_cor_ADC"]["LG"] = 2000;   xmax["ch_cor_ADC"]["HG"]  = 8500;
 
     if (runType == "cosmic")
     {
-	xmax["hit_ADC"][0] = 1000;	xmax["hit_ADC"][1] = 1000;
-	xmax["event_ADC"][0] = 1000;	xmax["event_ADC"][1] = 1000;
-	xmax["event_mul"][0] = 100;	xmax["event_mul"][1] = 100;
-	xmax["event_mul1"][0] = 20;	xmax["event_mul1"][1] = 20;
-	xmax["event_mul2"][0] = 20;	xmax["event_mul2"][1] = 20;
-	xmax["ch_raw_ADC"][0] = 400;	xmax["ch_raw_ADC"][1] = 400;
-	xmax["ch_cor_ADC"][0] = 200;	xmax["ch_cor_ADC"][1] = 200;
+	xmax["hit_ADC"]["LG"] = 1000;	xmax["hit_ADC"]["HG"] = 1000;
+	xmax["event_ADC"]["LG"] = 1000;	xmax["event_ADC"]["HG"] = 1000;
+	xmax["event_mul"]["LG"] = 100;	xmax["event_mul"]["HG"] = 100;
+	xmax["event_mul1"]["LG"] = 20;	xmax["event_mul1"]["HG"] = 20;
+	xmax["event_mul2"]["LG"] = 20;	xmax["event_mul2"]["HG"] = 20;
+	xmax["ch_raw_ADC"]["LG"] = 400;	xmax["ch_raw_ADC"]["HG"] = 400;
+	xmax["ch_cor_ADC"]["LG"] = 200;	xmax["ch_cor_ADC"]["HG"] = 200;
     }
-    for (int i=0; i<2; i++) // gain
+    for (auto const &gain : calo::gains) // gain
     {
-	const char* gain = (0 == i) ? "LG" : "HG";
+	h1["hit_ADC"][gain] = new TH1F(Form("hit_ADC_%s", gain), Form("%s: hit energy;ADC", gain), 100, 0, xmax["hit_ADC"][gain]);
 
-	h1["hit_ADC"][i] = new TH1F(Form("hit_ADC_%s", gain), Form("%s: hit energy;ADC", gain), 100, 0, xmax["hit_ADC"][i]);
-
-	h1["event_rate"][i]  = new TH1F(Form("event_rate_%s", gain),  Form("%s: rate;Time", gain), 100, 1e8, 1e10);	// needs update later
-	h1["event_mul"][i]   = new TH1F(Form("event_mul_%s",  gain),  Form("%s: mul", gain), xmax["event_mul"][i], 0, xmax["event_mul"][i]);
-	h1["event_mul1"][i]  = new TH1F(Form("event_mul1_%s", gain),  Form("%s: mul (3#sigma)", gain), xmax["event_mul1"][i], 0, xmax["event_mul1"][i]);
-	h1["event_mul2"][i]  = new TH1F(Form("event_mul2_%s", gain),  Form("%s: mul (5#sigma)", gain), xmax["event_mul2"][i], 0, xmax["event_mul2"][i]);
-	h1["event_ADC"][i] = new TH1F(Form("event_ADC_%s", gain),  Form("%s: event energy;ADC", gain), 100, 0, xmax["event_ADC"][i]);
-	h1["event_x"][i] = new TH1F(Form("event_x_%s", gain),  Form("%s: COG X;cm", gain), 100, -10, 10);
-	h1["event_y"][i] = new TH1F(Form("event_y_%s", gain),  Form("%s: COG Y;cm", gain), 100, -10, 10);
-	h1["event_z"][i] = new TH1F(Form("event_z_%s", gain),  Form("%s: COG Z;layer", gain), 100, 0, cali::nLayers);
+	h1["event_rate"][gain]  = new TH1F(Form("event_rate_%s", gain),  Form("%s: rate;Time", gain), 100, 1e8, 1e10);	// needs update later
+	h1["event_mul"][gain]   = new TH1F(Form("event_mul_%s",  gain),  Form("%s: mul", gain), xmax["event_mul"][gain], 0, xmax["event_mul"][gain]);
+	h1["event_mul1"][gain]  = new TH1F(Form("event_mul1_%s", gain),  Form("%s: mul (3#sigma)", gain), xmax["event_mul1"][gain], 0, xmax["event_mul1"][gain]);
+	h1["event_mul2"][gain]  = new TH1F(Form("event_mul2_%s", gain),  Form("%s: mul (5#sigma)", gain), xmax["event_mul2"][gain], 0, xmax["event_mul2"][gain]);
+	h1["event_ADC"][gain] = new TH1F(Form("event_ADC_%s", gain),  Form("%s: event energy;ADC", gain), 100, 0, xmax["event_ADC"][gain]);
+	h1["event_x"][gain] = new TH1F(Form("event_x_%s", gain),  Form("%s: COG X;cm", gain), 100, -10, 10);
+	h1["event_y"][gain] = new TH1F(Form("event_y_%s", gain),  Form("%s: COG Y;cm", gain), 100, -10, 10);
+	h1["event_z"][gain] = new TH1F(Form("event_z_%s", gain),  Form("%s: COG Z;layer", gain), 100, 0, cali::nLayers);
 
 	for (int l=0; l<cali::nLayers; l++)
 	{
-	    h1Layer["mul"][l][i] = new TH1F(Form("layer%d_mul_%s", l, gain), Form("%s: layer %d", gain, l), 100, 0, 100);
-	    h1Layer["ADC"][l][i] = new TH1F(Form("layer%d_ADC_%s", l, gain), Form("%s: layer %d;ADC", gain, l), 100, 0, 1000);
-	    h1Layer["x"][l][i] = new TH1F(Form("layer%d_x_%s", l, gain),   Form("%s: layer %d;cm", gain, l), 100, -10, 10);
-	    h1Layer["y"][l][i] = new TH1F(Form("layer%d_y_%s", l, gain),   Form("%s: layer %d;cm", gain, l), 100, -10, 10);
+	    h1Layer[l]["mul"][gain] = new TH1F(Form("layer%d_mul_%s", l, gain), Form("%s: layer %d", gain, l), 100, 0, 100);
+	    h1Layer[l]["ADC"][gain] = new TH1F(Form("layer%d_ADC_%s", l, gain), Form("%s: layer %d;ADC", gain, l), 100, 0, 1000);
+	    h1Layer[l]["x"][gain] = new TH1F(Form("layer%d_x_%s", l, gain),   Form("%s: layer %d;cm", gain, l), 100, -10, 10);
+	    h1Layer[l]["y"][gain] = new TH1F(Form("layer%d_y_%s", l, gain),   Form("%s: layer %d;cm", gain, l), 100, -10, 10);
 	}
 
 	for (int ch=0; ch<calo::nChannels; ch++)
 	{
-	    h1Channel["raw"][ch][i] = new TH1F(Form("ch%d_raw_%s", ch, gain), Form("%s: Ch %d;ADC", gain, ch), 100, 0, xmax["ch_raw_ADC"][i]);
-	    h1Channel["cor"][ch][i] = new TH1F(Form("ch%d_cor_%s", ch, gain), Form("%s: Ch %d;ADC", gain, ch), 100, -100, xmax["ch_cor_ADC"][i]);
+	    h1Channel[ch]["raw"][gain] = new TH1F(Form("ch%d_raw_%s", ch, gain), Form("%s: Ch %d;ADC", gain, ch), 100, 0, xmax["ch_raw_ADC"][gain]);
+	    h1Channel[ch]["cor"][gain] = new TH1F(Form("ch%d_cor_%s", ch, gain), Form("%s: Ch %d;ADC", gain, ch), 100, -100, xmax["ch_cor_ADC"][gain]);
 	}
 
-	h2["hit_xy"][i] = new TH2F(Form("hit_xy_%s", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
+	h2["hit_xy"][gain] = new TH2F(Form("hit_xy_%s", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
 
 	// formats
-	h1["event_rate"][i]->GetXaxis()->SetTimeDisplay(1);
-	// h1["event_rate"][i]->GetXaxis()->SetTimeOffset(0, "gmt");
-	h1["event_rate"][i]->GetXaxis()->SetTimeFormat("%H:%M");
-	h1["event_rate"][i]->SetStats(false);
+	h1["event_rate"][gain]->GetXaxis()->SetTimeDisplay(1);
+	// h1["event_rate"][gain]->GetXaxis()->SetTimeOffset(0, "gmt");
+	h1["event_rate"][gain]->GetXaxis()->SetTimeFormat("%H:%M");
+	h1["event_rate"][gain]->SetStats(false);
 
-	h2["hit_xy"][i]->SetStats(false);
+	h2["hit_xy"][gain]->SetStats(false);
     }
 }
 
@@ -145,34 +143,37 @@ void QA::fillData()
 
     double TS;
     float rate;
-    map<string, int[2]> iVal;	// int value
-    map<int, int[2]> chRawADC;
-    map<int, float[2]> chCorADC;
+    map<string, map<string, int>> iVal;	// int value
+    map<int, map<string, int>> chRawADC;
+    map<int, map<string, float>> chCorADC;
 
     t->SetBranchAddress("raw.TS", &TS);
     t->SetBranchAddress("rate", &rate);
     for (const char* var : {"mul", "mul1", "mul2"})
     {
+	iVal[var] = {{"LG", 0}, {"HG", 0}};
 	TBranch *b = (TBranch*) t->GetBranch(var);
-	b->GetLeaf("LG")->SetAddress(iVal[var]);
-	b->GetLeaf("HG")->SetAddress(iVal[var] + 1);
+	b->GetLeaf("LG")->SetAddress(&iVal[var]["LG"]);
+	b->GetLeaf("HG")->SetAddress(&iVal[var]["HG"]);
     }
     for (int ch=0; ch<cali::nChannels; ch++)
     {
+	chRawADC[ch] = {{"LG", 0}, {"HG", 0}};
 	TBranch *braw = (TBranch*) t->GetBranch(Form("raw.ch_%d", ch));
-	braw->GetLeaf("LG")->SetAddress(chRawADC[ch]);
-	braw->GetLeaf("HG")->SetAddress(chRawADC[ch] + 1);
+	braw->GetLeaf("LG")->SetAddress(&chRawADC[ch]["LG"]);
+	braw->GetLeaf("HG")->SetAddress(&chRawADC[ch]["HG"]);
+	chCorADC[ch] = {{"LG", 0.}, {"HG", 0.}};
 	TBranch *bcor = (TBranch*) t->GetBranch(Form("ch_%d", ch));
-	bcor->GetLeaf("LG")->SetAddress(chCorADC[ch]);
-	bcor->GetLeaf("HG")->SetAddress(chCorADC[ch] + 1);
+	bcor->GetLeaf("LG")->SetAddress(&chCorADC[ch]["LG"]);
+	bcor->GetLeaf("HG")->SetAddress(&chCorADC[ch]["HG"]);
     }
 
     t->GetEntry(0);
     double startTS = TS - 10;
     t->GetEntry(t->GetEntries() - 1);
     double endTS = TS + 10;
-    for (int i=0; i<2; i++)
-        h1["event_rate"][i]->GetXaxis()->SetLimits(startTS, endTS);
+    for (auto const& gain : calo::gains)
+        h1["event_rate"][gain]->GetXaxis()->SetLimits(startTS, endTS);
 
     cali::sipmXY pos[cali::channelMax];
     int layerNumber[cali::channelMax];
@@ -195,7 +196,7 @@ void QA::fillData()
     {
 	t->GetEntry(ei);
 
-	for(int i=0; i<2; i++)
+	for(auto const & gain : calo::gains)
 	{
 	    eventADC = 0;
 	    eventX = 0;
@@ -210,10 +211,10 @@ void QA::fillData()
 		layerY[l] = 0;
 	    }
 
-	    h1["event_rate"][i]->Fill(TS, rate);
-	    h1["event_mul"][i]->Fill(iVal["mul"][i]);
-	    h1["event_mul1"][i]->Fill(iVal["mul1"][i]);
-	    h1["event_mul2"][i]->Fill(iVal["mul2"][i]);
+	    h1["event_rate"][gain]->Fill(TS, rate);
+	    h1["event_mul"][gain]->Fill(iVal["mul"][gain]);
+	    h1["event_mul1"][gain]->Fill(iVal["mul1"][gain]);
+	    h1["event_mul2"][gain]->Fill(iVal["mul2"][gain]);
 
 	    for (int ch=0; ch<cali::nChannels; ch++)
 	    {
@@ -221,14 +222,14 @@ void QA::fillData()
 		x = pos[ch].x;
 		y = pos[ch].y;
 
-		h1Channel["raw"][ch][i]->Fill(chRawADC[ch][i]);
+		h1Channel[ch]["raw"][gain]->Fill(chRawADC[ch][gain]);
 
-		float adc = chCorADC[ch][i];
+		float adc = chCorADC[ch][gain];
 		if (adc > 0)
 		{
-		    h1["hit_ADC"][i]->Fill(adc);
-		    h2["hit_xy"][i]->Fill(x/cm, y/cm);
-		    h1Channel["cor"][ch][i]->Fill(adc);
+		    h1["hit_ADC"][gain]->Fill(adc);
+		    h2["hit_xy"][gain]->Fill(x/cm, y/cm);
+		    h1Channel[ch]["cor"][gain]->Fill(adc);
 		    layerMul[layer]++;
 		    layerADC[layer] += adc;
 		    layerX[layer] += adc*x;
@@ -246,21 +247,21 @@ void QA::fillData()
 		eventX /= eventADC;
 		eventY /= eventADC;
 		eventZ /= eventADC;
-		h1["event_ADC"][i]->Fill(eventADC);
-		h1["event_x"][i]->Fill(eventX/cm);
-		h1["event_y"][i]->Fill(eventY/cm);
-		h1["event_z"][i]->Fill(eventZ);
+		h1["event_ADC"][gain]->Fill(eventADC);
+		h1["event_x"][gain]->Fill(eventX/cm);
+		h1["event_y"][gain]->Fill(eventY/cm);
+		h1["event_z"][gain]->Fill(eventZ);
 	    }
 	    for (int l=0; l<cali::nLayers; l++)
 	    {
-		h1Layer["mul"][l][i]->Fill(layerMul[l]);
-		h1Layer["ADC"][l][i]->Fill(layerADC[l]);
+		h1Layer[l]["mul"][gain]->Fill(layerMul[l]);
+		h1Layer[l]["ADC"][gain]->Fill(layerADC[l]);
 		if (layerADC[l])
 		{
 		    layerX[l] /= layerADC[l];
 		    layerY[l] /= layerADC[l];
-		    h1Layer["x"][l][i]->Fill(layerX[l]/cm);
-		    h1Layer["y"][l][i]->Fill(layerY[l]/cm);
+		    h1Layer[l]["x"][gain]->Fill(layerX[l]/cm);
+		    h1Layer[l]["y"][gain]->Fill(layerY[l]/cm);
 		}
 	    }
 	}
@@ -274,9 +275,9 @@ void QA::fillCosmic()
 
     double TS;
     float rate;
-    map<string, int[2]> iVal;	// int value
-    map<int, int[2]> chRawADC;
-    map<int, float[2]> chCorADC;
+    map<string, map<string, int>> iVal;	// int value
+    map<int, map<string, int>> chRawADC;
+    map<int, map<string, float>> chCorADC;
 
     for (int ci=0; ci<calo::nCAENs; ci++)
     {
@@ -292,26 +293,29 @@ void QA::fillCosmic()
 	t->SetBranchAddress("rate", &rate);
 	for (const char* var : {"mul", "mul1", "mul2"})
 	{
+	    iVal[var] = {{"LG", 0}, {"HG", 0}};
 	    TBranch *b = (TBranch*) t->GetBranch(var);
-	    b->GetLeaf("LG")->SetAddress(iVal[var]);
-	    b->GetLeaf("HG")->SetAddress(iVal[var] + 1);
+	    b->GetLeaf("LG")->SetAddress(&iVal[var]["LG"]);
+	    b->GetLeaf("HG")->SetAddress(&iVal[var]["HG"]);
 	}
-	for (int ch=0; ch<cali::nChannels; ch++)
+	for (int ch=0; ch<calo::nCAENChannels[ci]; ch++)    
 	{
-	    TBranch *braw = (TBranch*) t->GetBranch(Form("raw_CAEN%d.ch_%d",ci, ch));
-	    braw->GetLeaf("LG")->SetAddress(chRawADC[ch]);
-	    braw->GetLeaf("HG")->SetAddress(chRawADC[ch] + 1);
+	    chRawADC[ch] = {{"LG", 0}, {"HG", 0}};
+	    TBranch *braw = (TBranch*) t->GetBranch(Form("raw_CAEN%d.ch_%d", ci, ch));
+	    braw->GetLeaf("LG")->SetAddress(&chRawADC[ch]["LG"]);
+	    braw->GetLeaf("HG")->SetAddress(&chRawADC[ch]["HG"]);
+	    chCorADC[ch] = {{"LG", 0.}, {"HG", 0.}};
 	    TBranch *bcor = (TBranch*) t->GetBranch(Form("ch_%d", ch));
-	    bcor->GetLeaf("LG")->SetAddress(chCorADC[ch]);
-	    bcor->GetLeaf("HG")->SetAddress(chCorADC[ch] + 1);
+	    bcor->GetLeaf("LG")->SetAddress(&chCorADC[ch]["LG"]);
+	    bcor->GetLeaf("HG")->SetAddress(&chCorADC[ch]["HG"]);
 	}
 
 	t->GetEntry(0);
 	double startTS = TS - 10;
 	t->GetEntry(t->GetEntries() - 1);
 	double endTS = TS + 10;
-	for (int i=0; i<2; i++)
-	    h1["event_rate"][i]->GetXaxis()->SetLimits(startTS, endTS);
+	for (auto const &gain : calo::gains)
+	    h1["event_rate"][gain]->GetXaxis()->SetLimits(startTS, endTS);
 
 	cali::sipmXY pos[cali::channelMax];
 	int layerNumber[cali::channelMax];
@@ -324,35 +328,35 @@ void QA::fillCosmic()
 	int layer;
 	float x, y;
 
-	float eventADC[2], eventX[2], eventY[2], eventZ[2];
-	map<int, int[2]> layerMul;
-	map<int, float[2]> layerADC;
-	map<int, float[2]> layerX;
-	map<int, float[2]> layerY;
+	float eventADC, eventX, eventY, eventZ;
+	map<int, int> layerMul;
+	map<int, float> layerADC;
+	map<int, float> layerX;
+	map<int, float> layerY;
 
 	for (int ei=0; ei<t->GetEntries(); ei++)
 	{
 	    t->GetEntry(ei);
 
-	    for(int i=0; i<2; i++)
+	    for (auto const &gain : calo::gains)
 	    {
-		eventADC[i] = 0;
-		eventX[i] = 0;
-		eventY[i] = 0;
-		eventZ[i] = 0;
+		eventADC = 0;
+		eventX = 0;
+		eventY = 0;
+		eventZ = 0;
 
 		for (int l=0; l<cali::nLayers; l++)
 		{
-		    layerMul[l][i] = 0;
-		    layerADC[l][i] = 0;
-		    layerX[l][i] = 0;
-		    layerY[l][i] = 0;
+		    layerMul[l] = 0;
+		    layerADC[l] = 0;
+		    layerX[l] = 0;
+		    layerY[l] = 0;
 		}
 
-		h1["event_rate"][i]->Fill(TS, rate);
-		h1["event_mul"][i]->Fill(iVal["mul"][i]);
-		h1["event_mul1"][i]->Fill(iVal["mul1"][i]);
-		h1["event_mul2"][i]->Fill(iVal["mul2"][i]);
+		h1["event_rate"][gain]->Fill(TS, rate);
+		h1["event_mul"][gain]->Fill(iVal["mul"][gain]);
+		h1["event_mul1"][gain]->Fill(iVal["mul1"][gain]);
+		h1["event_mul2"][gain]->Fill(iVal["mul2"][gain]);
 
 		for (int ch=0; ch<cali::nChannels; ch++)
 		{
@@ -360,46 +364,46 @@ void QA::fillCosmic()
 		    x = pos[ch].x/cm;
 		    y = pos[ch].y/cm;
 
-		    h1Channel["raw"][ch][i]->Fill(chRawADC[ch][i]);
+		    h1Channel[ch]["raw"][gain]->Fill(chRawADC[ch][gain]);
 
-		    float adc = chCorADC[ch][i];
+		    float adc = chCorADC[ch][gain];
 		    if (adc > 0)
 		    {
-			h1["hit_ADC"][i]->Fill(adc);
-			h2["hit_xy"][i]->Fill(x, y);
-			h1Channel["cor"][ch][i]->Fill(adc);
-			layerMul[layer][i]++;
-			layerADC[layer][i] += adc;
-			layerX[layer][i] += adc*x;
-			layerY[layer][i] += adc*y;
+			h1["hit_ADC"][gain]->Fill(adc);
+			h2["hit_xy"][gain]->Fill(x, y);
+			h1Channel[ch]["cor"][gain]->Fill(adc);
+			layerMul[layer]++;
+			layerADC[layer] += adc;
+			layerX[layer] += adc*x;
+			layerY[layer] += adc*y;
 
-			eventADC[i] += adc;
-			eventX[i] += adc*x;
-			eventY[i] += adc*y;
-			eventZ[i] += adc*layer;
+			eventADC += adc;
+			eventX += adc*x;
+			eventY += adc*y;
+			eventZ += adc*layer;
 		    }
 		}
 
-		if (eventADC[i])
+		if (eventADC)
 		{
-		    eventX[i] /= eventADC[i];
-		    eventY[i] /= eventADC[i];
-		    eventZ[i] /= eventADC[i];
-		    h1["event_ADC"][i]->Fill(eventADC[i]);
-		    h1["event_x"][i]->Fill(eventX[i]);
-		    h1["event_y"][i]->Fill(eventY[i]);
-		    h1["event_z"][i]->Fill(eventZ[i]);
+		    eventX /= eventADC;
+		    eventY /= eventADC;
+		    eventZ /= eventADC;
+		    h1["event_ADC"][gain]->Fill(eventADC);
+		    h1["event_x"][gain]->Fill(eventX);
+		    h1["event_y"][gain]->Fill(eventY);
+		    h1["event_z"][gain]->Fill(eventZ);
 		}
 		for (int l=0; l<cali::nLayers; l++)
 		{
-		    h1Layer["mul"][l][i]->Fill(layerMul[l][i]);
-		    h1Layer["ADC"][l][i]->Fill(layerADC[l][i]);
-		    if (layerADC[l][i])
+		    h1Layer[l]["mul"][gain]->Fill(layerMul[l]);
+		    h1Layer[l]["ADC"][gain]->Fill(layerADC[l]);
+		    if (layerADC[l])
 		    {
-			layerX[l][i] /= layerADC[l][i];
-			layerY[l][i] /= layerADC[l][i];
-			h1Layer["x"][l][i]->Fill(layerX[l][i]);
-			h1Layer["y"][l][i]->Fill(layerY[l][i]);
+			layerX[l] /= layerADC[l];
+			layerY[l] /= layerADC[l];
+			h1Layer[l]["x"][gain]->Fill(layerX[l]);
+			h1Layer[l]["y"][gain]->Fill(layerY[l]);
 		    }
 		}
 	    }
@@ -410,43 +414,42 @@ void QA::fillCosmic()
 
 void QA::plot()
 {
-    cout << INFO << "producing plots" << endl;
+    cout << INFO << "making plots" << endl;
     gErrorIgnoreLevel = kWarning;
-    for (int g=0; g<2; g++)
+    for (auto const & gain : calo::gains)
     {
 	TCanvas* c = new TCanvas("c", "c", 1000, 600);
-	const char* gain = (0 == g) ? "LG" : "HG";
 	for (auto const & x : h1)
 	{
-	    if (x.first == "event_ADC" || x.first == "hit_ADC")
+	    c->Clear();
+	    string var = x.first;
+	    if (var == "event_ADC" || var == "hit_ADC")
 		c->SetLogy(1);
-	    x.second[g]->Draw("HIST");
-	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, x.first.c_str()));
-	    c->SetLogy(0);
-	    delete x.second[g];
+	    h1[var][gain]->Draw("HIST");
+	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, var.c_str()));
+	    delete h1[var][gain];
 	}
 	for (auto const & x : h2)
 	{
-	    x.second[g]->Draw("text");
-	    reverseXAxis(x.second[g]);
-	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, x.first.c_str()));
-	    delete x.second[g];
+	    string var = x.first;
+	    h2[var][gain]->Draw("text");
+	    reverseXAxis(h2[var][gain]);
+	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, var.c_str()));
 	}
 	delete c;
 
 	// layer plot
 	TCanvas* c1 = new TCanvas("c1", "c1", 800, 600);
-	for (auto const & x : h1Layer)
+	for (int l=0; l<cali::nLayers; l++)
 	{
-	    if (x.first == "ADC")
-		c1->SetLogy();
-	    
-	    for (int l=0; l<cali::nLayers; l++)
+	    for (auto const & x : h1Layer[l])
 	    {
-		TH1F *h = h1Layer[x.first][l][g];
-		h->Draw();
-		c1->SaveAs(Form("%s/%s_layer%d_%s.png", fdir.c_str(), gain, l, x.first.c_str()));
-		delete h;
+		string var = x.first;
+		if (var == "ADC")
+		    c1->SetLogy();
+	    
+		h1Layer[l][var][gain]->Draw();
+		c1->SaveAs(Form("%s/%s_layer%d_%s.png", fdir.c_str(), gain, l, var.c_str()));
 	    }
 	    c1->SetLogy(0);
 	}
@@ -458,15 +461,14 @@ void QA::plot()
 	c2->SetBottomMargin(0.08);
 	c2->SetLeftMargin(0.06);
 	c2->SetRightMargin(0.05);
-	for (auto const & x : h1Channel)
+	for (int ch=0; ch<calo::nChannels; ch++)
 	{
-	    for (int ch=0; ch<calo::nChannels; ch++)
+	    for (auto const & x : h1Channel[ch])
 	    {
-		TH1F *h = h1Channel[x.first][ch][g];
-		h->SetStats(false);
-		h->Draw();
-		c2->SaveAs(Form("%s/%s_ch%d_%s.png", fdir.c_str(), gain, ch, x.first.c_str()));
-		delete h;
+		string var = x.first;
+		h1Channel[ch][var][gain]->SetStats(false);
+		h1Channel[ch][var][gain]->Draw();
+		c2->SaveAs(Form("%s/%s_ch%d_%s.png", fdir.c_str(), gain, ch, var.c_str()));
 	    }
 	}
 	delete c2;
