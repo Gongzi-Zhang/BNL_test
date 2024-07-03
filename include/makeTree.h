@@ -118,7 +118,7 @@ class treeMaker {
 
     map<int, pair<int, int>> rawADC;
     map<int, pair<float, float>> corADC;
-    pair<int, int> mul, mul1, mul2;
+    pair<int, int> mul;
 
     string ofName;
     TFile *fout = NULL;

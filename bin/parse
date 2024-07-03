@@ -23,7 +23,11 @@ do
 	fi
     else
 	${ROOT}/bin/convert $run
-	${ROOT}/bin/QA $run
+	if [ "$run_type" = "cosmic" ]; then
+            ${ROOT}/bin/MIP_analysis $run
+	else
+	    ${ROOT}/bin/QA $run
+	fi
 	if [ $? -ne 0 ]; then
 	    ${ROOT}/bin/caliDB update --run $run --field Flag --value bad
 	else

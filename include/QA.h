@@ -67,8 +67,6 @@ void QA::init()
     xmax["hit_ADC"]["LG"]    = 8500;   xmax["hit_ADC"]["HG"]   = 8500;
     xmax["event_ADC"]["LG"]  = 1e5;    xmax["event_ADC"]["HG"] = 6e5;
     xmax["event_mul"]["LG"]  = 200;    xmax["event_mul"]["HG"] = 200;
-    xmax["event_mul1"]["LG"] = 200;    xmax["event_mul1"]["HG"] = 200;
-    xmax["event_mul2"]["LG"] = 200;    xmax["event_mul2"]["HG"] = 200;
     xmax["ch_raw_ADC"]["LG"] = 2000;   xmax["ch_raw_ADC"]["HG"]  = 8500;
     xmax["ch_cor_ADC"]["LG"] = 2000;   xmax["ch_cor_ADC"]["HG"]  = 8500;
 
@@ -77,8 +75,6 @@ void QA::init()
 	xmax["hit_ADC"]["LG"] = 1000;	xmax["hit_ADC"]["HG"] = 1000;
 	xmax["event_ADC"]["LG"] = 1000;	xmax["event_ADC"]["HG"] = 1000;
 	xmax["event_mul"]["LG"] = 100;	xmax["event_mul"]["HG"] = 100;
-	xmax["event_mul1"]["LG"] = 20;	xmax["event_mul1"]["HG"] = 20;
-	xmax["event_mul2"]["LG"] = 20;	xmax["event_mul2"]["HG"] = 20;
 	xmax["ch_raw_ADC"]["LG"] = 400;	xmax["ch_raw_ADC"]["HG"] = 400;
 	xmax["ch_cor_ADC"]["LG"] = 200;	xmax["ch_cor_ADC"]["HG"] = 200;
     }
@@ -87,9 +83,7 @@ void QA::init()
 	h1["hit_ADC"][gain] = new TH1F(Form("hit_ADC_%s", gain), Form("%s: hit energy;ADC", gain), 100, 0, xmax["hit_ADC"][gain]);
 
 	h1["event_rate"][gain]  = new TH1F(Form("event_rate_%s", gain),  Form("%s: rate;Time", gain), 100, 1e8, 1e10);	// needs update later
-	h1["event_mul"][gain]   = new TH1F(Form("event_mul_%s",  gain),  Form("%s: mul", gain), xmax["event_mul"][gain], 0, xmax["event_mul"][gain]);
-	h1["event_mul1"][gain]  = new TH1F(Form("event_mul1_%s", gain),  Form("%s: mul (3#sigma)", gain), xmax["event_mul1"][gain], 0, xmax["event_mul1"][gain]);
-	h1["event_mul2"][gain]  = new TH1F(Form("event_mul2_%s", gain),  Form("%s: mul (5#sigma)", gain), xmax["event_mul2"][gain], 0, xmax["event_mul2"][gain]);
+	h1["event_mul"][gain]   = new TH1F(Form("event_mul_%s",  gain),  Form("%s: mul (5#sigma)", gain), xmax["event_mul"][gain], 0, xmax["event_mul"][gain]);
 	h1["event_ADC"][gain] = new TH1F(Form("event_ADC_%s", gain),  Form("%s: event energy;ADC", gain), 100, 0, xmax["event_ADC"][gain]);
 	h1["event_x"][gain] = new TH1F(Form("event_x_%s", gain),  Form("%s: COG X;cm", gain), 100, -10, 10);
 	h1["event_y"][gain] = new TH1F(Form("event_y_%s", gain),  Form("%s: COG Y;cm", gain), 100, -10, 10);
@@ -149,10 +143,10 @@ void QA::fillData()
 
     t->SetBranchAddress("raw.TS", &TS);
     t->SetBranchAddress("rate", &rate);
-    for (const char* var : {"mul", "mul1", "mul2"})
     {
+	string var = "mul";
 	iVal[var] = {{"LG", 0}, {"HG", 0}};
-	TBranch *b = (TBranch*) t->GetBranch(var);
+	TBranch *b = (TBranch*) t->GetBranch(var.c_str());
 	b->GetLeaf("LG")->SetAddress(&iVal[var]["LG"]);
 	b->GetLeaf("HG")->SetAddress(&iVal[var]["HG"]);
     }
@@ -213,8 +207,6 @@ void QA::fillData()
 
 	    h1["event_rate"][gain]->Fill(TS, rate);
 	    h1["event_mul"][gain]->Fill(iVal["mul"][gain]);
-	    h1["event_mul1"][gain]->Fill(iVal["mul1"][gain]);
-	    h1["event_mul2"][gain]->Fill(iVal["mul2"][gain]);
 
 	    for (int ch=0; ch<cali::nChannels; ch++)
 	    {
@@ -291,10 +283,10 @@ void QA::fillCosmic()
 
 	t->SetBranchAddress(Form("raw_CAEN%d.TS", ci), &TS);
 	t->SetBranchAddress("rate", &rate);
-	for (const char* var : {"mul", "mul1", "mul2"})
 	{
+	    string var = "mul";
 	    iVal[var] = {{"LG", 0}, {"HG", 0}};
-	    TBranch *b = (TBranch*) t->GetBranch(var);
+	    TBranch *b = (TBranch*) t->GetBranch(var.c_str());
 	    b->GetLeaf("LG")->SetAddress(&iVal[var]["LG"]);
 	    b->GetLeaf("HG")->SetAddress(&iVal[var]["HG"]);
 	}
@@ -355,8 +347,6 @@ void QA::fillCosmic()
 
 		h1["event_rate"][gain]->Fill(TS, rate);
 		h1["event_mul"][gain]->Fill(iVal["mul"][gain]);
-		h1["event_mul1"][gain]->Fill(iVal["mul1"][gain]);
-		h1["event_mul2"][gain]->Fill(iVal["mul2"][gain]);
 
 		for (int ch=0; ch<cali::nChannels; ch++)
 		{
@@ -421,14 +411,16 @@ void QA::plot()
 	TCanvas* c = new TCanvas("c", "c", 1000, 600);
 	for (auto const & x : h1)
 	{
-	    c->Clear();
 	    string var = x.first;
 	    if (var == "event_ADC" || var == "hit_ADC")
 		c->SetLogy(1);
+	    else
+		c->SetLogy(0);
+
 	    h1[var][gain]->Draw("HIST");
 	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, var.c_str()));
-	    delete h1[var][gain];
 	}
+	c->SetLogy(0);
 	for (auto const & x : h2)
 	{
 	    string var = x.first;
@@ -446,17 +438,19 @@ void QA::plot()
 	    {
 		string var = x.first;
 		if (var == "ADC")
-		    c1->SetLogy();
+		    c1->SetLogy(1);
+		else
+		    c1->SetLogy(0);
 	    
 		h1Layer[l][var][gain]->Draw();
 		c1->SaveAs(Form("%s/%s_layer%d_%s.png", fdir.c_str(), gain, l, var.c_str()));
 	    }
-	    c1->SetLogy(0);
 	}
 	delete c1;
 
 	// channel plot
 	TCanvas* c2 = new TCanvas("c2", "c2", 800, 600);
+	c2->SetLogy(1);
 	c2->SetTopMargin(0.08);
 	c2->SetBottomMargin(0.08);
 	c2->SetLeftMargin(0.06);

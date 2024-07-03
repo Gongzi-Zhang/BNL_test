@@ -98,6 +98,7 @@ fi
 LG=$(grep '\<LG\>' ${config} | cut -d':' -f2)
 HG=$(grep '\<HG\>' ${config} | cut -d':' -f2)
 Ped=$(grep '\<Ped\>' ${config} | cut -d':' -f2)
+Vbias=$(grep 'HV_Vbias' ${info_file} | awk '{print $2}')
 Size=$(ls -lh --block-size=1MiB $list_file | awk '{print $5}')
 PedRun=$(grep '\<PedRun\>' ${config} | cut -d':' -f2)
 if [ "$run_type" = "ptrg" ]; then
@@ -128,6 +129,7 @@ ${ROOT}/bin/caliDB insert \
     --LG $LG	    \
     --HG $HG	    \
     --Ped $Ped	    \
+    --Vbias $Vbias  \
     --Size $Size    \
     --PedRun $PedRun	    \
     --TrgRate $TrgRate	    \

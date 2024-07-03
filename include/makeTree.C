@@ -383,8 +383,6 @@ void treeMaker::init()
 
     tcor->Branch("rate",  &rate);
     tcor->Branch("mul",   &mul,  "LG/I:HG/I");
-    tcor->Branch("mul1",  &mul1, "LG/I:HG/I");
-    tcor->Branch("mul2",  &mul2, "LG/I:HG/I");
 }
 
 void treeMaker::fill()
@@ -402,8 +400,6 @@ void treeMaker::fill()
 	{
 	    nEvents++;
 	    mul = {0, 0};
-	    mul1 = {0, 0};
-	    mul2 = {0, 0};
 
 	    TS = evt->TS + st;
 	    rate = 1/(TS - preTS);
@@ -417,28 +413,16 @@ void treeMaker::fill()
 		corADC[ch].second = rawADC[ch].second - ped["HG"][ch].mean;
 		
 		// LG
-		if (corADC[ch].first < ped["LG"][ch].rms)
+		if (corADC[ch].first < 5*ped["LG"][ch].rms)
 		    corADC[ch].first = 0;
 		else
-		{
 		    mul.first++;
-		    if (corADC[ch].first > 3*ped["LG"][ch].rms)
-			mul1.first++;
-		    if (corADC[ch].first > 5*ped["LG"][ch].rms)
-			mul2.first++;
 
-		}
 		// HG
-		if (corADC[ch].second < ped["HG"][ch].rms)
+		if (corADC[ch].second < 5*ped["HG"][ch].rms)
 		    corADC[ch].second = 0;
 		else
-		{
 		    mul.second++;
-		    if (corADC[ch].second > 3*ped["HG"][ch].rms)
-			mul1.second++;
-		    if (corADC[ch].second > 5*ped["HG"][ch].rms)
-			mul2.second++;
-		}
 	    }
 	    traw->Fill();
 	    tcor->Fill();
@@ -483,8 +467,6 @@ void cosmicTreeMaker::init()
 
 	tcor[ci]->Branch("rate",  &rate);
 	tcor[ci]->Branch("mul",   &mul,  "LG/I:HG/I");
-	tcor[ci]->Branch("mul1",  &mul1, "LG/I:HG/I");
-	tcor[ci]->Branch("mul2",  &mul2, "LG/I:HG/I");
     }
 }
 
@@ -526,8 +508,6 @@ void cosmicTreeMaker::fill(const int ci)
 
 
 	mul = {0, 0};
-	mul1 = {0, 0};
-	mul2 = {0, 0};
 
 	TS = b->getTS() + st;
 	rate = 1/(TS - preTS[ci]);
@@ -541,28 +521,11 @@ void cosmicTreeMaker::fill(const int ci)
 	    corADC[ch].second = rawADC[ch].second - ped["HG"][ch].mean;
 	    
 	    // LG
-	    if (corADC[ch].first < ped["LG"][ch].rms)
+	    if (corADC[ch].first < 5*ped["LG"][ch].rms)
 		corADC[ch].first = 0;
-	    else
-	    {
-		mul.first++;
-		if (corADC[ch].first > 3*ped["LG"][ch].rms)
-		    mul1.first++;
-		if (corADC[ch].first > 5*ped["LG"][ch].rms)
-		    mul2.first++;
-
-	    }
 	    // HG
-	    if (corADC[ch].second < ped["HG"][ch].rms)
+	    if (corADC[ch].second < 5*ped["HG"][ch].rms)
 		corADC[ch].second = 0;
-	    else
-	    {
-		mul.second++;
-		if (corADC[ch].second > 3*ped["HG"][ch].rms)
-		    mul1.second++;
-		if (corADC[ch].second > 5*ped["HG"][ch].rms)
-		    mul2.second++;
-	    }
 	}
 	traw[ci]->Fill();
 	tcor[ci]->Fill();

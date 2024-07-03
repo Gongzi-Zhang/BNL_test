@@ -14,7 +14,7 @@ FIELDS = [ 'Run', 'Type', 'Flag',
     'StartTime', 'StopTime', 'Length', 
     'Geometry', 'Channels', 
     'Trigger', 'T1', 'T2', 'T3', 'T4', 
-    'Events', 'LG', 'HG', 'Ped','Size', 
+    'Events', 'LG', 'HG', 'Ped', 'Vbias', 'Size', 
     'PedRun', 'TrgRate',
     'Note' ]
 TextFields = ['Type', 'Flag', 'StartTime', 'StopTime', 'Geometry', 'Size', 'Note']
@@ -23,7 +23,7 @@ FreFields = [ 'Run', 'Type', 'Flag',
     'Trigger', 
     'Events', 'Size', 
     'Note' ]
-TYPES = ['ptrg', 'cosmic', 'data', 'junk']
+TYPES = ['ptrg', 'cosmic', 'data', 'cmdata', 'junk']
 FLAGS = ['good', 'bad', 'susp']
 
 FIELD_WIDTH = {

@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     cali::setRun(run);
     caliDB db;
     string runType = db.getRunType(run);
-    if (runType != "cosmic" && runType != "data" && runType != "tlogic")
+    if (runType != "cosmic" && runType != "data" && runType != "cmdata")
     {
 	cout << WARNING << "not a data/cosmic run: " << run << endl;
 	exit(1);
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     }
     listReader* reader = new listReader(listFile);
 
-    if (runType == "data" || runType == "cosmic")
+    if (runType == "data" || runType == "cmdata")
     {
 	eventBuilder *builder = new eventBuilder(reader);
 	treeMaker *maker = new treeMaker(builder);

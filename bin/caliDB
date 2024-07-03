@@ -38,6 +38,7 @@ if __name__ == '__main__':
     parser_insert.add_argument('--LG',          dest='iLG',         help='LG')
     parser_insert.add_argument('--HG',          dest='iHG',         help='HG')
     parser_insert.add_argument('--Ped',         dest='iPed',        help='pedestal position')
+    parser_insert.add_argument('--Vbias',       dest='iVbias',      help='bias voltage')
     parser_insert.add_argument('--PedRun',      dest='iPedRun',     help='pedestal run')
     parser_insert.add_argument('--TrgRate',     dest='iTrgRate',    help='trigger rate')
     parser_insert.add_argument('--Note',        dest='iNote',       help='other info')
@@ -121,6 +122,8 @@ if __name__ == '__main__':
             record['HG'] = int(args.iHG)
         if args.iPed:
             record['Ped'] = int(args.iPed)
+        if args.iVbias:
+            record['Vbias'] = float(args.iVbias)
         if args.iPedRun:
             record['PedRun'] = int(args.iPedRun)
         if args.iTrgRate:

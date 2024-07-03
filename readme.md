@@ -1,17 +1,32 @@
 # operation
-* Take at least one ptrg run every day and add it to the database/analyze it manually
+* Add a run to the database manually:
+```
+bin/add_run /path/to/ptrg/run_Info.txt [run_type]
+```
+
+* pedestal run:
+Take at least one ptrg run every day and add it to the database/analyze it manually
 ```
 bin/add_run /path/to/ptrg/run_Info.txt ptrg
 ```
-  * Update the PedRun value in the [config file](data/config.cfg)
+Remember to add all runs before it to the database manually before adding the ptrg run.
+    * Update the PedRun value in the [config file](data/config.cfg)
+* cosmic
+When taking cosmic run, use 
+    * Bunch Trigger Source: TLOGIC; 
+    * Trigger Logic: MAJ64
+    * Majority Level: 2
+and
+    * Preset time: 360 m
+
 
 * Trigger tile threshold:
 
-Whenever you modify the trigger tile threshold value, add the old runs to the database first:
+Whenever you modify the trigger tile threshold value or the trigger logic, add the old runs to the database first:
 ```
 bin/add_run /path/to/data/run_Info.txt [data|cosmic]
 ```
-then update the trigger tile threshold values in the [config file](data/config.cfg), 
+then update the corresponding information in the [config file](data/config.cfg), 
 which will affect all following runs.
 
 # data
@@ -58,5 +73,8 @@ bin/QA run_number
   * nlohmann-json3
 * python:
   * pandas
+  * matplotlib
+  * scipy
+  * mplhep
   * uproot
   * datetime

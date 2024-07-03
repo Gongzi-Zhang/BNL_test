@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+
+import os
+import uproot as ur
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import find_peaks
+import mplhep as hep
+import argparse
+import cali
+
+def analyze_run(run_number):
+
+    input_file = f'{cali.CALIROOT}/data/Run{run_number}.root'
+
+    # Initialize lists to store the numpy arrays for LG and HG values
+    LG_values = []
+    HG_values = []
+
+    # Iterate over each TTree
+    for ttree_name in ['raw_CAEN0', 'raw_CAEN1', 'raw_CAEN2']:  # Add all TTree names here
+        ttree = ur.open(f"{input_file}:{ttree_name}")
+
+        # Get the list of branches in the current TTree 
+        branches = ttree.keys()
+
+        # Initialize sub-lists to collect data from each TTree
+        LG_temp = []
+        HG_temp = []
+
+        # Iterate over each branch in the current TTree
+        for branch in branches:
+            if branch.startswith('ch_'):
+                # Extract the array of dictionaries
+                array_of_dicts = ttree[branch].array()
+
+                # Convert the list of dictionaries to a structured numpy array
+                dtype = [('LG', np.int32), ('HG', np.int32)]
+                structured_array = np.array(array_of_dicts, dtype=dtype)
+
+                # Extract LG and HG values using structured array indexing
+                LG_branch = structured_array['LG']
+                HG_branch = structured_array['HG']
+
+                # Append the numpy arrays to the temporary lists
+                LG_temp.append(LG_branch)
+                HG_temp.append(HG_branch)
+
+        # After processing all branches in the current TTree, append the collected data
+        LG_values.extend(LG_temp)
+        HG_values.extend(HG_temp)
+
+    MIPs = []
+    Peds = []
+
+    num_channels = 64*3
+    start = 0
+
+    plt.rcParams['figure.facecolor'] = 'white'
+    plt.rcParams['savefig.facecolor'] = 'white'
+    plt.rcParams['savefig.bbox'] = 'tight'
+    hep.style.use(hep.style.CMS)
+
+    def landau(x, A, mu, sigma):
+        u = (x - mu)*3.591/(sigma/2.355)
+        Aprime = 1.648*A
+        return Aprime*np.exp((-u)/2 - np.exp(-u)/2)
+
+    def gauss(x, A, mu, sigma):
+        return A*np.exp(-(x-mu)**2/(2.*sigma**2))
+
+    # Determine the grid size
+    num_cols = 16
+    num_rows = (num_channels + num_cols - 1) // num_cols
+
+    # Create a figure and grid of subplots
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(30, 30), sharey=True, sharex=True)
+    axes = axes.flatten()
+
+    # Plot histogram for each channel
+    for i, HG_branch in enumerate(HG_values):
+        h, bins = np.histogram(HG_branch, bins=1000, range=(0, 8000))
+        bin_centers = 0.5 * (bins[:-1] + bins[1:])
+        errors = np.sqrt(h)
+        channel_number = i+(start*64)
+        
+        axes[i].errorbar(bin_centers, h, yerr=errors, fmt='o', ecolor='tab:blue', color='tab:blue', markersize = 1, capsize=0, elinewidth=1, markeredgewidth=0, label=f'Ch {channel_number}')
+        axes[i].set_yscale('log')
+
+        peaks, _ = find_peaks(h, height=100, width=10)
+        if(len(peaks) > 0):
+            Peds.append(bin_centers[peaks[0]])
+        else:
+            Peds.append(0)
+
+        # Filter peaks to find the first one where bin_centers[peak_index] > 100
+        valid_peaks = [p for p in peaks if bin_centers[p] > 500]
+
+        # Proceed only if there is at least one valid peak
+        if valid_peaks:
+            first_valid_peak_idx = valid_peaks[0]
+            first_valid_peak_value = bin_centers[first_valid_peak_idx]
+            MIPs.append(first_valid_peak_value)
+
+            axes[i].plot(first_valid_peak_value, h[first_valid_peak_idx], "x", color='tab:red', zorder=100, markersize=10, markeredgewidth=2, label="MIP")
+        else:
+            MIPs.append(0)
+
+        handles, labels = axes[i].get_legend_handles_labels()
+        axes[i].legend(handles[::-1], labels[::-1], fontsize=14)
+
+        if i % num_cols == 0:
+            axes[i].set_ylabel('Count')
+        if i >= (num_rows - 1) * num_cols:
+            axes[i].set_xlabel('ADC')
+
+    plt.tight_layout(pad=0.0)
+
+    fig.suptitle('High-gain ADC spectra', fontsize=34)
+    plt.tight_layout(rect=[0, 0, 1.5, 1])
+    plt.subplots_adjust(wspace=0, hspace=0)
+
+    fdir = f'{cali.CALIROOT}/figures/{run_number}/'
+    if not os.path.exists(fdir):
+        os.makedirs(fdir)
+    fig.savefig(f'{fdir}/HG_ADC_spectra_MIP.png')
+    
+    plt.figure()
+    plt.scatter(range(0,64*3), Peds)
+    plt.xlabel("Ch #")
+    plt.ylabel("Pedestals [ADC]")
+
+    plt.savefig(f'{fdir}/Pedestals_for_MIP.png')
+
+    plt.figure()
+    plt.scatter(range(0,64*3), np.array(MIPs) - np.array(Peds))
+    plt.xlabel("Ch #")
+    plt.ylabel("HG MIP [ADC]")
+    plt.savefig(f'{fdir}/MIPs.png')
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Analyze MIP data for a given run number.')
+    parser.add_argument('run_number', type=int, help='The run number to analyze')
+    args = parser.parse_args()
+    
+    analyze_run(args.run_number)
