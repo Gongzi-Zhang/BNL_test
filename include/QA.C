@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     qa->setRunType(runType.c_str());
     qa->setRootFile(rootFile);
     qa->setOutDir(fdir);
+    qa->setDeltaT(-5*3600); // switch to NY time zone
     qa->init();
     qa->fill();
     qa->plot();

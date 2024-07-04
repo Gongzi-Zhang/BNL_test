@@ -52,7 +52,7 @@ class QA {
     string runType = "data";
     string rootFile;
     string fdir;
-    time_t deltaT = 5*3600;
+    time_t deltaT = 0;
 
     // histograms
     map<string, map<string, TH1F*>> h1;
@@ -163,9 +163,9 @@ void QA::fillData()
     }
 
     t->GetEntry(0);
-    double startTS = TS - 10;
+    double startTS = TS + deltaT - 10;
     t->GetEntry(t->GetEntries() - 1);
-    double endTS = TS + 10;
+    double endTS = TS + deltaT + 10;
     for (auto const& gain : calo::gains)
         h1["event_rate"][gain]->GetXaxis()->SetLimits(startTS, endTS);
 
@@ -205,7 +205,7 @@ void QA::fillData()
 		layerY[l] = 0;
 	    }
 
-	    h1["event_rate"][gain]->Fill(TS, rate);
+	    h1["event_rate"][gain]->Fill(TS + deltaT, rate);
 	    h1["event_mul"][gain]->Fill(iVal["mul"][gain]);
 
 	    for (int ch=0; ch<cali::nChannels; ch++)
@@ -303,9 +303,9 @@ void QA::fillCosmic()
 	}
 
 	t->GetEntry(0);
-	double startTS = TS - 10;
+	double startTS = TS + deltaT - 10;
 	t->GetEntry(t->GetEntries() - 1);
-	double endTS = TS + 10;
+	double endTS = TS + deltaT + 10;
 	for (auto const &gain : calo::gains)
 	    h1["event_rate"][gain]->GetXaxis()->SetLimits(startTS, endTS);
 
@@ -345,7 +345,7 @@ void QA::fillCosmic()
 		    layerY[l] = 0;
 		}
 
-		h1["event_rate"][gain]->Fill(TS, rate);
+		h1["event_rate"][gain]->Fill(TS + deltaT, rate);
 		h1["event_mul"][gain]->Fill(iVal["mul"][gain]);
 
 		for (int ch=0; ch<cali::nChannels; ch++)
