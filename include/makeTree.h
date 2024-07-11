@@ -100,7 +100,7 @@ class treeMaker {
   public:
     treeMaker(eventBuilder* b) { builder = b; }
     ~treeMaker() {}
-    void setPed(const pedestal p) { ped = p; }
+    void setMIP(const mip_t m);
     void setStartTime(time_t t) { st = t; }
     void setOfName(string n) { ofName = n; }
     void init();
@@ -108,7 +108,6 @@ class treeMaker {
     void write();
 
   private:
-    pedestal ped;
     eventBuilder *builder = NULL;
 
     int nEvents = 0;
@@ -117,20 +116,16 @@ class treeMaker {
     float rate;
 
     map<int, pair<int, int>> rawADC;
-    map<int, pair<float, float>> corADC;
-    pair<int, int> mul;
 
     string ofName;
     TFile *fout = NULL;
     TTree *traw = NULL;
-    TTree *tcor = NULL;
 };
 
 class cosmicTreeMaker {
   public:
     cosmicTreeMaker(listReader* r) { reader = r; }
     ~cosmicTreeMaker() {}
-    void setPed(const pedestal p) { ped = p; }
     void setStartTime(time_t t) { st = t; }
     void setOfName(string n) { ofName = n; }
     void addBoard(boardReadout*);
@@ -141,7 +136,7 @@ class cosmicTreeMaker {
 
   private:
     listReader* reader;
-    pedestal ped;
+    ped_t ped;
     string ofName;
     TFile *fout = NULL;
 
@@ -153,10 +148,7 @@ class cosmicTreeMaker {
 
     map<int, vector<boardReadout*>> boards;
     map<int, pair<int, int>> rawADC;
-    map<int, pair<float, float>> corADC;
-    pair<int, int> mul, mul1, mul2;
 
     vector<TTree *> traw;
-    vector<TTree *> tcor;
 };
 #endif

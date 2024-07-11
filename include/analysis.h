@@ -16,37 +16,10 @@ struct chPed {
     double rms;
 };
 
-typedef map<string, map<int, chPed>> pedestal;
+typedef map<int, map<string, chPed>> ped_t;
+typedef map<int, map<string, double>> mip_t;
 
-bool getPedestal(const int pedRun, pedestal &res)
-{
-    char pedFileName[1024];
-    sprintf(pedFileName, "%s/data/Run%d_ped.json", cali::CALIROOT, pedRun);
-    if (!fileExists(pedFileName))
-    {
-	cerr << FATAL << "no ped result for ped run: " << pedRun << ", please check it" << endl;
-	return false;
-    }
-
-    ifstream pedFile(pedFileName);
-    auto ped = nlohmann::json::parse(pedFile);
-    pedFile.close();
-
-    for (auto gain : calo::gains)
-    {
-	for (int ch=0; ch<calo::nChannels; ch++)
-	{
-	    const char* chName = to_string(ch).c_str();
-	    double mean = ped[gain][chName][0];
-	    double rms = ped[gain][chName][1];
-	    res[gain][ch] = {mean, rms};
-	}
-    }
-
-    return true;
-}
-
-bool getPedestal(const char* pedFileName, pedestal &res)
+bool getPedestal(const char* pedFileName, ped_t &res)
 {
     if (!fileExists(pedFileName))
     {
@@ -62,13 +35,50 @@ bool getPedestal(const char* pedFileName, pedestal &res)
     {
 	for (int ch=0; ch<calo::nChannels; ch++)
 	{
-	    const char* chName = to_string(ch).c_str();
+	    string chName = to_string(ch);
 	    double mean = ped[gain][chName][0];
 	    double rms = ped[gain][chName][1];
-	    res[gain][ch] = {mean, rms};
+	    res[ch][gain] = {mean, rms};
 	}
     }
 
     return true;
+}
+
+bool getPedestal(const int pedRun, ped_t &res)
+{
+    char pedFileName[1024];
+    sprintf(pedFileName, "%s/data/Run%d_ped.json", cali::CALIROOT, pedRun);
+    return getPedestal(pedFileName, res);
+}
+
+bool getMIP(const char* mipFileName, mip_t &res)
+{
+    if (!fileExists(mipFileName))
+    {
+	cerr << FATAL << "MIP file doesn't exist: " << mipFileName << endl;
+	return false;
+    }
+
+    ifstream mipFile(mipFileName);
+    auto mip = nlohmann::json::parse(mipFile);
+    mipFile.close();
+
+    for (auto gain : calo::gains)
+    {
+	for (int ch=0; ch<calo::nChannels; ch++)
+	{
+	    res[ch][gain] = mip[gain][to_string(ch)];
+	}
+    }
+
+    return true;
+}
+
+bool getMIP(const int mipRun, mip_t &res)
+{
+    char mipFileName[1024];
+    sprintf(mipFileName, "%s/data/Run%d_mip.json", cali::CALIROOT, mipRun);
+    return getMIP(mipFileName, res);
 }
 #endif

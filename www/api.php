@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['func']))
 
 function getDateRunInfo($date)
 {
-    $fields = array('Run', 'Type', 'Flag', 'StartTime', 'StopTime', 'Length', 'Channels', 'Trigger', 'Events', 'PedRun');
+    $fields = array('Run', 'Type', 'Flag', 'StartTime', 'StopTime', 'Length', 'Channels', 'Trigger', 'Events', 'PedRun', 'LG', 'HG', 'Vbias');
     global $cdb;
     // $cdb->setReverse();
     $res = $cdb->getRunsInfo("date(StartTime) = '{$date}'", implode(',', $fields));
@@ -74,8 +74,8 @@ function getRunQA($run)
 {
     global $cali;
     $res = '';
-    $imgs = array("event_rate", "hit_xy", "event_mul", "event_mul1", "event_mul2",
-		  "hit_ADC", "event_ADC", "event_x", "event_y", "event_z");
+    $imgs = array("event_rate", "hit_xy", "event_mul", "hit_ADC", 
+		  "event_ADC", "event_x", "event_y", "event_z");
     foreach ($cali::gains as $gain)
 	foreach ($imgs as $img)
 	    $res .= "<img src='figures/$run/{$gain}_{$img}.png' alt='{$gain}_{$img} does not exist' onclick='zoom(this);'/>";

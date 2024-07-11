@@ -12,6 +12,7 @@ class _caliDB
 	'T2'	 => 'T2 (V)',
 	'T3'	 => 'T3 (V)',
 	'T4'	 => 'T4 (V)',
+	'Vbias'	 => 'Vbias (V)',
     );
     protected static $trigger = array(
 	1   => 'T1',	16 => 'T1',

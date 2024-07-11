@@ -366,23 +366,43 @@ int eventBuilder::getEvents(const int nRequest, vector<event*>& ret)
 
 
 //////////////////////////////////////////////////////////////////////
+void treeMaker::setMIP(const mip_t m)
+{
+    for (int ch = 0; ch<calo::nChannels; ch++)
+    {
+	if (m.find(ch) == m.end())
+	{
+	    cerr << WARNING << "channel " << ch << " has no MIP value" << endl;
+	    mip[ch]["LG"] = 1e20;
+	    mip[ch]["HG"] = 1e20;
+	    continue;
+	}
+	for (const char* gain : calo::gains)
+	{
+	    if (m[ch].find(gain) == m[ch].end())
+	    {
+		cerr << WARNING << "channel " << ch << " has no " << gain << " MIP value" << endl;
+		mip[ch][gain] = 1e20;
+		continue;
+	    }
+	    mip[ch][gain] = m[ch][gain];
+	    if (0 == m[ch][gain])   // set zero MIP value to infinity
+		mip[ch][gain] = 1e20;
+	}
+    }
+}
+
 void treeMaker::init()
 {
     fout = new TFile(ofName.c_str(), "recreate");
     traw = new TTree("raw", "raw ADC values");	 // owned by fout
-    tcor = new TTree("cor", "corrected ADC values");
-
     traw->Branch("TS", &TS);
     for (int ch=0; ch<calo::nChannels; ch++)
     {
 	rawADC[ch] = {0, 0};
-	corADC[ch] = {0, 0};
-	traw->Branch(Form("ch_%d", ch), &rawADC[ch], "LG/I:HG/I");
-	tcor->Branch(Form("ch_%d", ch), &corADC[ch], "LG/F:HG/F");
+	traw->Branch(Form("ch%d", ch), &rawADC[ch], "LG/I:HG/I");
     }
-
-    tcor->Branch("rate",  &rate);
-    tcor->Branch("mul",   &mul,  "LG/I:HG/I");
+    traw->Branch("rate",  &rate);
 }
 
 void treeMaker::fill()
@@ -408,24 +428,8 @@ void treeMaker::fill()
 	    {
 		rawADC[ch].first = evt->LG[ch];
 		rawADC[ch].second = evt->HG[ch];
-
-		corADC[ch].first = rawADC[ch].first - ped["LG"][ch].mean;
-		corADC[ch].second = rawADC[ch].second - ped["HG"][ch].mean;
-		
-		// LG
-		if (corADC[ch].first < 5*ped["LG"][ch].rms)
-		    corADC[ch].first = 0;
-		else
-		    mul.first++;
-
-		// HG
-		if (corADC[ch].second < 5*ped["HG"][ch].rms)
-		    corADC[ch].second = 0;
-		else
-		    mul.second++;
 	    }
 	    traw->Fill();
-	    tcor->Fill();
 	    delete evt;
 	}
 	cout << INFO << nEvents << " events filled" << endl;
@@ -435,7 +439,6 @@ void treeMaker::fill()
 void treeMaker::write()
 {
     traw->Write();
-    tcor->Write();
     fout->Close();
 
     delete fout;
@@ -454,19 +457,15 @@ void cosmicTreeMaker::init()
 
 	fout->cd();
 	traw.push_back(new TTree(Form("raw_CAEN%d", ci), Form("CAEN%d: raw ADC values", ci)));
-	tcor.push_back(new TTree(Form("cor_CAEN%d", ci), Form("CAEN%d: corrected ADC values", ci)));
 
 	traw[ci]->Branch("TS", &TS);
 	for (int ch=calo::preChannels[ci]; ch<calo::preChannels[ci] + calo::nCAENChannels[ci]; ch++)
 	{
 	    rawADC[ch] = {0, 0};
-	    corADC[ch] = {0, 0};
 	    traw[ci]->Branch(Form("ch_%d", ch), &rawADC[ch], "LG/I:HG/I");
-	    tcor[ci]->Branch(Form("ch_%d", ch), &corADC[ch], "LG/F:HG/F");
 	}
 
-	tcor[ci]->Branch("rate",  &rate);
-	tcor[ci]->Branch("mul",   &mul,  "LG/I:HG/I");
+	traw[ci]->Branch("rate",  &rate);
     }
 }
 
@@ -516,19 +515,8 @@ void cosmicTreeMaker::fill(const int ci)
 	{
 	    rawADC[ch].first = LG[ch];
 	    rawADC[ch].second = HG[ch];
-
-	    corADC[ch].first = rawADC[ch].first - ped["LG"][ch].mean;
-	    corADC[ch].second = rawADC[ch].second - ped["HG"][ch].mean;
-	    
-	    // LG
-	    if (corADC[ch].first < 5*ped["LG"][ch].rms)
-		corADC[ch].first = 0;
-	    // HG
-	    if (corADC[ch].second < 5*ped["HG"][ch].rms)
-		corADC[ch].second = 0;
 	}
 	traw[ci]->Fill();
-	tcor[ci]->Fill();
 
 	delete b;
 	b = NULL;
@@ -543,10 +531,7 @@ void cosmicTreeMaker::fill(const int ci)
 void cosmicTreeMaker::write()
 {
     for (int ci=0; ci<calo::nCAENs; ci++)
-    {
 	traw[ci]->Write();
-	tcor[ci]->Write();
-    }
     fout->Close();
     delete fout;
 }
