@@ -15,7 +15,7 @@ FIELDS = [ 'Run', 'Type', 'Flag',
     'Geometry', 'Channels', 
     'Trigger', 'T1', 'T2', 'T3', 'T4', 
     'Events', 'LG', 'HG', 'Ped', 'Vbias', 'Size', 
-    'PedRun', 'TrgRate',
+    'PedRun', 'MIPRun', 'TrgRate',
     'Note' ]
 TextFields = ['Type', 'Flag', 'StartTime', 'StopTime', 'Geometry', 'Size', 'Note']
 FreFields = [ 'Run', 'Type', 'Flag', 
@@ -46,6 +46,7 @@ FIELD_WIDTH = {
     'Ped': 3,
     'Size':   4,    # raw data file size in GB
     'PedRun': 4,
+    'MIPRun': 4,
     'TrgRate': 8,   # in MHz
     'Note': 30, 
     }
@@ -54,7 +55,8 @@ FIELD_TITLE = {
     'Length':   'Len',
     'Channels': 'Chs',
     'Trigger':  'Trg',
-    'PedRun': 'PRun'
+    'PedRun': 'PRun',
+    'MIPRun': 'MRun'
     }
 
 formatted = True
@@ -237,6 +239,7 @@ def createTable():
                 Vbias float,
                 Size integer,
                 PedRun integer,
+                MIPRun integer,
                 TrgRate float,
                 Note text
             );'''
@@ -355,6 +358,7 @@ def insertToTable():
         values['HG'] = int(input('HG: ') or 55)
         values['Ped'] = int(input('Ped: ') or 160)
         values['PedRun'] = int(input('PedRun: '))
+        values['MIPRun'] = int(input('MIPRun: '))
         values['TrgRate'] = float(input('TrgRate: '))
         values['Note'] = input('Note: ').strip()
         if not insertRecord(values):

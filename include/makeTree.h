@@ -26,9 +26,9 @@ class boardReadout {
   public:
     boardReadout(const int bid, const double ts) { id = bid; TS =ts; }
     ~boardReadout() {}
-    int getId() const { return id; }
-    int getnChannels() const { return nChannels; }
-    double getTS() const { return TS; }
+    int getId() { return id; }
+    int getnChannels() { return nChannels; }
+    double getTS() { return TS; }
     map<int, int> getLG() { return LG; }
     map<int, int> getHG() { return HG; }
     void addChannel(int ch, int vLG, int vHG)
@@ -63,7 +63,7 @@ class listReader {
     vector<string> fields;
     int li = 0;
     bool eof = false;
-    boardReadout* board;
+    boardReadout* board = 0;
     vector<boardReadout*> boards;
     int nGoods = 0;
     int nBads = 0;
@@ -100,7 +100,6 @@ class treeMaker {
   public:
     treeMaker(eventBuilder* b) { builder = b; }
     ~treeMaker() {}
-    void setMIP(const mip_t m);
     void setStartTime(time_t t) { st = t; }
     void setOfName(string n) { ofName = n; }
     void init();

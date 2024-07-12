@@ -66,12 +66,15 @@ int main(int argc, char *argv[])
 
     char fdir[1024];
     sprintf(fdir, "%s/figures/%d", cali::CALIROOT, run);
+    if (!dirExists(fdir))
+	mkdir(fdir, 0755);
 
     calibrate *cab = new calibrate();
     cab->setRootFile(rootFile);
     cab->setOutDir(fdir);
     cab->setPed(ped);
     cab->setMIP(mip);
+    cab->init();
     cab->fillCorADC();
     cab->fillCorMIP();
     cab->write();

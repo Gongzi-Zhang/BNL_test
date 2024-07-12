@@ -34,13 +34,14 @@ int main(int argc, char *argv[])
 	cerr << WARNING << "not a good run: " << run << endl;
 	exit(1);
     }
-    string outName = cali::CALIROOT;
-    outName += "/data/Run" + to_string(run) + ".root";
+    char outName[1024];
+    sprintf(outName, "%s/data/Run%d.root", cali::CALIROOT, run);
 
     cout << INFO << "processing run: " << run << endl;
 
-    string listFile = Form("%s/data/Run%d_list.txt", cali::CALIROOT, run);
-    if (!fileExists(listFile.c_str()))
+    char listFile[1024];
+    sprintf(listFile, "%s/data/Run%d_list.txt", cali::CALIROOT, run);
+    if (!fileExists(listFile))
     {
 	cerr << FATAL << "no list file for run " << run << endl;
 	exit(4);

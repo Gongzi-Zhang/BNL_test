@@ -366,32 +366,6 @@ int eventBuilder::getEvents(const int nRequest, vector<event*>& ret)
 
 
 //////////////////////////////////////////////////////////////////////
-void treeMaker::setMIP(const mip_t m)
-{
-    for (int ch = 0; ch<calo::nChannels; ch++)
-    {
-	if (m.find(ch) == m.end())
-	{
-	    cerr << WARNING << "channel " << ch << " has no MIP value" << endl;
-	    mip[ch]["LG"] = 1e20;
-	    mip[ch]["HG"] = 1e20;
-	    continue;
-	}
-	for (const char* gain : calo::gains)
-	{
-	    if (m[ch].find(gain) == m[ch].end())
-	    {
-		cerr << WARNING << "channel " << ch << " has no " << gain << " MIP value" << endl;
-		mip[ch][gain] = 1e20;
-		continue;
-	    }
-	    mip[ch][gain] = m[ch][gain];
-	    if (0 == m[ch][gain])   // set zero MIP value to infinity
-		mip[ch][gain] = 1e20;
-	}
-    }
-}
-
 void treeMaker::init()
 {
     fout = new TFile(ofName.c_str(), "recreate");
@@ -419,15 +393,13 @@ void treeMaker::fill()
 	for (auto &evt : ve)
 	{
 	    nEvents++;
-	    mul = {0, 0};
 
 	    TS = evt->TS + st;
 	    rate = 1/(TS - preTS);
 	    preTS = TS;
 	    for (int ch=0; ch<calo::nChannels; ch++)
 	    {
-		rawADC[ch].first = evt->LG[ch];
-		rawADC[ch].second = evt->HG[ch];
+		rawADC[ch] = {evt->LG[ch], evt->HG[ch]};
 	    }
 	    traw->Fill();
 	    delete evt;
@@ -505,16 +477,12 @@ void cosmicTreeMaker::fill(const int ci)
 	LG = b->getLG();
 	HG = b->getHG();
 
-
-	mul = {0, 0};
-
 	TS = b->getTS() + st;
 	rate = 1/(TS - preTS[ci]);
 	preTS[ci] = TS;
 	for (int ch=calo::preChannels[ci]; ch<calo::preChannels[ci] + calo::nCAENChannels[ci]; ch++)
 	{
-	    rawADC[ch].first = LG[ch];
-	    rawADC[ch].second = HG[ch];
+	    rawADC[ch] = {LG[ch], HG[ch]};
 	}
 	traw[ci]->Fill();
 

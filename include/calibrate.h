@@ -26,7 +26,7 @@ class calibrate {
     ~calibrate() {}
     void setRootFile(string fin) { rootFile = fin; }
     void setPed(ped_t p) { ped = p; }
-    void setMIP(mip_t m) { mip = m; }
+    void setMIP(mip_t m);
     void setOutDir(string f) { fdir = f; }
     void getChPos();
     void getLGMIP();
@@ -53,10 +53,36 @@ class calibrate {
     int layerNumber[cali::channelMax];
 };
 
+void calibrate::setMIP(mip_t m)
+{
+    for (int ch = 0; ch<calo::nChannels; ch++)
+    {
+	if (m.find(ch) == m.end())
+	{
+	    cerr << WARNING << "channel " << ch << " has no MIP value" << endl;
+	    mip[ch]["LG"] = 1e20;
+	    mip[ch]["HG"] = 1e20;
+	    continue;
+	}
+	for (const char* gain : calo::gains)
+	{
+	    if (m[ch].find(gain) == m[ch].end())
+	    {
+		cerr << WARNING << "channel " << ch << " has no " << gain << " MIP value" << endl;
+		mip[ch][gain] = 1e20;
+		continue;
+	    }
+	    mip[ch][gain] = m[ch][gain];
+	    if (0 == m[ch][gain])   // set zero MIP value to infinity
+		mip[ch][gain] = 1e20;
+	}
+    }
+}
+
 void calibrate::init()
 {
     fio = new TFile(rootFile.c_str(), "update");
-    traw = (TTree*) fio->Get("cor");
+    traw = (TTree*) fio->Get("raw");
     tcor = new TTree("cor", "corrected ADC values");
     tmip = new TTree("mip", "corrected MIP values");
     for (int ch=0; ch<calo::nChannels; ch++)
@@ -146,10 +172,12 @@ void calibrate::fillCorADC()
     map<int, map<string, int>> rawADC;
     for (int ch=0; ch<calo::nChannels; ch++)
     {
-	rawADC[ch] = {{"LG", 0}, {"HG", 0}};
 	TBranch *b = (TBranch*) traw->GetBranch(Form("ch_%d", ch));
-	b->GetLeaf("LG")->SetAddress(&rawADC[ch]["LG"]);
-	b->GetLeaf("HG")->SetAddress(&rawADC[ch]["HG"]);
+	for (const char*gain : calo::gains)
+	{
+	    rawADC[ch][gain] = 0;
+	    b->GetLeaf(gain)->SetAddress(&rawADC[ch][gain]);
+	}
     }
 
     for (int ei=0; ei<traw->GetEntries(); ei++)

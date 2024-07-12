@@ -27,6 +27,7 @@ class caliDB {
     string getRunType(const int run);
     string getRunFlag(const int run);
     int getPedRun(const int run);
+    int getMIPRun(const int run);
 };
 
 caliDB::caliDB() 
@@ -88,5 +89,10 @@ string caliDB::getRunFlag(const int run)
 int caliDB::getPedRun(const int run)
 {
     return stoi(getRunValue(run, "PedRun"));
+}
+
+int caliDB::getMIPRun(const int run)
+{
+    return stoi(getRunValue(run, "MIPRun"));
 }
 #endif

@@ -78,7 +78,7 @@ bool getMIP(const char* mipFileName, mip_t &res)
 bool getMIP(const int mipRun, mip_t &res)
 {
     char mipFileName[1024];
-    sprintf(mipFileName, "%s/data/Run%d_mip.json", cali::CALIROOT, mipRun);
+    sprintf(mipFileName, "%s/data/Run%d_MIP.json", cali::CALIROOT, mipRun);
     return getMIP(mipFileName, res);
 }
 #endif
