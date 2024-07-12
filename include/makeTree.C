@@ -400,7 +400,7 @@ void treeMaker::init()
     for (int ch=0; ch<calo::nChannels; ch++)
     {
 	rawADC[ch] = {0, 0};
-	traw->Branch(Form("ch%d", ch), &rawADC[ch], "LG/I:HG/I");
+	traw->Branch(Form("ch_%d", ch), &rawADC[ch], "LG/I:HG/I");
     }
     traw->Branch("rate",  &rate);
 }

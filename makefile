@@ -40,6 +40,10 @@ MIP: MIP.C
 convert: convert.C
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
+calibrate: calibrate.C
+	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
+	mv $@ bin/
+
 convert1: convert1.C
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/

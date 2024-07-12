@@ -20,22 +20,22 @@ int main(int argc, char *argv[])
     const int run = atoi(argv[1]);
     cali::setRun(run);
     caliDB db;
+
     string runType = db.getRunType(run);
     if (runType != "cosmic" && runType != "data" && runType != "cmdata")
     {
 	cout << WARNING << "not a data/cosmic run: " << run << endl;
 	exit(1);
     }
+
+    string runFlag = db.getRunFlag(run);
+    if (runFlag != "good")
+    {
+	cerr << WARNING << "not a good run: " << run << endl;
+	exit(1);
+    }
     string outName = cali::CALIROOT;
     outName += "/data/Run" + to_string(run) + ".root";
-
-    const int pedRun = db.getPedRun(run);
-    pedestal ped;
-    if (!getPedestal(pedRun, ped))
-    {
-	cerr << FATAL << "unable to read pedestal file" << endl;
-	exit(2);
-    }
 
     cout << INFO << "processing run: " << run << endl;
 
@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
 	eventBuilder *builder = new eventBuilder(reader);
 	treeMaker *maker = new treeMaker(builder);
 	maker->setStartTime(reader->getStartTime());
-	maker->setPed(ped);
 	maker->setOfName(outName);
 	maker->init();
 	maker->fill();
@@ -65,7 +64,6 @@ int main(int argc, char *argv[])
     {
 	cosmicTreeMaker *maker = new cosmicTreeMaker(reader);
 	maker->setStartTime(reader->getStartTime());
-	maker->setPed(ped);
 	maker->setOfName(outName);
 	maker->init();
 	maker->fill();
