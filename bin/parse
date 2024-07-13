@@ -13,7 +13,7 @@ do
 	shift
 	continue
     fi
-    run_type=$(${ROOT}/bin/caliDB -p query --run $run --field Type | tail -n1 | xargs)
+    run_type=$(${ROOT}/bin/caliDB -p query --run $run --field Type | xargs)
     if [ "$run_type" = "ptrg" ]; then
 	${ROOT}/bin/parse_ptrg $run
 	if [ $? -ne 0 ]; then
@@ -26,7 +26,9 @@ do
 	if [ "$run_type" = "cosmic" ]; then
             ${ROOT}/bin/MIP_analysis $run
 	else
-	    ${ROOT}/bin/QA $run
+	    ${ROOT}/bin/calibrate $run
+	    # ${ROOT}/bin/QA $run
+	    # ${ROOT}/bin/HG_vs_LG $run
 	fi
 	if [ $? -ne 0 ]; then
 	    ${ROOT}/bin/caliDB update --run $run --field Flag --value bad

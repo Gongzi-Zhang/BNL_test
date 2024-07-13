@@ -104,6 +104,10 @@ PedRun=$(grep '\<PedRun\>' ${config} | cut -d':' -f2)
 if [ "$run_type" = "ptrg" ]; then
     PedRun=-1
 fi
+MIPRun=$(grep '\<MIPRun\>' ${config} | cut -d':' -f2)
+if [ "$run_type" = "ptrg" ]; then
+    MIPRun=-1
+fi
 TrgRate=$(grep '\<TrgRate\>' ${config} | cut -d':' -f2)
 if [ "$run_type" = "ptrg" ] || [ "$run_type" = "cosmic" ]; then
     TrgRate=0
@@ -132,6 +136,7 @@ ${ROOT}/bin/caliDB insert \
     --Vbias $Vbias  \
     --Size $Size    \
     --PedRun $PedRun	    \
+    --MIPRun $MIPRun	    \
     --TrgRate $TrgRate	    \
     --Note "$Note"
 if [ $? -ne 0 ]; then

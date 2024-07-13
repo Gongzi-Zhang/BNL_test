@@ -64,7 +64,7 @@ formatted = True
 def setFormat(f):
     global formatted
     formatted = f
-    logger.info(f'Formatted output: {formatted}')
+    logger.debug(f'Formatted output: {formatted}')
 
 def checkField(field):
     if field in FIELDS:
