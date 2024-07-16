@@ -106,11 +106,11 @@ void QA::init()
 
 	for (int ch=0; ch<calo::nChannels; ch++)
 	{
-	    h1Channel[ch][gain] = new TH1F(Form("ch%d_raw_%s", ch, gain), Form("ch %d", ch), 100, 0, xmax["ch_"][gain]);
+	    h1Channel[ch][gain] = new TH1F(Form("ch%d_raw_%s", ch, gain), Form("ch %d", ch), 100, 0, xmax["ch_MIP"][gain]);
 	}
 
 	h2["hit_xy"][gain] = new TH2F(Form("hit_xy_%s", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
-	h2["event_MIP_vs_mul"][gain] = new TH2F(Form("event_MIP_vs_mul_%s", gain), Form("%s: Event Sum (MIPs) vs Hit Multiplicity;Hit Multiplicity;Event Sum (MIPs)", gain), 100, 0, 200, 100, 0, 500);
+	h2["event_MIP_vs_hit_mul"][gain] = new TH2F(Form("event_MIP_vs_mul_%s", gain), Form("%s: Event Sum (MIPs) vs Hit Multiplicity;Hit Multiplicity;Event Sum (MIPs)", gain), 100, 0, xmax["hit_mul"][gain], 100, 0, xmax["event_MIP"][gain]);
 
 	// formats
 	h1["event_rate"][gain]->GetXaxis()->SetTimeDisplay(1);
@@ -149,7 +149,7 @@ void QA::fillData()
 
     t->SetBranchAddress("raw.TS", &TS);
     t->SetBranchAddress("raw.rate", &rate);
-    for (const char* var : {"mul"})
+    for (const char* var : {"hit_mul", "event_e", "event_x", "event_y", "event_z"})
     {
 	TBranch *b = (TBranch*) t->GetBranch(var);
 	for (const char* gain : calo::gains)
@@ -189,12 +189,13 @@ void QA::fillData()
 	    //     layerY[l] = 0;
 	    // }
 
-	    h1["hit_mul"][gain]->Fill(values["mul"][gain]);
+	    h1["hit_mul"][gain]->Fill(values["hit_mul"][gain]);
 	    h1["event_rate"][gain]->Fill(TS + deltaT, rate);
 	    h1["event_MIP"][gain]->Fill(values["event_e"][gain]);
-	    h1["event_x"][gain]->Fill(values["event_x"][gain]);
-	    h1["event_y"][gain]->Fill(values["event_y"][gain]);
+	    h1["event_x"][gain]->Fill(values["event_x"][gain]/cm);
+	    h1["event_y"][gain]->Fill(values["event_y"][gain]/cm);
 	    h1["event_z"][gain]->Fill(values["event_z"][gain]);
+	    h2["event_MIP_vs_hit_mul"][gain]->Fill(values["hit_mul"][gain], values["event_e"][gain]);
 
 	    for (int ch=0; ch<cali::nChannels; ch++)
 	    {
@@ -348,7 +349,7 @@ void QA::plot()
 	for (auto const & x : h1)
 	{
 	    string var = x.first;
-	    if (var == "event_ADC" || var == "hit_ADC")
+	    if (var == "event_MIP" || var == "hit_MIP")
 		c->SetLogy(1);
 	    else
 		c->SetLogy(0);
@@ -360,8 +361,15 @@ void QA::plot()
 	for (auto const & x : h2)
 	{
 	    string var = x.first;
-	    h2[var][gain]->Draw("text");
-	    reverseXAxis(h2[var][gain]);
+	    if (var == "hit_xy")
+	    {
+		reverseXAxis(h2[var][gain]);
+		h2[var][gain]->Draw("text");
+	    }
+	    else
+	    {
+		h2[var][gain]->Draw("colz");
+	    }
 	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, var.c_str()));
 	}
 	delete c;
@@ -390,7 +398,7 @@ void QA::plot()
 	c2->SetBottomMargin(0.08);
 	c2->SetLeftMargin(0.06);
 	c2->SetRightMargin(0.05);
-	c2->Divide(8, 1 + (calo::nChannels-1)/8);
+	c2->Divide(8, 1 + (calo::nChannels-1)/8, 0, 0);
 	for (int ch=0; ch<calo::nChannels; ch++)
 	{
 	    TVirtualPad *p = c2->cd(ch+1);

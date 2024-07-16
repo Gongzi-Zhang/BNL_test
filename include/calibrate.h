@@ -14,6 +14,7 @@
 #include "TProfile.h"
 #include "TF1.h"
 #include "TCanvas.h"
+#include "TText.h"
 #include "calo.h"
 #include "cali.h"
 #include "analysis.h"
@@ -28,7 +29,6 @@ class calibrate {
     void setPed(ped_t p) { ped = p; }
     void setMIP(mip_t m);
     void setOutDir(string f) { fdir = f; }
-    void getChPos();
     void getLGMIP();
     void init();
     void fillCorADC();
@@ -81,42 +81,43 @@ void calibrate::setMIP(mip_t m)
 
 void calibrate::init()
 {
+    for (int ch=0; ch<cali::nChannels; ch++)
+    {
+	layerNumber[ch] = cali::getSipm(ch).layer;
+	pos[ch] = cali::getSipmXY(ch);
+    }
+
     fio = new TFile(rootFile.c_str(), "update");
+      for (const char *var : {"cor", "mip"})
+	if (fio->Get(var))
+ 	    fio->Delete(Form("%s;*", var));
+
     traw = (TTree*) fio->Get("raw");
     tcor = new TTree("cor", "corrected ADC values");
     tmip = new TTree("mip", "corrected MIP values");
     for (int ch=0; ch<calo::nChannels; ch++)
     {
-	corADC[ch] = {{"LG", 0}, {"HG", 0}};
-	corMIP[ch] = {{"LG", 0}, {"HG", 0}};
 	tcor->Branch(Form("ch_%d", ch), 0, "LG/F:HG/F");
 	tmip->Branch(Form("ch_%d", ch), 0, "LG/F:HG/F");
 	for (const char* gain : calo::gains)
 	{
+	    corADC[ch][gain] = 0;
+	    corMIP[ch][gain] = 0;
 	    tcor->GetBranch(Form("ch_%d", ch))->GetLeaf(gain)->SetAddress(&corADC[ch][gain]);
 	    tmip->GetBranch(Form("ch_%d", ch))->GetLeaf(gain)->SetAddress(&corMIP[ch][gain]);
 	}
 	h2[ch] = new TH2F(Form("ch_%d", ch), Form("ch %d", ch), 100, 0, 500, 100, 0, 8000);
     }
-    for (const char* var : {"mul", "event_e", "event_x", "event_y", "event_z"})
+    for (const char* var : {"hit_mul", "event_e", "event_x", "event_y", "event_z"})
     {
-	values[var] = {{"LG", 0}, {"HG", 0}};
 	tcor->Branch(var, 0, "LG/F:HG/F");
 	tmip->Branch(var, 0, "LG/F:HG/F");
 	for (const char* gain : calo::gains)
 	{
+	    values[var][gain] = 0;
 	    tcor->GetBranch(var)->GetLeaf(gain)->SetAddress(&values[var][gain]);
 	    tmip->GetBranch(var)->GetLeaf(gain)->SetAddress(&values[var][gain]);
 	}
-    }
-}
-
-void calibrate::getChPos()
-{
-    for (int ch=0; ch<cali::nChannels; ch++)
-    {
-	layerNumber[ch] = cali::getSipm(ch).layer;
-	pos[ch] = cali::getSipmXY(ch);
     }
 }
 
@@ -124,6 +125,7 @@ void calibrate::fillEvent(map<int, map<string, float>> &val, TTree* t)
 {
     for (const char* gain : calo::gains)
     {
+	values["hit_mul"][gain] = 0;
 	values["event_e"][gain] = 0;
 	values["event_x"][gain] = 0;
 	values["event_y"][gain] = 0;
@@ -144,7 +146,7 @@ void calibrate::fillEvent(map<int, map<string, float>> &val, TTree* t)
 	    float e = val[ch][gain];
 	    if (e > 0)
 	    {
-		values["hit_mul"][gain]++;
+		values["hit_mul"][gain] += 1;
 		values["event_e"][gain] += e;
 		values["event_x"][gain] += e*x;
 		values["event_y"][gain] += e*y;
@@ -207,16 +209,20 @@ void calibrate::getLGMIP()
     c->Divide(ncol, nrow, 0, 0);
     for (int ch=0; ch<calo::nChannels; ch++)
     {
-	if (h2[ch]->GetEntries() < 300)
-	    continue;
-
 	c->cd(ch+1);
-	h2[ch]->Draw("COLZ");
 	TProfile * proX = h2[ch]->ProfileX(Form("ch%d_profileX", ch));
 	TF1 *fit = new TF1(Form("ch%d_fit", ch), "[0] + [1]*x", 0, 1000);
 	fit->SetParameters(0, 30);
 	proX->Fit(fit, "q");
-	mip[ch]["LG"] = mip[ch]["HG"] / fit->GetParameter(1);
+	if (h2[ch]->GetEntries() > 300)
+	    mip[ch]["LG"] = mip[ch]["HG"] / fit->GetParameter(1);
+
+	h2[ch]->Draw("COLZ");
+	fit->Draw("same");
+	TText *t = new TText(0.6, 0.2, Form("slope = %.2f", fit->GetParameter(1)));
+	t->SetNDC();
+	t->SetTextColor(kRed);
+	t->Draw();
     }
     c->SaveAs(Form("%s/HG_vs_LG.png", fdir.c_str()));
 }
@@ -232,7 +238,7 @@ void calibrate::fillCorMIP()
 	    for (const char *gain : calo::gains)
 	    {
 		corMIP[ch][gain] = corADC[ch][gain] / mip[ch][gain];
-		if (corMIP[ch][gain] < 0.3*mip[ch][gain])
+		if (corMIP[ch][gain] < 0.3)
 		    corMIP[ch][gain] = 0;
 	    }
 	}

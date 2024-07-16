@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	mkdir(fdir, 0755);
 
     TFile *fin = new TFile(rootFile.c_str(), "read");
-    if (fin->IsOpen())
+    if (!fin->IsOpen())
     {
 	cerr << FATAL << "can't open the root file: " << rootFile << endl;
 	exit(4);
@@ -105,7 +105,6 @@ int main(int argc, char *argv[])
 	    }
 	}
     }
-    fin->Close();
 
     int ncol = 8;
     int nrow = 1 + (calo::nChannels - 1)/ncol;
@@ -116,11 +115,11 @@ int main(int argc, char *argv[])
 	if (h2[ch]->GetEntries() < 1000)
 	{
 	    cerr << WARNING << "not enough statistics in channel: " << ch << endl;
+	    cout << INFO << "MIP value: " << inMIP[ch]["LG"] << "\tvs\t" << inMIP[ch]["HG"] << endl;
 	    continue;
 	}
 
 	c->cd(ch+1);
-	h2[ch]->Draw("COLZ");
 	TProfile * proX = h2[ch]->ProfileX(Form("ch%d_profileX", ch));
 	TF1 *fit = new TF1(Form("ch%d_fit", ch), "[0] + [1]*x", 0, 500);
 	fit->SetParameters(0, 30);
@@ -128,8 +127,13 @@ int main(int argc, char *argv[])
 	cout << INFO << "update MIP value in channel " << ch << " from: " << inMIP[ch]["LG"] << "\tto\t";
 	inMIP[ch]["LG"] = inMIP[ch]["HG"] / fit->GetParameter(1);
 	cout << inMIP[ch]["LG"] << endl;
+
+	c->cd(ch+1);
+	h2[ch]->Draw("COLZ");
+	fit->Draw("same");
     }
     c->SaveAs(Form("%s/%s_HG_vs_LG.png", fdir, prefix.c_str()));
+    fin->Close();
 
     // write result
     nlohmann::json outMIP;

@@ -27,7 +27,7 @@ do
             ${ROOT}/bin/MIP_analysis $run
 	else
 	    ${ROOT}/bin/calibrate $run
-	    # ${ROOT}/bin/QA $run
+	    ${ROOT}/bin/QA $run
 	    # ${ROOT}/bin/HG_vs_LG $run
 	fi
 	if [ $? -ne 0 ]; then

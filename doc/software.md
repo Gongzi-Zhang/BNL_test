@@ -1,11 +1,15 @@
 # operation
 # DRS4
-~/local
+```
+cd ~/local
 ./drs4eb/software/bin/drsosc &
+```
 
 # Janus
-~/local/Janus_3.2.4_Linux_20230822/bin$ 
+```
+cd ~/local/Janus_3.2.4_Linux_20230822/bin$ 
 python3 JanusPy.pyw &
+```
 
 
 
