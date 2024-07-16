@@ -96,7 +96,7 @@ void calibrate::init()
 	    tcor->GetBranch(Form("ch_%d", ch))->GetLeaf(gain)->SetAddress(&corADC[ch][gain]);
 	    tmip->GetBranch(Form("ch_%d", ch))->GetLeaf(gain)->SetAddress(&corMIP[ch][gain]);
 	}
-	h2[ch] = new TH2F(Form("ch_%d", ch), Form("ch %d", ch), 100, 0, 10, 100, 0, 10);
+	h2[ch] = new TH2F(Form("ch_%d", ch), Form("ch %d", ch), 100, 0, 500, 100, 0, 8000);
     }
     for (const char* var : {"mul", "event_e", "event_x", "event_y", "event_z"})
     {
@@ -144,6 +144,7 @@ void calibrate::fillEvent(map<int, map<string, float>> &val, TTree* t)
 	    float e = val[ch][gain];
 	    if (e > 0)
 	    {
+		values["hit_mul"][gain]++;
 		values["event_e"][gain] += e;
 		values["event_x"][gain] += e*x;
 		values["event_y"][gain] += e*y;
@@ -191,7 +192,8 @@ void calibrate::fillCorADC()
 		if (corADC[ch][gain] < 5*ped[ch][gain].rms)
 		    corADC[ch][gain] = 0;
 	    }
-	    h2[ch]->Fill(corADC[ch]["LG"], corADC[ch]["HG"]);
+	    if (corADC[ch]["LG"] > 0 && corADC[ch]["HG"] < 7900)
+		h2[ch]->Fill(corADC[ch]["LG"], corADC[ch]["HG"]);
 	}
 	fillEvent(corADC, tcor);
     }
@@ -205,6 +207,9 @@ void calibrate::getLGMIP()
     c->Divide(ncol, nrow, 0, 0);
     for (int ch=0; ch<calo::nChannels; ch++)
     {
+	if (h2[ch]->GetEntries() < 300)
+	    continue;
+
 	c->cd(ch+1);
 	h2[ch]->Draw("COLZ");
 	TProfile * proX = h2[ch]->ProfileX(Form("ch%d_profileX", ch));
@@ -213,7 +218,7 @@ void calibrate::getLGMIP()
 	proX->Fit(fit, "q");
 	mip[ch]["LG"] = mip[ch]["HG"] / fit->GetParameter(1);
     }
-    c->SaveAs(Form("%s/LG_vs_HG.png", fdir.c_str()));
+    c->SaveAs(Form("%s/HG_vs_LG.png", fdir.c_str()));
 }
 
 void calibrate::fillCorMIP()

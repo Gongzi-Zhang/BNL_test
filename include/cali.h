@@ -251,6 +251,16 @@ namespace cali {
 	    printf("%3d\t%.2f\t%.2f\n", ch, pos.x, pos.y);
 	}
     }
+
+    void printSipmBoards()
+    {
+	for (int ch=0; ch<192; ch++)
+	{
+	    SiPM sp = getSipm(ch);
+	    int bl = boardLabel[sp.layer][sp.quadrant];
+	    printf("%3d\t%d\n", ch, bl);
+	}
+    }
 }
 
 #endif

@@ -36,6 +36,9 @@ QA: QA.C
 MIP: MIP.C
 	g++ $(CXXFLAGS) -o $@ $^ $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
+LGMIP: LGMIP.C
+	g++ $(CXXFLAGS) -o $@ $^ $(root_libs)
+	mv $@ bin/
 
 convert: convert.C
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)

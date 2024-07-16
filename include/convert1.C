@@ -18,8 +18,7 @@ using namespace std;
 void usage()
 {
     cout << INFO << "usage" << endl;
-    cout << "\t./makeHist run_number" << endl;
-    cout << "\t./makeHist -i input.root" << endl;
+    cout << "\t./convert1 -c nCh1,nCh2,... -i listFile -o outFileName -m mode" << endl;
 }
 
 int main(int argc, char *argv[])
@@ -28,9 +27,9 @@ int main(int argc, char *argv[])
     string listFile;
     string pedFile;
     string outName;
-    string mode;
+    string mode("event");
     char opt;
-    while ((opt = getopt(argc, argv, "c:i:p:o:m:")) != -1)
+    while ((opt = getopt(argc, argv, "c:i:o:m:")) != -1)
 	switch(opt)
 	{
 	    case 'c':
@@ -38,9 +37,6 @@ int main(int argc, char *argv[])
 		break;
 	    case 'i':
 		listFile = optarg;
-		break;
-	    case 'p':
-		pedFile = optarg;
 		break;
 	    case 'o':
 		outName = optarg;
@@ -60,13 +56,6 @@ int main(int argc, char *argv[])
 	nCh.push_back(stoi(ch));
     calo::setnCAENChannels(nCh);
 
-    pedestal ped;
-    if (!getPedestal(pedFile.c_str(), ped))
-    {
-	cerr << FATAL << "unable to read pedestal file" << endl;
-	exit(2);
-    }
-
     if (!fileExists(listFile.c_str()))
     {
 	cerr << FATAL << "list file doesn't exist: " << listFile << endl;
@@ -79,7 +68,6 @@ int main(int argc, char *argv[])
 	eventBuilder *builder = new eventBuilder(reader);
 	treeMaker *maker = new treeMaker(builder);
 	maker->setStartTime(reader->getStartTime());
-	maker->setPed(ped);
 	maker->setOfName(outName);
 	maker->init();
 	maker->fill();
@@ -92,7 +80,6 @@ int main(int argc, char *argv[])
     {
 	cosmicTreeMaker *maker = new cosmicTreeMaker(reader);
 	maker->setStartTime(reader->getStartTime());
-	maker->setPed(ped);
 	maker->setOfName(outName);
 	maker->init();
 	maker->fill();
