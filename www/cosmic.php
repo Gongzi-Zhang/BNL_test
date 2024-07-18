@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>CALI: QA</title>
+        <title>CALI: COSMIC </title>
 	<link rel="stylesheet" type="text/css" href="cali.css">
 	<script type="text/javascript" src="cali.js"> 
 	</script>
@@ -15,19 +15,19 @@
 
 	<div id="topnav">
 	    <?php 
-		echo $chtml->topNav('CHANNEL');
+		echo $chtml->topNav('COSMIC');
 	    ?>
 	</div>
 
-	<div id="leftnav">
+	<div id="leftnav" >
 	    <?php
-		$date = date('Y-m-d', time());
-		if (isset($_GET['date']))
-		    $date = $_GET['date'];
-
-		$Year = (int)explode('-', $date)[0];
-		$out = "<div id='datenav' title='{$date}'>";
-		$out .= $chtml->dateNav($Year);
+		$res = $cdb->query("SELECT DISTINCT date(StartTime) AS Date From runs WHERE Type = 'cosmic' AND Flag = 'good' ORDER by Date DESC");
+		$out = "<div id='datenav' style='text-align: center;background-color: #F5F5DC;'>";
+		while ($row = $res->fetchArray())
+		{
+		    $date = $row['Date'];
+		    $out .= "<p id='$date'> <a href='#' onclick=\"launchDate('$date')\"> $date </a> </p>";
+		}
 		$out .= "</div>";
 		echo $out;
 	    ?>
@@ -45,10 +45,7 @@
 		    echo "<div id='runs'>";
 	    ?>
 	    </div>
-	    <div id='which-plot'>
-	    </div>
-	    <div id='channel-plot'>
-		<img src='#'/>
+	    <div id='cosmic-plots'>
 	    </div>
 	</div>
     </body>

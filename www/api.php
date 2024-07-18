@@ -18,16 +18,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['func']))
 
     if ($func == 'getDateRunInfo')
         echo getDateRunInfo($date);
-    else if ($func == 'getDatePtrgs')
-        echo getDatePtrgs($date);
     else if ($func == 'getDateRuns')
         echo getDateRuns($date);
+    else if ($func == 'getDatePtrgs')
+        echo getDatePtrgs($date);
+    else if ($func == 'getDateCosmics')
+        echo getDateCosmics($date);
     else if ($func == 'getRunQA')
 	echo getRunQA($run);
-    else if ($func == 'getRunPtrg')
-	echo getRunPtrg($run);
     else if ($func == 'getRunChannel')
 	echo getRunChannel($run);
+    else if ($func == 'getRunPtrg')
+	echo getRunPtrg($run);
+    else if ($func == 'getRunMIP')
+	echo getRunMIP($run);
     else if ($func == 'getRunsInfo')
     {
 	if (!$runs)
@@ -57,9 +61,25 @@ function getDateRunInfo($date)
 function getDateRuns($date)
 {
     global $cdb;
-    $runs = $cdb->getRuns("date(StartTime) = '{$date}' AND Type in ('data', 'cosmic') AND Flag = 'good'");
+    $runs = $cdb->getRuns("date(StartTime) = '{$date}' AND Type in ('data', 'cmdata') AND Flag = 'good'");
     if (!$runs)
-	return "<h2> No data/cosmic run on {$date} </h2>";
+	return "<h2> No data run on {$date} </h2>";
+
+    $res = 'Run: ';
+    foreach ($runs as $run )
+    {
+	$res .= "<a id='$run' href='#' onclick='launchRun({$run})'> {$run} </a>";
+    }
+
+    return $res;
+}
+
+function getDateCosmics($date)
+{
+    global $cdb;
+    $runs = $cdb->getRuns("date(StartTime) = '{$date}' AND Type = 'cosmic' AND Flag = 'good'");
+    if (!$runs)
+	return "<h2> No cosmic run on {$date} </h2>";
 
     $res = 'Run: ';
     foreach ($runs as $run )
@@ -74,8 +94,9 @@ function getRunQA($run)
 {
     global $cali;
     $res = '';
-    $imgs = array("event_rate", "hit_xy", "event_mul", "hit_ADC", 
-		  "event_ADC", "event_x", "event_y", "event_z");
+    $imgs = array("event_rate", "hit_xy", "hit_mul", 
+	"hit_MIP", "event_MIP", "event_MIP_vs_hit_mul",
+	"event_x", "event_y", "event_z");
     foreach ($cali::gains as $gain)
 	foreach ($imgs as $img)
 	    $res .= "<img src='figures/$run/{$gain}_{$img}.png' alt='{$gain}_{$img} does not exist' onclick='zoom(this);'/>";
@@ -100,16 +121,28 @@ function getDatePtrgs($date)
 function getRunChannel($run)
 {
     global $cali;
-    global $cdb;
-    $res = $cdb->getRunInfo($run, 'Channels');
-    $nCh = ($res->fetchArray())['Channels'];
 
-    $res = '';
-    foreach ($cali::gains as $gain)
-	for($ch = 0; $ch < $nCh; $ch++)
-	    $res .= "<img src='figures/$run/{$gain}_ch{$ch}_raw.png' alt='{$gain}_ch{$ch}_raw does not exist' onclick='zoom(this);'/>";
+    $table = '<table CELLSPACING=0>';
+    $imgs = array("HG_vs_LG");
+    foreach ($imgs as $img)
+    {
+	$table .= '<tr> <td>';
+	$table .= "<a href='#' onclick='launchChannelPlot(\"figures/$run/${img}.png\")'> $img </a>";
+	$table .= '</td> </tr>';
+    }
 
-    return $res;
+    $imgs = array("ch_e");
+    foreach ($imgs as $img)
+    {
+	$table .= "<tr> <td>";
+	$table .= "<b> ${img} </b>";
+	foreach ($cali::gains as $gain)
+	    $table .= "<a href='#' onclick='launchChannelPlot(\"figures/$run/${gain}_${img}.png\")'> $gain </a>";
+	$table .= "</td> </tr>";
+    }
+    $table .= '</table>';
+
+    return $table;
 }
 
 function getRunPtrg($run)
@@ -122,6 +155,17 @@ function getRunPtrg($run)
 	foreach ($imgs as $img)
 	    $res .= "<img src='figures/$run/{$gain}_{$img}.png' alt='{$gain}_{$img} does not exist' onclick='zoom(this);' />";
     }
+
+    return $res;
+}
+
+function getRunMIP($run)
+{
+    global $cali;
+    $res = '';
+    $imgs = array("MIP_HG");
+    foreach ($imgs as $img)
+	$res .= "<img src='figures/$run/{$img}.png' alt='{$img} does not exist' onclick='zoom(this);' />";
 
     return $res;
 }

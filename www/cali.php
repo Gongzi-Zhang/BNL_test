@@ -23,11 +23,11 @@ class _cali
 class _caliHtml
 {
     protected static $pages = array(
-	'HOME' => 'index.php',
-	'QA'   => 'QA.php',
-	'PTRG' => 'ptrg.php',
+	'HOME'	=> 'index.php',
+	'QA'	=> 'QA.php',
 	'CHANNEL' => 'channel.php',
-	// 'DB'   => 'db.php'
+	'PTRG'	=> 'ptrg.php',
+	'COSMIC' => 'cosmic.php',
     );
 
     public function topNav($page)

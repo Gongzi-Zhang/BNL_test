@@ -44,6 +44,10 @@ body, html {
     width: var(--datenav-width); 
 }
 
+#datenav p {
+    background-color: #F5F5DC;
+}
+
 #datenav a {
     display: block;
     text-decoration: none;
@@ -128,7 +132,7 @@ div.calendar a#self {
 }
 
 #QA-plots img {
-    width: 24.8%;
+    width: 33.3%;
     display: block;
 }
 
@@ -151,14 +155,30 @@ div.calendar a#self {
     display: block;
 }
 
-#channel-plots {
+#which-plot {
+    justify-content: center;
+    font-size: 24px;
+}
+
+#channel-plot {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-#channel-plots img {
-    width: 12.4%;
+#channel-plot img {
+    width: 100%;
+    display: block;
+}
+
+#cosmic-plot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#cosmic-plot img {
+    width: 100%;
     display: block;
 }
 /* for DB */

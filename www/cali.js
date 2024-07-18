@@ -34,21 +34,31 @@ function changeRunBgColor(run)
 
 function launchDate(date = '')
 {
+    var page = document.getElementById('self').text;
+
     if (!date)
-	date = document.getElementById('datenav').title;
+    {
+	if (page === 'COSMIC')
+	    date = document.getElementById('datenav').getElementsByTagName('p')[0].innerText;
+	else
+	    date = document.getElementById('datenav').title;
+    }
+    console.log(date)
 
     changeDateBgColor(date);
 
-    var page = document.getElementById('self').text;
     var func = '';
     if (page === 'HOME')
 	func = 'getDateRunInfo';
     else if (page === 'QA')
 	func = 'getDateRuns';
-    else if (page === 'PTRG')
-	func = 'getDatePtrgs';
     else if (page === 'CHANNEL')
 	func = 'getDateRuns';
+    else if (page === 'PTRG')
+	func = 'getDatePtrgs';
+    else if (page === 'COSMIC')
+	func = 'getDateCosmics';
+    console.log(func)
 
     var url = "api.php?func=" + func + "&date=" + date;
 
@@ -88,15 +98,20 @@ function launchRun(run)
 	func = 'getRunQA';
 	id = 'QA-plots';
     }
+    else if (page === 'CHANNEL')
+    {
+	func = 'getRunChannel';
+	id = 'which-plot';
+    }
     else if (page === 'PTRG')
     {
 	func = 'getRunPtrg';
 	id = 'ptrg-plots';
     }
-    else if (page === 'CHANNEL')
+    else if (page === 'COSMIC')
     {
-	func = 'getRunChannel';
-	id = 'channel-plots';
+	func = 'getRunMIP';
+	id = 'cosmic-plots';
     }
 
     if (!run)
@@ -137,4 +152,14 @@ function getRunsInfo(evt)
     var url = "api.php?func=getRunsInfo&runs=" + runs;
     xmlHttp.open("GET", url, true);
     xmlHttp.send();
+}
+
+function launchChannelPlot(img)
+{
+    document.getElementById('channel-plot').getElementsByTagName('img')[0].src = img;
+}
+
+function launchChannelPlot(img)
+{
+    document.getElementById('channel-plot').getElementsByTagName('img')[0].src = img;
 }

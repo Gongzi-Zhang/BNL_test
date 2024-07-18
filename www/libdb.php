@@ -48,6 +48,11 @@ class _caliDB
 	$this->reverse = false;
     }
 
+    function query($sql)
+    {
+	return self::$db->query($sql);
+    }
+
     function getRunsInfo($cond, $fields = 'Run')
     {
 	$table = self::$table;
