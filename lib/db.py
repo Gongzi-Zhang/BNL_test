@@ -23,7 +23,7 @@ FreFields = [ 'Run', 'Type', 'Flag',
     'Trigger', 
     'Events', 'Size', 
     'Note' ]
-TYPES = ['ptrg', 'cosmic', 'data', 'cmdata', 'junk']
+TYPES = ['ptrg', 'cosmic', 'data', 'cmdata', 'test', 'junk']
 FLAGS = ['good', 'bad', 'susp']
 
 FIELD_WIDTH = {

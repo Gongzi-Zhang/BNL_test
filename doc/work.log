@@ -1,3 +1,10 @@
+# 20240717
+    Add a function generator to the DRS4 for external trigger
+    Test grounding cable, the random pedestal problem persists
+    change 'HG' to 60 (run 1271):
+    old: HG Gain: 55; LG Gain: 27; Pedestal Position: 160
+    new: HG Gain: 60; LG Gain: 27; Pedestal Position: 160
+
 # 20240620
     Add 32 cables (P52-P59), all 55 boards (14 layers + 1 bottom right on 15th layer) 
     are connected, 12 cables left spare (Run 877)
