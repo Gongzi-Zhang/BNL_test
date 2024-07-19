@@ -88,7 +88,7 @@ void QA::init()
     for (auto const &gain : calo::gains) // gain
     {
 	h1["hit_MIP"][gain] = new TH1F(Form("hit_MIP_%s", gain), Form("%s: hit energy;MIP", gain), 100, 0, xmax["hit_MIP"][gain]);
-	h1["hit_mul"][gain]   = new TH1F(Form("hit_mul_%s",  gain),  Form("%s: mul (5#sigma)", gain), xmax["hit_mul"][gain], 0, xmax["hit_mul"][gain]);
+	h1["hit_mul"][gain]   = new TH1F(Form("hit_mul_%s",  gain),  Form("%s: mul (> 0.3 MIP)", gain), xmax["hit_mul"][gain], 0, xmax["hit_mul"][gain]);
 
 	h1["event_rate"][gain]  = new TH1F(Form("event_rate_%s", gain),  Form("%s: rate;Time", gain), 100, 1e8, 1e10);	// needs update later
 	h1["event_MIP"][gain] = new TH1F(Form("event_MIP_%s", gain),  Form("%s: event energy;MIP", gain), 100, 0, xmax["event_MIP"][gain]);
@@ -111,6 +111,7 @@ void QA::init()
 
 	h2["hit_xy"][gain] = new TH2F(Form("hit_xy_%s", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
 	h2["event_MIP_vs_hit_mul"][gain] = new TH2F(Form("event_MIP_vs_mul_%s", gain), Form("%s: Event Sum (MIPs) vs Hit Multiplicity;Hit Multiplicity;Event Sum (MIPs)", gain), 100, 0, xmax["hit_mul"][gain], 100, 0, xmax["event_MIP"][gain]);
+	h2["event_MIP_vs_eta"][gain] = new TH2F(Form("event_MIP_vs_eta_%s", gain), Form("%s: Event Sum (MIPs) vs #eta;#eta;Event Sum (MIPs)", gain), 100, 3, 4, 100, 0, xmax["event_MIP"][gain]);
 
 	// formats
 	h1["event_rate"][gain]->GetXaxis()->SetTimeDisplay(1);
@@ -175,6 +176,9 @@ void QA::fillData()
     for (auto const& gain : calo::gains)
         h1["event_rate"][gain]->GetXaxis()->SetLimits(startTS, endTS);
 
+    double theta, eta;
+    double x, y, z;
+
     for (int ei=0; ei<t->GetEntries(); ei++)
     {
 	t->GetEntry(ei);
@@ -196,6 +200,13 @@ void QA::fillData()
 	    h1["event_y"][gain]->Fill(values["event_y"][gain]/cm);
 	    h1["event_z"][gain]->Fill(values["event_z"][gain]);
 	    h2["event_MIP_vs_hit_mul"][gain]->Fill(values["hit_mul"][gain], values["event_e"][gain]);
+
+	    x = values["event_x"][gain] + cali::X;
+	    y = values["event_y"][gain];
+	    z = values["event_z"][gain]*cali::layerZ + cali::Z;
+	    theta = atan(sqrt(x*x + y*y)/z);
+	    eta = -log(tan(theta/2));
+	    h2["event_MIP_vs_eta"][gain]->Fill(eta, values["event_e"][gain]);
 
 	    for (int ch=0; ch<cali::nChannels; ch++)
 	    {

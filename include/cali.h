@@ -50,6 +50,9 @@ namespace cali {
     const double pcbX = 131.92*mm;	// 177.64 - 45.72
     const double pcbY = 97.99*mm;	// 130.91 - 32.92
     const double layerZ = 27.1526*mm;
+    const double X = 70*cm;
+    const double Y = 0;
+    const double Z = 7*m;
 
 
     void setRun(const int r)
