@@ -181,6 +181,17 @@ div.calendar a#self {
     width: 100%;
     display: block;
 }
+
+#misc-plots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#misc-plots img {
+    width: 100%;
+    display: block;
+}
 /* for DB */
 #search {
     position: absolute;

@@ -19,18 +19,19 @@
 	    ?>
 	</div>
 
-	<div id="leftnav" >
-	    <?php
-		$res = $cdb->query("SELECT DISTINCT date(StartTime) AS Date From runs WHERE Type = 'cosmic' AND Flag = 'good' ORDER by Date DESC");
-		$out = "<div id='datenav' style='text-align: center;background-color: #F5F5DC;'>";
-		while ($row = $res->fetchArray())
-		{
-		    $date = $row['Date'];
-		    $out .= "<p id='$date'> <a href='#' onclick=\"launchDate('$date')\"> $date </a> </p>";
-		}
-		$out .= "</div>";
-		echo $out;
-	    ?>
+	<div id="leftnav">
+	    <div id='datenav' style='text-align: center;background-color: #F5F5DC;'>
+		<?php
+		    $res = $cdb->query("SELECT DISTINCT date(StartTime) AS Date From runs WHERE Type = 'cosmic' AND Flag = 'good' ORDER by Date DESC");
+		    $out = '';
+		    while ($row = $res->fetchArray())
+		    {
+			$date = $row['Date'];
+			$out .= "<p id='$date'> <a href='#' onclick=\"launchDate('$date')\"> $date </a> </p>";
+		    }
+		    echo $out;
+		?>
+	    </div>
 	</div>
 
 	<div id='content'>

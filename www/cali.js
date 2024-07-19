@@ -1,4 +1,4 @@
-var dateClick = '';
+var linkClick = '';
 var runClick = '';
 
 function zoom(ele)
@@ -6,16 +6,16 @@ function zoom(ele)
     ele.classList.toggle("zoom");
 }
 
-function changeDateBgColor(date)
+function changBgColor(link)
 {
-    if (date)
+    if (link)
     {
-	if (dateClick && document.getElementById(dateClick))
+	if (linkClick && document.getElementById(linkClick))
 	{
-	    document.getElementById(dateClick).style.background = '#F5F5DC';
+	    document.getElementById(linkClick).style.background = '#F5F5DC';
 	}
-	document.getElementById(date).style.background = '#778899';
-	dateClick = date;
+	document.getElementById(link).style.background = '#778899';
+	linkClick = link;
     }
 }
 
@@ -45,7 +45,7 @@ function launchDate(date = '')
     }
     console.log(date)
 
-    changeDateBgColor(date);
+    changBgColor(date);
 
     var func = '';
     if (page === 'HOME')
@@ -159,7 +159,7 @@ function launchChannelPlot(img)
     document.getElementById('channel-plot').getElementsByTagName('img')[0].src = img;
 }
 
-function launchChannelPlot(img)
+function launchMisc(img)
 {
-    document.getElementById('channel-plot').getElementsByTagName('img')[0].src = img;
+    document.getElementById('misc-plots').getElementsByTagName('img')[0].src = img;
 }

@@ -28,6 +28,7 @@ class _caliHtml
 	'CHANNEL' => 'channel.php',
 	'PTRG'	=> 'ptrg.php',
 	'COSMIC' => 'cosmic.php',
+	'MISC'	=> 'misc.php',
     );
 
     public function topNav($page)
