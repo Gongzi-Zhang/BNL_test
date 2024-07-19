@@ -171,13 +171,13 @@ div.calendar a#self {
     display: block;
 }
 
-#cosmic-plot {
+#cosmic-plots {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-#cosmic-plot img {
+#cosmic-plots img {
     width: 100%;
     display: block;
 }
