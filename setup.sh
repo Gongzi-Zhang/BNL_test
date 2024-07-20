@@ -29,3 +29,10 @@ else
 	export LD_LIBRARY_PATH=${CALIROOT}/lib:$LD_LIBRARY_PATH
     fi
 fi
+
+upload () {
+    while [ $# -gt 0 ]; do
+	scp -r ${CALIROOT}/figures/$1/ weibin@cali:public/cali/BNL_test/figures/
+	shift
+    done
+}

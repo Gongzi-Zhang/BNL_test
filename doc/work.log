@@ -1,9 +1,24 @@
+# 20240719
+    change 'HG' to 55 (run 1293):
+    old: HG Gain: 60; LG Gain: 27; Pedestal Position: 160
+    new: HG Gain: 55; LG Gain: 27; Pedestal Position: 160
+    change 'TD_CoarseThreshold' to 260 (run 1293):
+    old: TD_CoarseThreshold: 300
+    new: TD_CoarseThreshold: 260
+
+    change 'HV IMax' to 4 mA (run 1296)
+    old: HV IMax: 3 mA
+    new: HV IMax: 4 mA
+
 # 20240717
     Add a function generator to the DRS4 for external trigger
     Test grounding cable, the random pedestal problem persists
     change 'HG' to 60 (run 1271):
     old: HG Gain: 55; LG Gain: 27; Pedestal Position: 160
     new: HG Gain: 60; LG Gain: 27; Pedestal Position: 160
+    change 'TD_CoarseThreshold' to 300 (run 1271):
+    old: TD_CoarseThreshold: 260
+    new: TD_CoarseThreshold: 300
 
 # 20240620
     Add 32 cables (P52-P59), all 55 boards (14 layers + 1 bottom right on 15th layer) 

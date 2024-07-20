@@ -36,7 +36,7 @@ for file in sorted(os.listdir(directory)):
     date.append(datetime(2024, int(month), int(day), int(hour), int(minute), tzinfo=timezone.utc))
 
 plt.figure(figsize=(20,10))
-plt.title(f'Dark Current Time Trend: Total {len(Voltage)} Files')
+plt.title(f'Dark Current Monitor for\n Irradiated S14160 3015 SiPM')
 plt.xlabel('Time (UTC)')
 plt.ylabel(r'Current ($\mu$A)')
 
@@ -48,7 +48,7 @@ for i in range(5):
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
 # plt.yscale('log')
 plt.xticks(rotation=45)
-plt.legend(bbox_to_anchor=(1, 1), loc='upper left')
+plt.legend()
 # plt.show()
 fdir = os.path.expanduser('~/BNL_test/figures/misc/')
 plt.savefig(f'{fdir}/IV.png')
