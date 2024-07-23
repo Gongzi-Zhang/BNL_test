@@ -7,6 +7,7 @@
 #include "TLeaf.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TProfile.h"
 #include "TCanvas.h"
 #include "TGaxis.h"
 #include "TLatex.h"
@@ -56,6 +57,7 @@ class QA {
 
     // histograms
     map<string, map<string, TH1F*>> h1;
+    map<string, map<string, TProfile*>> hp;
     map<string, map<string, TH2F*>> h2;
     // map<int, map<string, map<string, TH1F*>>> h1Layer;
     map<int, map<string, TH1F*>> h1Channel;
@@ -111,7 +113,7 @@ void QA::init()
 
 	h2["hit_xy"][gain] = new TH2F(Form("hit_xy_%s", gain), Form("%s: hit xy;x(cm);y(cm)", gain), 100, -10, 10, 100, -10, 10);
 	h2["event_MIP_vs_hit_mul"][gain] = new TH2F(Form("event_MIP_vs_mul_%s", gain), Form("%s: Event Sum (MIPs) vs Hit Multiplicity;Hit Multiplicity;Event Sum (MIPs)", gain), 100, 0, xmax["hit_mul"][gain], 100, 0, xmax["event_MIP"][gain]);
-	h2["event_MIP_vs_eta"][gain] = new TH2F(Form("event_MIP_vs_eta_%s", gain), Form("%s: Event Sum (MIPs) vs #eta;#eta;Event Sum (MIPs)", gain), 100, 3, 4, 100, 0, xmax["event_MIP"][gain]);
+	hp["event_MIP_vs_eta"][gain] = new TProfile(Form("event_MIP_vs_eta_%s", gain), Form("%s: Event Sum (MIPs) vs #eta;#eta;Event Sum (MIPs)", gain), 100, 2.8, 3.2, 0, xmax["event_MIP"][gain]);
 
 	// formats
 	h1["event_rate"][gain]->GetXaxis()->SetTimeDisplay(1);
@@ -176,6 +178,7 @@ void QA::fillData()
     for (auto const& gain : calo::gains)
         h1["event_rate"][gain]->GetXaxis()->SetLimits(startTS, endTS);
 
+    double e;
     double theta, eta;
     double x, y, z;
 
@@ -193,20 +196,24 @@ void QA::fillData()
 	    //     layerY[l] = 0;
 	    // }
 
+	    e = values["event_e"][gain];
+	    if (0 == e)
+		continue;
+
 	    h1["hit_mul"][gain]->Fill(values["hit_mul"][gain]);
 	    h1["event_rate"][gain]->Fill(TS + deltaT, rate);
 	    h1["event_MIP"][gain]->Fill(values["event_e"][gain]);
 	    h1["event_x"][gain]->Fill(values["event_x"][gain]/cm);
 	    h1["event_y"][gain]->Fill(values["event_y"][gain]/cm);
 	    h1["event_z"][gain]->Fill(values["event_z"][gain]);
-	    h2["event_MIP_vs_hit_mul"][gain]->Fill(values["hit_mul"][gain], values["event_e"][gain]);
+	    h2["event_MIP_vs_hit_mul"][gain]->Fill(values["hit_mul"][gain], e);
 
 	    x = values["event_x"][gain] + cali::X;
 	    y = values["event_y"][gain];
 	    z = values["event_z"][gain]*cali::layerZ + cali::Z;
 	    theta = atan(sqrt(x*x + y*y)/z);
 	    eta = -log(tan(theta/2));
-	    h2["event_MIP_vs_eta"][gain]->Fill(eta, values["event_e"][gain]);
+	    hp["event_MIP_vs_eta"][gain]->Fill(eta, e, 1);
 
 	    for (int ch=0; ch<cali::nChannels; ch++)
 	    {
@@ -381,6 +388,12 @@ void QA::plot()
 	    {
 		h2[var][gain]->Draw("colz");
 	    }
+	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, var.c_str()));
+	}
+	for (auto const & x : hp)
+	{
+	    string var = x.first;
+	    hp[var][gain]->Draw("HIST");
 	    c->SaveAs(Form("%s/%s_%s.png", fdir.c_str(), gain, var.c_str()));
 	}
 	delete c;
