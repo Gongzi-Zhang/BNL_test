@@ -245,24 +245,18 @@ namespace cali {
 	return pos + pcbAnchor[sp.quadrant];
     }
 
-    void printSipmXY(const int chMin = 0, const int chMax = nChannels - 1)
+    void printSipmInfo(const int ch = 0)
     {
-	assert(chMin <= chMax);
-	for (int ch=chMin; ch<=chMax; ch++) 
-	{
-	    sipmXY pos = getSipmXY(ch);
-	    printf("%3d\t%.2f\t%.2f\n", ch, pos.x, pos.y);
-	}
-    }
-
-    void printSipmBoards()
-    {
-	for (int ch=0; ch<192; ch++)
-	{
-	    SiPM sp = getSipm(ch);
-	    int bl = boardLabel[sp.layer][sp.quadrant];
-	    printf("%3d\t%d\n", ch, bl);
-	}
+	assert(ch <= nChannels);
+	SiPM sp = getSipm(ch);
+	printf("Channel: %d\n", ch);
+	printf("Board: %d\n", sp.layer*nLayerBoards + sp.quadrant);
+	printf("Board Label: %d\n", boardLabel[sp.layer][sp.quadrant]);
+	printf("Layer: %d\n", sp.layer);
+	printf("Quadrant in Layer: %d\n", sp.quadrant);
+	printf("SiPM in Board: %d\n", sp.sipm);
+	sipmXY pos = getSipmXY(ch);
+	printf("X:\t%.2f cm\tY:\t%.2f cm\n", pos.x/cm, pos.y/cm);
     }
 }
 

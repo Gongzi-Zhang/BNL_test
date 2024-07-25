@@ -49,6 +49,6 @@ bool fileExists(const char* fname)
 bool dirExists(const char* dname)
 {
     struct stat buffer;
-    return stat(dname, &buffer) == 0 ? (buffer.st_mode & S_IFDIR != 0) : false;
+    return stat(dname, &buffer) == 0 ? ((buffer.st_mode & S_IFDIR) != 0) : false;
 }
 #endif
