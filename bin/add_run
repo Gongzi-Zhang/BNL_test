@@ -66,6 +66,7 @@ fi
 StartTime='00'
 StopTime=$(ls -l --time-style='+%Y%m%d %H:%M' $list_file | cut -d' ' -f6-7)
 Length=-1
+Vbias=0
 
 if [ -f $info_file ]; then
     StartTime=$(grep '\<Start Time\>' $info_file | cut -d ':' -f2-)
@@ -74,6 +75,7 @@ if [ -f $info_file ]; then
     StopTime=$(extract_datetime "$StopTime")
     Length=$(grep '\<Elapsed time\>' $info_file | cut -d ' ' -f4)
     Length=$(perl -e "printf(\"%d\", $Length/60)")
+    Vbias=$(grep 'HV_Vbias' ${info_file} | awk '{print $2}')
 fi
 
 Geometry=$(grep '\<Geometry\>' ${config} | cut -d':' -f2)
@@ -98,7 +100,6 @@ fi
 LG=$(grep '\<LG\>' ${config} | cut -d':' -f2)
 HG=$(grep '\<HG\>' ${config} | cut -d':' -f2)
 Ped=$(grep '\<Ped\>' ${config} | cut -d':' -f2)
-Vbias=$(grep 'HV_Vbias' ${info_file} | awk '{print $2}')
 Size=$(ls -lh --block-size=1MiB $list_file | awk '{print $5}')
 PedRun=$(grep '\<PedRun\>' ${config} | cut -d':' -f2)
 if [ "$run_type" = "ptrg" ]; then

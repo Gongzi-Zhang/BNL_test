@@ -1,3 +1,18 @@
+# 20240731
+    IV test for SiPM in channel 5, 27, 32, 50 and 128-135; All SiPMs are good
+    except current over limit at 43V for channel 130.
+    Switch channel P7CH4 with P7CH1, they are wrongly connected before.
+    Replace cables for channel 5, 27, 32, 50 with that from channel 128-131 (run 1444)
+    P0CH5 (ch 5)  -> P20CH0
+    P3CH6 (ch 27) -> P20CH1
+    P4CH4 (ch 32) -> P20CH2
+    P7CH1 (ch 50) -> P20CH3
+
+# 20240724
+    change 'HV IMax' to 5 mA (run 1349)
+    old: HV IMax: 4 mA
+    new: HV IMax: 5 mA
+
 # 20240719
     change 'HG' to 55 (run 1293):
     old: HG Gain: 60; LG Gain: 27; Pedestal Position: 160

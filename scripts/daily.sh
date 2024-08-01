@@ -3,6 +3,7 @@
 script=$(realpath -- ${BASH_SOURCE[0]})
 ROOT=$(dirname $script)/..
 source ${ROOT}/setup.sh
+source ${ROOT}/lib/cali.sh
 
 ${ROOT}/scripts/github.sh 
 ${ROOT}/scripts/sync.sh 
