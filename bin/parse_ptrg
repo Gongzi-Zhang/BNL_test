@@ -80,12 +80,12 @@ class parsePtrg:
             for line in fin:
                 line = line.strip()
                 values = line.split()
-                if 6 == len(values):
+                if 6 == len(values):    # run < 1576
                     bd = int(values[2])
                     ch = int(values[3])
                     LG = int(values[4])
                     HG = int(values[5])
-                elif 4 == len(values):
+                elif 4 == len(values) or 7 == len(values):
                     bd = int(values[0])
                     ch = int(values[1])
                     LG = int(values[2])

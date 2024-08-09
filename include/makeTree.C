@@ -53,7 +53,7 @@ void listReader::read(const int nRequest)
 	fields.clear();
 	fields = split(line);
 	const int n = fields.size();
-	if (6 == n)
+	if (6 == n) // for runs < 1576
 	{
 	    addBoard(board);
 
@@ -62,6 +62,17 @@ void listReader::read(const int nRequest)
 	    ch  = stoi(fields[3]);
 	    LG  = stoi(fields[4]);
 	    HG  = stoi(fields[5]);
+	    board = new boardReadout(bid, ts);
+	}
+	else if (7 == n)
+	{
+	    addBoard(board);
+
+	    bid = stoi(fields[0]);
+	    ch  = stoi(fields[1]);
+	    LG  = stoi(fields[2]);
+	    HG  = stoi(fields[3]);
+	    ts  = stod(fields[4])*us;
 	    board = new boardReadout(bid, ts);
 	}
 	else if (4 == n)
