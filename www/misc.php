@@ -22,9 +22,9 @@
 	    <div style='text-align: center;background-color: #F5F5DC;'>
 		<?php
 		    $out = '';
-		    $imgs = array('IV');
+		    $imgs = array('IV', 'MIPs', 'MIP_SB_ratio');
 		    foreach ($imgs as $img)
-			$out .= "<p id='$img'> <a href='#' onclick=\"launchMisc('${img}.png')\"> $img </a> </p>";
+			$out .= "<p id='$img'> <a href='#' onclick=\"launchMisc('figures/misc/${img}.png')\"> $img </a> </p>";
 		    echo $out;
 		?>
 	    </div>
@@ -32,7 +32,7 @@
 
 	<div id='content'>
 	    <div id='misc-plots'>
-		<img src='figures/misc/IV.png' alt='IV plot does not exist' onclick='zoom(this);' />
+		<img src='figures/misc/IV.png' alt='plot does not exist' onclick='zoom(this);' />
 	    </div>
 	</div>
     </body>

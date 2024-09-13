@@ -46,6 +46,14 @@ convert: convert.C
 calibrate: calibrate.C
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
+makeEdm4eic: makeEdm4eic.C
+	# check eic-shell environment
+	@if [ -z "$(DETECTOR)" ] || [ "epic" != "$(DETECTOR)" ]; then
+	    echo -e "ERROR\t eic-shell not set.\n makeEdm4eic must be compiled within eic-shell"
+	    exit 1
+	fi
+	# g++ -o edm4hep edm4hep.cpp -I../EDM4hep/install/include/ -I../podio/install/include/ -I/home/weibin/local/root/include -L../DEM4hep/install/lib/ -ledm4hep -L../podio/install/lib -lpodio -lpodioRootIO
+	mv $@ bin/
 
 convert1: convert1.C
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
