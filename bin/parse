@@ -16,25 +16,19 @@ do
     run_type=$(${ROOT}/bin/caliDB -p query --run $run --field Type | xargs)
     if [ "$run_type" = "ptrg" ]; then
 	${ROOT}/bin/parse_ptrg $run
-	if [ $? -ne 0 ]; then
-	    ${ROOT}/bin/caliDB update --run $run --field Flag --value bad
-	else
-	    scp -qr ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
-	fi
-    else
+    elif [ "$run_type" = "cosmic" ]; then
 	${ROOT}/bin/convert $run
-	if [ "$run_type" = "cosmic" ]; then
-            ${ROOT}/bin/MIP_analysis $run
-	else
-	    ${ROOT}/bin/calibrate $run
-	    ${ROOT}/bin/QA $run
-	    # ${ROOT}/bin/HG_vs_LG $run
-	fi
-	if [ $? -ne 0 ]; then
-	    ${ROOT}/bin/caliDB update --run $run --field Flag --value bad
-	else
-	    scp -qr ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
-	fi
+	${ROOT}/bin/MIP_analysis $run
+	${ROOT}/bin/MIP $run
+    elif [ "$run_type" = "data" ] || [ "$run_type" = "cmdata" ]; then
+	${ROOT}/bin/convert $run
+	${ROOT}/bin/calibrate $run
+	${ROOT}/bin/QA $run
+    fi
+    if [ $? -ne 0 ]; then
+	${ROOT}/bin/caliDB update --run $run --field Flag --value bad
+    else
+	scp -qr ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
     fi
     shift
 done

@@ -12,10 +12,12 @@ config -> -0.05 to +0.95 V -> Execute Voltage Calibration
 
 # Janus
 ```
-cd ~/local/Janus_3.2.4_Linux_20230822/bin$ 
+cd ~/local/Janus_5202_3.6.0_20240514_linux/bin
 python3 JanusPy.pyw &
 ```
 
+# GlobalProtect
+globalprotect connect -p campusvpn.ucr.edu
 
 
 # installation

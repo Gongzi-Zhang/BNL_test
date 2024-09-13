@@ -245,6 +245,22 @@ namespace cali {
 	return pos + pcbAnchor[sp.quadrant];
     }
 
+    char* getRootFile(const int run)
+    {
+	char rootFile[1024];
+	sprintf(rootFile, "%s/data/Run%d.root", cali::CALIROOT, run);
+	if (!fileExists(rootFile))
+	{
+	    sprintf(rootFile, "%s/data/Run%d.root", cali::backupDir, run);
+	    if (!fileExists(rootFile))
+	    {
+		cerr << FATAL << "can't find the root file" << endl;
+		return NULL;
+	    }
+	}
+	return rootFile;
+    }
+
     void printSipmInfo(const int ch = 0)
     {
 	assert(ch <= nChannels);
