@@ -50,7 +50,7 @@ void rate_scan()
 void energy_scan()
 {
     // int runs[] = {1856, 1857, 1858, 1859, 1860}; // T1
-    int runs[] = {1954, 1955, 1956, 1957}; // T1
+    int runs[] = {1954, /* 1955, 1956, */ 1962, 1961, 1960, 1959, 1958}; // T1
     // int runs[] = {1866, 1867, 1868, 1869, 1870}; // T2
     // int runs[] = {1877, 1878, 1879, 1880, 1881}; // T3
     map<int, string> legend = {
@@ -76,7 +76,11 @@ void energy_scan()
 	{1954, "T1 = 0.02 V"},
 	{1955, "T1 = 0.03 V"},
 	{1956, "T1 = 0.04 V"},
-	{1957, "T1 = 0.05 V"},
+	{1962, "T1 = 0.05 V"},
+	{1961, "T1 = 0.08 V"},
+	{1960, "T1 = 0.1 V"},
+	{1959, "T1 = 0.2 V"},
+	{1958, "T1 = 0.3 V"},
     };
 
     float mip[nChannels];
@@ -84,9 +88,9 @@ void energy_scan()
     map<int, TH1F*> h1;
     for (int run : runs)
     {
-	h1[run] = new TH1F(Form("event_energy_%d", run), "Event Energy;MIP", 200, 0, 200);
-	const char* fname = cali::getRootFile(run);
-	TFile *fin = new TFile(fname, "read");
+	h1[run] = new TH1F(Form("event_energy_%d", run), "Event Energy;MIP", 400, 0, 400);
+	string fname = cali::getRootFile(run);
+	TFile *fin = new TFile(fname.c_str(), "read");
 	TTree *tin = (TTree*) fin->Get("mip");
 	for (int ch=0; ch<nChannels; ch++)
 	{
@@ -103,7 +107,8 @@ void energy_scan()
 		    continue;
 		event_energy += mip[ch];
 	    }
-	    h1[run]->Fill(event_energy);
+	    if (event_energy > 0)
+		h1[run]->Fill(event_energy);
 	}
 	h1[run]->Scale(1./tin->GetEntries());
     }

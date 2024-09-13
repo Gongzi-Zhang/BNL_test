@@ -173,8 +173,8 @@ namespace cali {
     {
 	if (ch < 0 || ch >= nChannels)
 	{
-	    std::cerr << ERROR << "Invalid channel number:" << ch << std::endl;
-	    std::cout << INFO << "Allowed channel range: 0 - " << nChannels - 1 << std::endl;
+	    cerr << ERROR << "Invalid channel number:" << ch << endl;
+	    cout << INFO << "Allowed channel range: 0 - " << nChannels - 1 << endl;
 	    return {-1, -1, -1};
 	}
 
@@ -245,16 +245,16 @@ namespace cali {
 	return pos + pcbAnchor[sp.quadrant];
     }
 
-    char* getRootFile(const int run)
+    string getRootFile(const int run)
     {
 	char rootFile[1024];
-	sprintf(rootFile, "%s/data/Run%d.root", cali::CALIROOT, run);
+	sprintf(rootFile, "%s/data/Run%d.root", CALIROOT, run);
 	if (!fileExists(rootFile))
 	{
-	    sprintf(rootFile, "%s/data/Run%d.root", cali::backupDir, run);
+	    sprintf(rootFile, "%s/data/Run%d.root", backupDir, run);
 	    if (!fileExists(rootFile))
 	    {
-		cerr << FATAL << "can't find the root file" << endl;
+		cerr << FATAL << "can't find the root file: " << rootFile << endl;
 		return NULL;
 	    }
 	}

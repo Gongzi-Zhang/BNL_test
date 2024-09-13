@@ -4,7 +4,7 @@
 '''
 extract the TS info for analysis
 
-usage: ./extract.py input.txt 
+usage: extract.py input.txt 
 '''
 
 import os
@@ -43,11 +43,11 @@ class extract:
 
             for line in fin:
                 values = line.split()
-                if 6 != len(values):
+                if 7 != len(values):
                     continue
-                ts = float(values[0])
-                trgId = int(values[1])
-                bd = int(values[2])
+                ts = float(values[4])
+                trgId = int(values[5])
+                bd = int(values[0])
                 print(f'{ts}\t{trgId}\t{bd}')
 
 def usage():
