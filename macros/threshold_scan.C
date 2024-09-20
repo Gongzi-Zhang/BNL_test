@@ -3,7 +3,7 @@
 const int nChannels = 192;
 const float mip_cut = 0.3;
 const int colors[] = {1, 2, 3, 4, 6, 7, 8, 9};
-const int markers[] = {20, 21, 22, 23, 33, 34};
+const int markers[] = {20, 21, 22, 23, 33, 34, 35};
 
 gROOT->SetBatch(1);
 
@@ -50,9 +50,10 @@ void rate_scan()
 void energy_scan()
 {
     // int runs[] = {1856, 1857, 1858, 1859, 1860}; // T1
-    int runs[] = {1954, /* 1955, 1956, */ 1962, 1961, 1960, 1959, 1958}; // T1
+    // int runs[] = {1954, /* 1955, 1956, */ 1962, 1961, 1960, 1959, 1958}; // T1
     // int runs[] = {1866, 1867, 1868, 1869, 1870}; // T2
     // int runs[] = {1877, 1878, 1879, 1880, 1881}; // T3
+    int runs[] = {2053, 1963, 2055, 2056, 2058, 1968};
     map<int, string> legend = {
 	{1856, "T1 = 0.05 V"},
 	{1857, "T1 = 0.08 V"},
@@ -81,6 +82,16 @@ void energy_scan()
 	{1960, "T1 = 0.1 V"},
 	{1959, "T1 = 0.2 V"},
 	{1958, "T1 = 0.3 V"},
+
+	{1963, "T3 = 0.08 V"},
+	{1968, "T3 = 0.3 V"},
+	{2003, "T3 = 0.2 V"},
+	{2018, "T3 = 0.1 V"},
+	{2053, "T3 = 0.06 V"},
+	{2054, "T3 = 0.07 V"},
+	{2055, "T3 = 0.09 V"},
+	{2056, "T3 = 0.1 V"},
+	{2058, "T3 = 0.2 V"},
     };
 
     float mip[nChannels];
@@ -139,4 +150,9 @@ void energy_scan()
     l->Draw();
     c->SetLogy(1);
     c->SaveAs("threshold_scan.png");
+}
+
+void threshold_scan()
+{
+    energy_scan();
 }

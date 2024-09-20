@@ -1,5 +1,5 @@
-#ifndef __MAKEEDM$EIC__
-#define __MAKEEDM$EIC__
+#ifndef __MAKEEDM4EIC__
+#define __MAKEEDM4EIC__
 
 #include "TFile.h"
 #include "TTree.h"
@@ -56,9 +56,6 @@ void makeEdm4eic::make()
 
     int cellID;
     float energy;
-    edm4hep::Vector3f position(0, 0, 0);
-    edm4hep::Vector3f dimension(0, 0, 0);
-    edm4hep::Vector3f local_position(0, 0, 0);
     int sid = 0;
     int lid = 0;
     int slice = 0;
@@ -82,8 +79,9 @@ void makeEdm4eic::make()
 		lid = layerNumber[ch] - 4*4;
 	    cellID = (lid << 8) + sid;
 	    energy = mip[ch];
-	    local_position = (pos[ch].x, pos[ch].y, layerNumber[ch]);
-	    position = (pos[ch].x, pos[ch].y, layerNumber[ch]);
+	    edm4hep::Vector3f local_position(pos[ch].x, pos[ch].y, layerNumber[ch]);
+	    edm4hep::Vector3f position(pos[ch].x, pos[ch].y, layerNumber[ch]);
+	    edm4hep::Vector3f dimension(0, 0, 0);
 	    hits->create(
 		cellID,
 		energy,

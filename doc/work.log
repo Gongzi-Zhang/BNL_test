@@ -1,3 +1,21 @@
+# 20240816
+    (run 1576)
+    change 'HG' to 55 (run 1705):
+    old: HG Gain: 50; LG Gain: 27; Pedestal Position: 160
+    new: HG Gain: 55; LG Gain: 27; Pedestal Position: 160
+
+# 20240808
+    (run 1576)
+    Update the CAEN unit firmware from 5.0 (build = 7703) 7.3 (build = 8731)
+    Update the concentrator from 2024.5.9.1
+    P20CH0 (ch 5) -> P0CH5
+
+# 20240802
+    Sean did a HG scan with external triggers
+    change 'HG' to 50 (run 1484):
+    old: HG Gain: 55; LG Gain: 27; Pedestal Position: 160
+    new: HG Gain: 50; LG Gain: 27; Pedestal Position: 160
+
 # 20240731
     IV test for SiPM in channel 5, 27, 32, 50 and 128-135; All SiPMs are good
     except current over limit at 43V for channel 130.

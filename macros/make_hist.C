@@ -39,13 +39,15 @@ void make_hist(const char *fname = "output.edm4hep.root",
     for (int ei = 0; ei<ne; ei++)
     {
 	tin->GetEntry(ei);
+	int nhits = 0;
 	for (int ch=0; ch<nChannels; ch++)
 	{
 	    if (chMIP[ch] < energy_cut)
 		continue;
+	    nhits++;
 	    h1["hit_MIP"]->Fill(chMIP[ch]);
 	}
-	if (values["event_e"] > 0)
+	if (values["event_e"] > 0 && nhits > 10)
 	{
 	    h1["event_MIP"]->Fill(values["event_e"]);
 	    h1["hit_mul"]->Fill(values["hit_mul"]);

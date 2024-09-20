@@ -101,4 +101,29 @@ make
 sudo make install
 ```
 
+# cvmfs
+```
+wget https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
+sudo dpkg -i cvmfs-release-latest_all.deb
+rm -f cvmfs-release-latest_all.deb
+sudo apt-get update
+sudo apt-get install cvmfs
+```
+## configuration
+create */etc/cvmfs/local.default* with the following content:
+CVMFS_REPOSITORIES=sw-nightlies.hsf.org,singularity.opensciencegrid.org
+CVMFS_CLIENT_PROFILE=single
+
+## setup
+```
+cvmfs_config setup
+cvmfs_config probe
+```
+
+## debug
+If the probe fails, try to restart *autofs*
+```
+sudo systemctl restart autofs
+```
+
 # eic-shell: https://github.com/eic/eic-shell

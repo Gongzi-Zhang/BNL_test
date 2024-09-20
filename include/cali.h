@@ -8,6 +8,7 @@
 #include "calo.h"
 #include "utilities.h"
 
+using namespace std;
 namespace cali {
     const char* CALIROOT = (assert(getenv("CALIROOT") != NULL), true)
 	? getenv("CALIROOT")
