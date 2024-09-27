@@ -22,9 +22,9 @@ int main(int argc, char *argv[])
     caliDB db;
 
     string runType = db.getRunType(run);
-    if (runType != "cosmic" && runType != "data" && runType != "cmdata")
+    if (runType != "mip" && runType != "data" && runType != "cmdata")
     {
-	cout << WARNING << "not a data/cosmic run: " << run << endl;
+	cout << WARNING << "not a data/mip run: " << run << endl;
 	exit(1);
     }
 

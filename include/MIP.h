@@ -22,6 +22,7 @@
 #include "TKDE.h"
 #include "TVirtualPad.h"
 #include "TCanvas.h"
+#include "TLine.h"
 #include "calo.h"
 #include "utilities.h"
 
@@ -608,6 +609,12 @@ void MIPfinder::plot()
 	    g1[ch][gain]->SetMarkerStyle(29);
 	    g1[ch][gain]->SetMarkerColor(kRed);
 	    g1[ch][gain]->Draw("Psame");
+
+	    TLine *l = new TLine(1, p->GetUymin(), 1, p->GetUymax());
+	    l->SetLineColor(kRed);
+	    l->SetLineStyle(2);
+	    l->SetLineWidth(2);
+	    l->Draw("same");
 	}
 	TLatex *title = new TLatex();
 	title->SetTextSize(0.03);

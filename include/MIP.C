@@ -18,9 +18,9 @@ int main(int argc, char *argv[])
     cali::setRun(run);
     caliDB db;
     string runType = db.getRunType(run);
-    if (runType != "cosmic")
+    if (runType != "mip")
     {
-	cerr << ERROR << "Not a cosmic run: " << run << endl;
+	cerr << ERROR << "Not a MIP run: " << run << endl;
 	exit(4);
     }
 

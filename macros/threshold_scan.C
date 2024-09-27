@@ -10,11 +10,12 @@ gROOT->SetBatch(1);
 void rate_scan()                                                           
 {                                                                               
     gROOT->SetBatch(1);
-    string inputs[] = {"T1.txt", "T2.txt", "T3.txt"};                            
-    string legends[] = {"T1", "T2", "T3"};                                       
-    TGraph* g[3];                                                               
+    string inputs[] = {"macros/T1.txt", "macros/T3.txt"};                            
+    string legends[] = {"T1", "T3"};                                       
+    const int n = sizeof(inputs)/sizeof(inputs[0]);
+    TGraph* g[n];                                                               
     float volt, rate;                                                           
-    for (int i=0; i<3; i++)                                                     
+    for (int i=0; i<n; i++)                                                     
     {                                                                           
         g[i] = new TGraph();                                                    
         ifstream fin(inputs[i]);                                                 
@@ -26,7 +27,7 @@ void rate_scan()
                                                                                 
     TCanvas *c = new TCanvas("c", "c", 800, 600);                               
     TLegend *l = new TLegend(0.8, 0.7, 0.9, 0.9);                               
-    for (int i=0; i<3; i++)                                                     
+    for (int i=0; i<n; i++)                                                     
     {                                                                           
 	g[i]->SetMarkerStyle(20);
         g[i]->SetMarkerColor(colors[i]);                                         
@@ -154,5 +155,6 @@ void energy_scan()
 
 void threshold_scan()
 {
-    energy_scan();
+    rate_scan();
+    // energy_scan();
 }

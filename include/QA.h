@@ -81,7 +81,7 @@ void QA::init()
     xmax["event_MIP"]["LG"] = 500;  xmax["event_MIP"]["HG"] = 200;
     xmax["ch_MIP"]["LG"] = 10;	    xmax["ch_MIP"]["HG"] = 5;
 
-    if (runType == "cosmic")
+    if (runType == "mip")
     {
 	xmax["event_MIP"]["LG"] = 1000;	xmax["event_MIP"]["HG"] = 1000;
 	xmax["event_mul"]["LG"] = 100;	xmax["event_mul"]["HG"] = 100;

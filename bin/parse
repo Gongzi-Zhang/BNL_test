@@ -16,7 +16,7 @@ do
     run_type=$(${ROOT}/bin/caliDB -p query --run $run --field Type | xargs)
     if [ "$run_type" = "ptrg" ]; then
 	${ROOT}/bin/parse_ptrg $run
-    elif [ "$run_type" = "cosmic" ]; then
+    elif [ "$run_type" = "mip" ]; then
 	${ROOT}/bin/convert $run
 	${ROOT}/bin/MIP_analysis $run
 	${ROOT}/bin/MIP $run
