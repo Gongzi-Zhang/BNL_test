@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>CALI: COSMIC </title>
+        <title>CALI: MIP </title>
 	<link rel="stylesheet" type="text/css" href="cali.css">
 	<script type="text/javascript" src="cali.js"> 
 	</script>
@@ -15,14 +15,14 @@
 
 	<div id="topnav">
 	    <?php 
-		echo $chtml->topNav('COSMIC');
+		echo $chtml->topNav('MIP');
 	    ?>
 	</div>
 
 	<div id="leftnav">
 	    <div id='datenav' style='text-align: center;background-color: #F5F5DC;'>
 		<?php
-		    $res = $cdb->query("SELECT DISTINCT date(StartTime) AS Date From runs WHERE Type = 'cosmic' AND Flag = 'good' ORDER by Date DESC");
+		    $res = $cdb->query("SELECT DISTINCT date(StartTime) AS Date From runs WHERE Type = 'mip' AND Flag = 'good' ORDER by Date DESC");
 		    $out = '';
 		    while ($row = $res->fetchArray())
 		    {
@@ -46,7 +46,7 @@
 		    echo "<div id='runs'>";
 	    ?>
 	    </div>
-	    <div id='cosmic-plots'>
+	    <div id='mip-plots'>
 	    </div>
 	</div>
     </body>

@@ -27,7 +27,7 @@ class _caliHtml
 	'QA'	=> 'QA.php',
 	'CHANNEL' => 'channel.php',
 	'PTRG'	=> 'ptrg.php',
-	'COSMIC' => 'cosmic.php',
+	'MIP' => 'mip.php',
 	'MISC'	=> 'misc.php',
     );
 

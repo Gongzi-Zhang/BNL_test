@@ -38,12 +38,11 @@ function launchDate(date = '')
 
     if (!date)
     {
-	if (page === 'COSMIC')
+	if (page === 'MIP')
 	    date = document.getElementById('datenav').getElementsByTagName('p')[0].innerText;
 	else
 	    date = document.getElementById('datenav').title;
     }
-    console.log(date)
 
     changBgColor(date);
 
@@ -56,9 +55,8 @@ function launchDate(date = '')
 	func = 'getDateRuns';
     else if (page === 'PTRG')
 	func = 'getDatePtrgs';
-    else if (page === 'COSMIC')
-	func = 'getDateCosmics';
-    console.log(func)
+    else if (page === 'MIP')
+	func = 'getDateMips';
 
     var url = "api.php?func=" + func + "&date=" + date;
 
@@ -108,10 +106,10 @@ function launchRun(run)
 	func = 'getRunPtrg';
 	id = 'ptrg-plots';
     }
-    else if (page === 'COSMIC')
+    else if (page === 'MIP')
     {
-	func = 'getRunMIP';
-	id = 'cosmic-plots';
+	func = 'getRunMip';
+	id = 'mip-plots';
     }
 
     if (!run)

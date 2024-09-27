@@ -22,16 +22,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['func']))
         echo getDateRuns($date);
     else if ($func == 'getDatePtrgs')
         echo getDatePtrgs($date);
-    else if ($func == 'getDateCosmics')
-        echo getDateCosmics($date);
+    else if ($func == 'getDateMips')
+        echo getDateMips($date);
     else if ($func == 'getRunQA')
 	echo getRunQA($run);
     else if ($func == 'getRunChannel')
 	echo getRunChannel($run);
     else if ($func == 'getRunPtrg')
 	echo getRunPtrg($run);
-    else if ($func == 'getRunMIP')
-	echo getRunMIP($run);
+    else if ($func == 'getRunMip')
+	echo getRunMip($run);
     else if ($func == 'getRunsInfo')
     {
 	if (!$runs)
@@ -74,12 +74,12 @@ function getDateRuns($date)
     return $res;
 }
 
-function getDateCosmics($date)
+function getDateMips($date)
 {
     global $cdb;
-    $runs = $cdb->getRuns("date(StartTime) = '{$date}' AND Type = 'cosmic' AND Flag = 'good'");
+    $runs = $cdb->getRuns("date(StartTime) = '{$date}' AND Type = 'mip' AND Flag = 'good'");
     if (!$runs)
-	return "<h2> No cosmic run on {$date} </h2>";
+	return "<h2> No MIP run on {$date} </h2>";
 
     $res = 'Run: ';
     foreach ($runs as $run )
@@ -159,7 +159,7 @@ function getRunPtrg($run)
     return $res;
 }
 
-function getRunMIP($run)
+function getRunMip($run)
 {
     global $cali;
     $res = '';
