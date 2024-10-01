@@ -11,6 +11,7 @@
 #include "TCanvas.h"
 #include "TGaxis.h"
 #include "TLatex.h"
+#include "TLine.h"
 #include "calo.h"
 #include "cali.h"
 
@@ -429,6 +430,17 @@ void QA::plot()
 	    p->SetLogy(1);
 	    h1Channel[ch][gain]->SetStats(false);
 	    h1Channel[ch][gain]->Draw();
+	    p->Update();
+	    p->Modified();
+
+	    if (strcmp(gain, "HG") == 0)
+	    {
+		TLine *l = new TLine(1, p->GetUymin(), 1, h1Channel[ch][gain]->GetMaximum());
+		l->SetLineColor(kRed);
+		l->SetLineWidth(4);
+		l->SetLineStyle(2);
+		l->Draw();
+	    }
 	}
 	c2->SaveAs(Form("%s/%s_ch_e.png", fdir.c_str(), gain));
 	delete c2;
