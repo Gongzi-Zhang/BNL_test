@@ -159,5 +159,6 @@ function launchChannelPlot(img)
 
 function launchMisc(img)
 {
-    document.getElementById('misc-plots').getElementsByTagName('img')[0].src = img;
+    var imgTag = document.getElementById('misc-plots').getElementsByTagName('img')[0];
+    imgTag.src = img;
 }

@@ -22,7 +22,7 @@
 	    <div style='text-align: center;background-color: #F5F5DC;'>
 		<?php
 		    $out = '';
-		    $imgs = array('IV', 'MIPs', 'MIP_SB_ratio');
+		    $imgs = array('IV', 'IV-benchmark', 'MIPs', 'MIP_SB_ratio');
 		    foreach ($imgs as $img)
 			$out .= "<p id='$img'> <a href='#' onclick=\"launchMisc('figures/misc/${img}.png')\"> $img </a> </p>";
 		    echo $out;
