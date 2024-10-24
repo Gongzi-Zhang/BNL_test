@@ -54,7 +54,34 @@ void energy_scan()
     // int runs[] = {1954, /* 1955, 1956, */ 1962, 1961, 1960, 1959, 1958}; // T1
     // int runs[] = {1866, 1867, 1868, 1869, 1870}; // T2
     // int runs[] = {1877, 1878, 1879, 1880, 1881}; // T3
-    int runs[] = {2053, 1963, 2055, 2056, 2058, 1968};
+    // int runs[] = {2053, 1963, 2055, 2056, 2058, 1968};	// T3
+    // int runs[] = {2229, 2210, 2191, 2173, 2153};
+    // map<int, string> rootFile = {  
+    //     {2229, "T1_0.02_T3_0.02.root"}, // 2229-2234
+    //	   {2210, "T1_0.02_T3_0.03.root"}, // 2210-2226 
+    //     {2191, "T1_0.03_T3_0.03.root"}, // 2191-2207
+    //     {2173, "T1_0.03_T3_0.04.root"}, // 2173-2188 
+    //     {2153, "T1_0.03_T3_0.05.root"}, // 2153-2168
+    // };
+
+    // AuAu
+    // int runs[] = {2526, 2520, 2535, 2558, 2559};
+    // map<int, string> rootFile = {
+    //     {2526, "T3_0.4.root"},	// 2526-2532
+    //     {2520, "T3_0.3.root"},	// 2520-2522, 2525, 2533-2534
+    //     {2535, "T3_0.2.root"},	// 2535-2537, 2539-2557
+    //     {2558, "T3_0.1.root"},
+    //     {2559, "T3_0.15.root"},
+    // };
+
+    int runs[] = {2579, 2563, 2577, 2570};
+    map<int, string> rootFile = {
+	{2579, "T1_0.07.root"},	
+	{2563, "T1_0.1.root"},	// 2563-2569
+	{2577, "T1_0.15.root"},
+	{2570, "T1_0.2.root"},	// 2570-2576
+    };
+
     map<int, string> legend = {
 	{1856, "T1 = 0.05 V"},
 	{1857, "T1 = 0.08 V"},
@@ -93,6 +120,24 @@ void energy_scan()
 	{2055, "T3 = 0.09 V"},
 	{2056, "T3 = 0.1 V"},
 	{2058, "T3 = 0.2 V"},
+
+	{2229, "T1=0.02 V, T3=0.02 V"}, 
+       	{2210, "T1=0.02 V, T3=0.03 V"}, 
+       	{2191, "T1=0.03 V, T3=0.03 V"}, 
+       	{2173, "T1=0.03 V, T3=0.04 V"}, 
+       	{2153, "T1=0.03 V, T3=0.05 V"},
+
+	// AuAu
+	{2526, "T3 = 0.4 V"},	
+	{2520, "T3 = 0.3 V"},	
+	{2535, "T3 = 0.2 V"},	
+	{2558, "T3 = 0.1 V"},
+	{2559, "T3 = 0.15 V"},
+
+	{2579, "T1 = 0.07 V"},	
+	{2563, "T1 = 0.1 V"},	// 2563-2569
+	{2577, "T1 = 0.15 V"},
+	{2570, "T1 = 0.2 V"},	// 2570-2576
     };
 
     float mip[nChannels];
@@ -100,8 +145,14 @@ void energy_scan()
     map<int, TH1F*> h1;
     for (int run : runs)
     {
-	h1[run] = new TH1F(Form("event_energy_%d", run), "Event Energy;MIP", 400, 0, 400);
-	string fname = cali::getRootFile(run);
+	h1[run] = new TH1F(Form("event_energy_%d", run), "Event Energy;MIP", 100, 0, 1000);
+	string fname;
+	if (run == 2153 || run == 2173 || run == 2191 || run == 2210 || run == 2229
+	 || run == 2526 || run == 2520 || run == 2535 || run == 2558 || run == 2559
+	 || run == 2579 || run == 2563 || run == 2577 || run == 2570)
+	    fname = cali::getRootFile(rootFile[run].c_str());
+	else
+	    fname = cali::getRootFile(run);
 	TFile *fin = new TFile(fname.c_str(), "read");
 	TTree *tin = (TTree*) fin->Get("mip");
 	for (int ch=0; ch<nChannels; ch++)
@@ -155,6 +206,6 @@ void energy_scan()
 
 void threshold_scan()
 {
-    rate_scan();
-    // energy_scan();
+    // rate_scan();
+    energy_scan();
 }

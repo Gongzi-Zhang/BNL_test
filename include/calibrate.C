@@ -52,17 +52,7 @@ int main(int argc, char *argv[])
 	exit(2);
     }
 
-    char rootFile[1024];
-    sprintf(rootFile, "%s/data/Run%d.root", cali::CALIROOT, run);
-    if (!fileExists(rootFile))
-    {
-	sprintf(rootFile, "%s/data/Run%d.root", cali::backupDir, run);
-	if (!fileExists(rootFile))
-	{
-	    cerr << FATAL << "can't find the root file" << endl;
-	    exit(4);
-	}
-    }
+    string rootFile = cali::getRootFile(run);
 
     char fdir[1024];
     sprintf(fdir, "%s/figures/%d", cali::CALIROOT, run);
@@ -70,7 +60,7 @@ int main(int argc, char *argv[])
 	mkdir(fdir, 0755);
 
     calibrate *cab = new calibrate();
-    cab->setRootFile(rootFile);
+    cab->setRootFile(rootFile.c_str());
     cab->setOutDir(fdir);
     cab->setPed(ped);
     cab->setMIP(mip);

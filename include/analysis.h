@@ -47,9 +47,7 @@ bool getPedestal(const char* pedFileName, ped_t &res)
 
 bool getPedestal(const int pedRun, ped_t &res)
 {
-    char pedFileName[1024];
-    sprintf(pedFileName, "%s/data/Run%d_ped.json", cali::CALIROOT, pedRun);
-    return getPedestal(pedFileName, res);
+    return getPedestal(cali::getPedFile(pedRun).c_str(), res);
 }
 
 bool getMIP(const char* mipFileName, mip_t &res)
@@ -77,10 +75,6 @@ bool getMIP(const char* mipFileName, mip_t &res)
 
 bool getMIP(const int mipRun, mip_t &res)
 {
-    char mipFileName[1024];
-    sprintf(mipFileName, "%s/data/Run%d_MIP_1.json", cali::CALIROOT, mipRun);
-    if (!fileExists(mipFileName))
-	sprintf(mipFileName, "%s/data/Run%d_MIP.json", cali::CALIROOT, mipRun);
-    return getMIP(mipFileName, res);
+    return getMIP(cali::getMipFile(mipRun).c_str(), res);
 }
 #endif

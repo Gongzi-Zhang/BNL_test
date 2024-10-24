@@ -1,5 +1,14 @@
+#include "cali.h"
+
 const int nChannels = 192;
 			
+void make_hist(const char *, const char*);
+
+void make_hist(const int run)
+{
+    make_hist(cali::getRootFile(run).c_str(), Form("Run%d_hist.root", run));
+}
+
 void make_hist(const char *fname = "output.edm4hep.root", 
 	  const char*out_name = "output.root")
 {
@@ -47,7 +56,8 @@ void make_hist(const char *fname = "output.edm4hep.root",
 	    nhits++;
 	    h1["hit_MIP"]->Fill(chMIP[ch]);
 	}
-	if (values["event_e"] > 0 && nhits > 10)
+	// if (values["event_e"] > 0)
+	if (nhits > 10)
 	{
 	    h1["event_MIP"]->Fill(values["event_e"]);
 	    h1["hit_mul"]->Fill(values["hit_mul"]);

@@ -255,11 +255,61 @@ namespace cali {
 	    sprintf(rootFile, "%s/data/Run%d.root", backupDir, run);
 	    if (!fileExists(rootFile))
 	    {
-		cerr << FATAL << "can't find the root file: " << rootFile << endl;
+		cerr << FATAL << "can't find the root file for run: " << run << endl;
 		return NULL;
 	    }
 	}
 	return rootFile;
+    }
+
+    string getRootFile(const char* fname)
+    {
+	char rootFile[1024];
+	char dirs[3][1024];
+	sprintf(dirs[0], ".");
+	sprintf(dirs[1], "%s/data", CALIROOT);
+	sprintf(dirs[2], "%s/data", backupDir);
+	for (char* dir : dirs)
+	{
+	    sprintf(rootFile, "%s/%s", dir, fname);
+	    if (fileExists(rootFile))
+		return rootFile;
+	}
+
+	cerr << FATAL << "can't find the root file: " << fname << endl;
+	return NULL;
+    }
+
+    string getPedFile(const int run)
+    {
+	char file[1024];
+	sprintf(file, "%s/data/Run%d_ped.json", CALIROOT, run);
+	if (!fileExists(file))
+	{
+	    sprintf(file, "%s/data/Run%d_ped.json", backupDir, run);
+	    if (!fileExists(file))
+	    {
+		cerr << FATAL << "can't find the ped file for run: " << run << endl;
+		return NULL;
+	    }
+	}
+	return file;
+    }
+
+    string getMipFile(const int run)
+    {
+	char file[1024];
+	sprintf(file, "%s/data/Run%d_MIP.json", CALIROOT, run);
+	if (!fileExists(file))
+	{
+	    sprintf(file, "%s/data/Run%d_MIP.json", backupDir, run);
+	    if (!fileExists(file))
+	    {
+		cerr << FATAL << "can't find the MIP file for run: " << run << endl;
+		return NULL;
+	    }
+	}
+	return file;
     }
 
     void printSipmInfo(const int ch = 0)

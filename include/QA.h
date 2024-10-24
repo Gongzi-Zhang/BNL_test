@@ -79,7 +79,7 @@ void QA::init()
     map<string, map<string, double>> xmax;
     xmax["hit_MIP"]["LG"] = 10;	    xmax["hit_MIP"]["HG"]   = 10;
     xmax["hit_mul"]["LG"] = 200;    xmax["hit_mul"]["HG"] = 200;
-    xmax["event_MIP"]["LG"] = 500;  xmax["event_MIP"]["HG"] = 200;
+    xmax["event_MIP"]["LG"] = 1000;  xmax["event_MIP"]["HG"] = 200;
     xmax["ch_MIP"]["LG"] = 10;	    xmax["ch_MIP"]["HG"] = 5;
 
     if (runType == "mip")

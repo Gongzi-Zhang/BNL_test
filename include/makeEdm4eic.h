@@ -6,6 +6,7 @@
 #include "TBranch.h"
 #include "TLeaf.h"
 
+#include "edm4hep/EventHeaderCollection.h"
 #include "edm4eic/CalorimeterHit.h"
 #include "edm4eic/CalorimeterHitCollection.h"
 #include "podio/ROOTWriter.h"
@@ -65,7 +66,11 @@ void makeEdm4eic::make()
     {
 	if (ei % 100000 == 0)
 	    cout << INFO << "reading " << ei << " events" << endl;
+
+	auto eventHeaderCollection = std::make_unique<edm4hep::EventHeaderCollection>();
 	auto hits = std::make_unique<edm4eic::CalorimeterHitCollection>();
+
+	eventHeaderCollection->create(ei, 100, 123456789, 1);
 
 	tin->GetEntry(ei);
 	for (int ch=0; ch<calo::nChannels; ch++)
@@ -95,6 +100,7 @@ void makeEdm4eic::make()
 		local_position);
 	}
 	podio::Frame frame;
+	frame.put(std::move(eventHeaderCollection), "EventHeader");
 	frame.put(std::move(hits), "CALIHits");
 	writer.writeFrame(frame, "events");
     }

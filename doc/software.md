@@ -127,3 +127,17 @@ sudo systemctl restart autofs
 ```
 
 # eic-shell: https://github.com/eic/eic-shell
+
+# Virtual machine: KVM
+* default network is not active
+```
+sudo virsh net-list --all
+sudo virsh net-start default
+```
+Looks like the above command will result in 'no internet connection' in the VM,
+run the following command to fix it:
+```
+sudo virsh net-destroy default
+sudo virsh net-start default
+sudo systemctl restart libvirtd
+```
