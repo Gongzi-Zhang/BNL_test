@@ -12,7 +12,7 @@ void make_hist(const int run)
 void make_hist(const char *fname = "output.edm4hep.root", 
 	  const char*out_name = "output.root")
 {
-    float energy_cut = 0.3;
+    float energy_cut = 3;
     string unit = "MIP";
 
     TFile *fin = new TFile(fname, "read");
@@ -33,9 +33,11 @@ void make_hist(const char *fname = "output.edm4hep.root",
 
     TFile *fout = new TFile(out_name, "recreate");
     map<string, TH1F*> h1;
-    h1["hit_MIP"] = new TH1F("hit_MIP", "Hit Energy;MIP", 50, 0, 10);
+    h1["hit_MIP"] = new TH1F("hit_MIP", "Hit Energy;MIP", 100, 0, 50);
     h1["hit_mul"] = new TH1F("hit_mul", "Hit Multiplicity", 200, 0, 200);
     h1["event_MIP"] = new TH1F("event_MIP", "Event Energy;MIP", 100, 0, 500);
+    map<string, TH2F*> h2;
+    h2["event_MIP_vs_hit_mul"] = new TH2F("event_MIP_vs_hit_mul", "event MIP vs hit mul", 200, 0, 200, 100, 0, 500);
     // TTree *tout = new TTree("mip", "mip values");
     // double ch_e[nChannels];
     // for (int ch=0; ch<nChannels; ch++)
@@ -44,23 +46,28 @@ void make_hist(const char *fname = "output.edm4hep.root",
     // }
 
     const int ne = tin->GetEntries();
+    int nhits;
     double e;
     for (int ei = 0; ei<ne; ei++)
     {
 	tin->GetEntry(ei);
-	int nhits = 0;
+
+	nhits = 0;
+        e = 0;
 	for (int ch=0; ch<nChannels; ch++)
 	{
 	    if (chMIP[ch] < energy_cut)
 		continue;
 	    nhits++;
+	    e += chMIP[ch];
 	    h1["hit_MIP"]->Fill(chMIP[ch]);
 	}
-	// if (values["event_e"] > 0)
-	if (nhits > 10)
+	if (e > 0)
+	// if (nhits > 10)
 	{
-	    h1["event_MIP"]->Fill(values["event_e"]);
-	    h1["hit_mul"]->Fill(values["hit_mul"]);
+	    h1["event_MIP"]->Fill(e);
+	    h1["hit_mul"]->Fill(nhits);
+	    h2["event_MIP_vs_hit_mul"]->Fill(nhits, e);
 	}
     }
 
