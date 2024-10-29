@@ -28,6 +28,8 @@ if __name__ == '__main__':
     parser_insert.add_argument('--Length',      dest='iLength',     help='elapsed time in hour')
     parser_insert.add_argument('--Geometry',    dest='iGeometry',   required=True,  help='geometry used for this run')
     parser_insert.add_argument('--Channels',    dest='iChannels',   help='number of good channels')
+    parser_insert.add_argument('--Beam1',       dest='iBeam1',      help='Beam 1 energy')
+    parser_insert.add_argument('--Beam2',       dest='iBeam2',      help='Beam 2 energy')
     parser_insert.add_argument('--Trigger',     dest='iTrigger',    required=True,  help='trigger logic')
     parser_insert.add_argument('--T1',          dest='iT1',         help='trigger tile 1 threshold voltage')
     parser_insert.add_argument('--T2',          dest='iT2',         help='trigger tile 2 threshold voltage')
@@ -102,6 +104,10 @@ if __name__ == '__main__':
         if args.iLength:
             record['Length'] = float(args.iLength)
         record['Geometry'] = args.iGeometry
+        if args.iBeam1:
+            record['Beam1'] = float(args.iBeam1)
+        if args.iBeam2:
+            record['Beam2'] = float(args.iBeam2)
         if args.iChannels:
             record['Channels'] = int(args.iChannels)
         record['Trigger'] = int(args.iTrigger, 16)
