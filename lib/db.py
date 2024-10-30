@@ -13,7 +13,7 @@ caliConn = ''
 FIELDS = [ 'Run', 'Type', 'Flag', 
     'StartTime', 'StopTime', 'Length', 
     'Geometry', 'Channels', 
-    'Beam1', 'Beam2',
+    # 'Beam1', 'Beam2',
     'Trigger', 'T1', 'T2', 'T3', 'T4', 
     'Events', 'LG', 'HG', 'Ped', 'Vbias', 'Size', 
     'PedRun', 'MIPRun', 'TrgRate',
@@ -36,8 +36,8 @@ FIELD_WIDTH = {
     'Length': 5,    # elapsed time in h
     'Geometry': 8,
     'Channels': 3,  # number of good channels
-    'Beam1': 6,
-    'Beam2': 6,
+    # 'Beam1': 6,
+    # 'Beam2': 6,
     'Trigger': 3,   # trigger logic
     'T1': 5,        # in V
     'T2': 5,
@@ -230,8 +230,6 @@ def createTable():
                 Length integer,
                 Geometry integer,
                 Channels integer,
-                Beam1 float,
-                Beam2 float,
                 Trigger integer,
                 T1 float,
                 T2 float,
@@ -352,8 +350,8 @@ def insertToTable():
         values['Length'] = float(input('Length/h: '))
         values['Geometry'] = input('Geometry: ').strip()
         values['Channels'] = int(input('#Channels: '))
-        values['Beam1'] = float(input('Beam1: ') or 100)
-        values['Beam2'] = float(input('Beam2: ') or 100)
+        # values['Beam1'] = float(input('Beam1: ') or 100)
+        # values['Beam2'] = float(input('Beam2: ') or 100)
         values['Trigger'] = int(input('Trigger Logic: '))
         values['T1'] = float(input('T1: ') or 0.005)
         values['T2'] = float(input('T2: ') or 0.005)

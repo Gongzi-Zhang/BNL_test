@@ -566,6 +566,7 @@ void MIPfinder::plot()
     gStyle->SetOptStat(100);
     gErrorIgnoreLevel = kWarning;
     TCanvas* c = new TCanvas("c", "c", 600*8, 600*(1 + (calo::nChannels-1)/8));	// 8 plots per row
+    TCanvas* c1 = new TCanvas("c1", "c1", 800, 600);
     for (const char* gain : calo::gains)
     {
 	c->Clear();
@@ -608,6 +609,15 @@ void MIPfinder::plot()
 	    g1[ch][gain]->SetMarkerStyle(29);
 	    g1[ch][gain]->SetMarkerColor(kRed);
 	    g1[ch][gain]->Draw("Psame");
+
+	    c1->cd();
+	    c1->SetLogy(1);
+	    h1[ch][gain]->Draw();
+	    // ps->Draw();
+	    TPaveStats *ps1 = (TPaveStats*) ps->Clone("cloneStats");
+	    ps1->Draw();
+	    g1[ch][gain]->Draw("Psame");
+	    c1->SaveAs(Form("%s/ch%d_%s.png", fdir.c_str(), ch, gain));
 	}
 	TLatex *title = new TLatex();
 	title->SetTextSize(0.03);
@@ -616,6 +626,7 @@ void MIPfinder::plot()
 	c->SaveAs(Form("%s/MIP_%s.png", fdir.c_str(), gain));
     }
     delete c;
+    delete c1;
 }
 
 void MIPfinder::write()
