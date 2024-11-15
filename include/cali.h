@@ -1,3 +1,4 @@
+/* const information about the prototype and run */
 #ifndef __CALI__
 #define __CALI__
 
@@ -9,11 +10,48 @@
 #include "utilities.h"
 
 using namespace std;
+
 namespace cali {
     const char* CALIROOT = (assert(getenv("CALIROOT") != NULL), true)
 	? getenv("CALIROOT")
 	: ".";
     const char* backupDir = "/media/arratialab/CALI/BNL_test/";
+
+    const char* run24Start	= "2024-04-24";
+    const char* run24End	= "2024-10-21";
+    const char* run24PPStart	= "2024-04-24";
+    const char* run24PPEnd	= "2024-09-30";
+    const char* run24AuAuStart	= "2024-10-05";
+    const char* run24AuAuEnd	= "2024-10-21";
+    const int   run24StartRun	= 12;
+    const int	run24EndRun	= 2587;
+    const int	run24PPStartRun = 12;
+    const int	run24PPEndRun	= 2235;
+    const int   run24AuAuStartRun = 2324;
+    const int   run24AuAuEndRun	= 2587;
+
+    map<int, const char*> trigger = 
+    {
+	{-2,	"mip"}, 
+	{-1,	"ptrg"},
+	{0,	"others"},
+	{1,	"T1"},	{16,	"T1"},
+	{2,	"T2"},	{32,	"T2"},
+	{4,	"T3"},	{64,	"T3"},
+	{8,	"T4"},  {128,	"T4"},
+	{3,	"T1 && T2"},
+	{5,	"T1 && T3"},
+	{6,	"T2 && T3"},
+	{7,	"T1 && T2 && T3"},
+	{12,	"T3 && T4"},
+	{28,	"T1 || (T3 && T4)"},
+	{48,	"T1 || T2"},
+	{60,	"T1 || T2 || (T3 && T4)"},
+	{67,	"(T1 && T2) || T3"},
+	{112,	"T1 || T2 || T3"},
+	{131,	"(T1 && T2) || T4"},
+	{240,	"T1 && T2 && T3 && T4"},
+    };
 
     /* CAEN:	  CAEN unit
      * channel:   channel count: 0-192
@@ -22,7 +60,6 @@ namespace cali {
      * quadrant:  quadrant count in a layer: 0-3
      * sipm:      SiPM count in a PCB: 0-6
      */
-
 	  int run = -1;
     	  int nCAENs = 3;
     const int CAENMax = 5;
@@ -31,6 +68,7 @@ namespace cali {
           int nLayers = 11;
     const int layerMax = 20;
 	  int nHexLayers = 4;
+    const int transLayer = 4;	// Layer 5
 	  int nSqaLayers = 9;
     const int nLayerBoards = 4;
           int nHexBoards = nHexLayers*nLayerBoards;
@@ -216,6 +254,26 @@ namespace cali {
 
     sipmXY getSipmXY(const int ch)
     {
+	/*  Top down channel number
+	 *  Hexagonal tiles
+	 *  Right: top middle - up left - up right - middle middle - down right - down left - bottom middle
+	 *  Left:  top middle - up right - up left - middle middle - down left - down right - bottom middle
+	 *  1,4,5,8,10,12,26: 6-5-4-3-1-2-0 (right side)
+	 *  2,3,6,7,9,11,13:  0-2-1-3-4-5-6 (left)
+	 *  28: 0-1-2-3-4-5-6 (right)
+	 *  25: 0-1-2-3-4-5-6 (left)
+	 *  37: 0-1-2-3 (right)
+	 *  14: 0-2-1-3 (left)
+	 *
+	 * Square tiles
+	 * Right: top right - top left - bottom right - bottom left
+	 * Left:  top right - top left - bottom right - bottom left
+	 *  30,44,47,31: 3-2-1-0 (right)
+	 *  41,21,15,46,20: 0-1-2-3 (left)
+	 *  38,18,24: 0-1-2-3 (right)
+	 *  54,22,58,57,33: 1-0-3-2 (left)
+	 *  50: 2-3-0-1 (right)
+	 */
 	SiPM sp = getSipm(ch);
 	if (sp.layer < 0)
 	    return {0, 0};
@@ -236,6 +294,8 @@ namespace cali {
 	else if (18 == bl || 38 == bl || 24 == bl || 16 == bl || 17 == bl)	// right side square, flip the index
 	    pos = sqaBoardSipmXY_topdown[nSqaBoardChannels - 1 - sp.sipm];
 	else if (sp.layer < nHexLayers) // general hex tile
+	    pos = hexBoardSipmXY[sp.sipm];
+	else if (sp.layer == transLayer && sp.quadrant > 1)
 	    pos = hexBoardSipmXY[sp.sipm];
 	else    // general square tile
 	    pos = sqaBoardSipmXY[sp.sipm];

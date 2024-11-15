@@ -1,0 +1,18 @@
+run24Start	= "2024-04-22"
+run24End	= "2024-10-21"
+run24PPStart	= "2024-04-22"
+run24PPEnd	= "2024-09-30"
+run24AuAuStart	= "2024-10-05"
+run24AuAuEnd	= "2024-10-21"
+run24StartRun	= 12
+run24EndRun	= 2587
+run24PPStartRun = 12
+run24PPEndRun	= 2235
+run24AuAuStartRun = 2324
+run24AuAuEndRun	= 2587
+
+# period
+* 2024-04-22 - 2024-06-04
+    all bad runs due to the wrong configuration of TRGTIME_SORTING
+* 2024-06-04 - 2024-09-30
+    High Luminosity (radio polarization)

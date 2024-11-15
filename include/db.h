@@ -26,8 +26,16 @@ class caliDB {
     string getRunValue(const int run, const char* field);
     string getRunType(const int run);
     string getRunFlag(const int run);
+    string getRunStartTime(const int run);
     int getPedRun(const int run);
     int getMIPRun(const int run);
+    int getRunEventNumber(const int run);
+    int getRunLength(const int run);
+    int getRunTrigger(const int run);
+    float getRunT1(const int run);
+    float getRunT2(const int run);
+    float getRunT3(const int run);
+    float getRunT4(const int run);
 };
 
 caliDB::caliDB() 
@@ -86,6 +94,11 @@ string caliDB::getRunFlag(const int run)
     return getRunValue(run, "Flag");
 }
 
+string caliDB::getRunStartTime(const int run)
+{
+    return getRunValue(run, "StartTime");
+}
+
 int caliDB::getPedRun(const int run)
 {
     return stoi(getRunValue(run, "PedRun"));
@@ -94,5 +107,40 @@ int caliDB::getPedRun(const int run)
 int caliDB::getMIPRun(const int run)
 {
     return stoi(getRunValue(run, "MIPRun"));
+}
+
+int caliDB::getRunEventNumber(const int run)
+{
+    return stoi(getRunValue(run, "Events"));
+}
+
+int caliDB::getRunLength(const int run)
+{
+    return stoi(getRunValue(run, "Length"));
+}
+
+int caliDB::getRunTrigger(const int run)
+{
+    return stoi(getRunValue(run, "Trigger"));
+}
+
+float caliDB::getRunT1(const int run)
+{
+    return stof(getRunValue(run, "T1"));
+}
+
+float caliDB::getRunT2(const int run)
+{
+    return stof(getRunValue(run, "T2"));
+}
+
+float caliDB::getRunT3(const int run)
+{
+    return stof(getRunValue(run, "T3"));
+}
+
+float caliDB::getRunT4(const int run)
+{
+    return stof(getRunValue(run, "T4"));
 }
 #endif

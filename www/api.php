@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['func']))
 
 function getDateRunInfo($date)
 {
-    $fields = array('Run', 'Type', 'Flag', 'StartTime', 'StopTime', 'Length', 'Channels', 'Trigger', 'Events', 'PedRun', 'LG', 'HG', 'Vbias');
+    $fields = array('Run', 'Type', 'Flag', 'StartTime', 'StopTime', 'Length', 'Channels', 'Trigger', 'T1', 'T2', 'T3', 'Events', 'PedRun', 'LG', 'HG', 'Vbias');
     global $cdb;
     // $cdb->setReverse();
     $res = $cdb->getRunsInfo("date(StartTime) = '{$date}'", implode(',', $fields));
