@@ -141,3 +141,8 @@ sudo virsh net-destroy default
 sudo virsh net-start default
 sudo systemctl restart libvirtd
 ```
+
+
+# Keithley
+* If there is empty txt output, it means the script is working, but the device
+is not connected. Try to re-add the hardware in QEMU.

@@ -246,6 +246,22 @@ namespace cali {
 	return pos + pcbAnchor[sp.quadrant];
     }
 
+    string getListFile(const int run)
+    {
+	char listFile[1024];
+	sprintf(listFile, "%s/data/Run%d_list.txt", CALIROOT, run);
+	if (!fileExists(listFile))
+	{
+	    sprintf(listFile, "%s/data/Run%d_list.txt", backupDir, run);
+	    if (!fileExists(listFile))
+	    {
+		cerr << FATAL << "can't find the list file for run: " << run << endl;
+		return NULL;
+	    }
+	}
+	return listFile;
+    }
+
     string getRootFile(const int run)
     {
 	char rootFile[1024];

@@ -1,9 +1,18 @@
+#include "utilities.h"
+#include "cali.h"
+
 void MIP(const int run, const int ch, const char* gain = "HG")
 {
     int caen = ch/64;
 
-    TFile *fin = new TFile(Form("data/Run%d.root", run), "read");
+    TFile *fin = new TFile(cali::getRootFile(run).c_str(), "read");
     TTree *tin = (TTree*) fin->Get(Form("raw_CAEN%d", caen));
+    if (!tin)
+    {
+	cerr << ERROR << "No raw_CAEN tree in run " << run << endl;
+	fin->Close();
+	return;
+    }
     tin->SetBranchStatus("*", 0);
     tin->SetBranchStatus(Form("ch_%d", ch), 1);
     TBranch *b = (TBranch*) tin->GetBranch(Form("ch_%d", ch));
@@ -11,6 +20,7 @@ void MIP(const int run, const int ch, const char* gain = "HG")
     b->GetLeaf(gain)->SetAddress(&adc);
 
     TCanvas *c = new TCanvas("c", "c", 800, 600);
+    c->ToggleEventStatus();
     c->SetLogy(1);
 
     map<string, double> xmax = { {"LG", 1000}, {"HG", 8400}};
