@@ -47,7 +47,9 @@ bool getPedestal(const char* pedFileName, ped_t &res)
 
 bool getPedestal(const int pedRun, ped_t &res)
 {
-    return getPedestal(cali::getPedFile(pedRun).c_str(), res);
+    char buf[32];
+    sprintf(buf, "Run%d_ped.json", pedRun);
+    return getPedestal(cali::getFile(buf).c_str(), res);
 }
 
 bool getMIP(const char* mipFileName, mip_t &res)
@@ -75,6 +77,8 @@ bool getMIP(const char* mipFileName, mip_t &res)
 
 bool getMIP(const int mipRun, mip_t &res)
 {
-    return getMIP(cali::getMipFile(mipRun).c_str(), res);
+    char buf[32];
+    sprintf(buf, "Run%d_MIP.json", mipRun);
+    return getMIP(cali::getFile(buf).c_str(), res);
 }
 #endif

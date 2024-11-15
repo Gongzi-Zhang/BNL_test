@@ -52,11 +52,13 @@ int main(int argc, char *argv[])
 	exit(2);
     }
 
-    string rootFile = cali::getRootFile(run);
+    char buf[1024];
+    sprintf(buf, "Run%d.root", run);
+    string rootFile = cali::getFile(buf);
 
-    char fdir[1024];
-    sprintf(fdir, "%s/figures/%d", cali::CALIROOT, run);
-    if (!dirExists(fdir))
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "%s/figures/%d", cali::CALIROOT, run);
+    if (!dirExists(buf))
 	mkdir(fdir, 0755);
 
     calibrate *cab = new calibrate();

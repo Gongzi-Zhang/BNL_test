@@ -150,9 +150,9 @@ void energy_scan()
 	if (run == 2153 || run == 2173 || run == 2191 || run == 2210 || run == 2229
 	 || run == 2526 || run == 2520 || run == 2535 || run == 2558 || run == 2559
 	 || run == 2579 || run == 2563 || run == 2577 || run == 2570)
-	    fname = cali::getRootFile(rootFile[run].c_str());
+	    fname = cali::getFile(rootFile[run].c_str());
 	else
-	    fname = cali::getRootFile(run);
+	    fname = cali::getFile(Form("Run%d.root", run));
 	TFile *fin = new TFile(fname.c_str(), "read");
 	TTree *tin = (TTree*) fin->Get("mip");
 	for (int ch=0; ch<nChannels; ch++)

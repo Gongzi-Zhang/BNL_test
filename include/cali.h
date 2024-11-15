@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <stdlib.h>
 #include <cassert>
 #include "calo.h"
@@ -306,39 +307,7 @@ namespace cali {
 	return pos + pcbAnchor[sp.quadrant];
     }
 
-    string getListFile(const int run)
-    {
-	char listFile[1024];
-	sprintf(listFile, "%s/data/Run%d_list.txt", CALIROOT, run);
-	if (!fileExists(listFile))
-	{
-	    sprintf(listFile, "%s/data/Run%d_list.txt", backupDir, run);
-	    if (!fileExists(listFile))
-	    {
-		cerr << FATAL << "can't find the list file for run: " << run << endl;
-		return NULL;
-	    }
-	}
-	return listFile;
-    }
-
-    string getRootFile(const int run)
-    {
-	char rootFile[1024];
-	sprintf(rootFile, "%s/data/Run%d.root", CALIROOT, run);
-	if (!fileExists(rootFile))
-	{
-	    sprintf(rootFile, "%s/data/Run%d.root", backupDir, run);
-	    if (!fileExists(rootFile))
-	    {
-		cerr << FATAL << "can't find the root file for run: " << run << endl;
-		return NULL;
-	    }
-	}
-	return rootFile;
-    }
-
-    string getRootFile(const char* fname)
+    string getFile(const char* fname)
     {
 	char rootFile[1024];
 	char dirs[3][1024];
@@ -352,40 +321,8 @@ namespace cali {
 		return rootFile;
 	}
 
-	cerr << FATAL << "can't find the root file: " << fname << endl;
+	cerr << FATAL << "can't find file: " << fname << endl;
 	return NULL;
-    }
-
-    string getPedFile(const int run)
-    {
-	char file[1024];
-	sprintf(file, "%s/data/Run%d_ped.json", CALIROOT, run);
-	if (!fileExists(file))
-	{
-	    sprintf(file, "%s/data/Run%d_ped.json", backupDir, run);
-	    if (!fileExists(file))
-	    {
-		cerr << FATAL << "can't find the ped file for run: " << run << endl;
-		return NULL;
-	    }
-	}
-	return file;
-    }
-
-    string getMipFile(const int run)
-    {
-	char file[1024];
-	sprintf(file, "%s/data/Run%d_MIP.json", CALIROOT, run);
-	if (!fileExists(file))
-	{
-	    sprintf(file, "%s/data/Run%d_MIP.json", backupDir, run);
-	    if (!fileExists(file))
-	    {
-		cerr << FATAL << "can't find the MIP file for run: " << run << endl;
-		return NULL;
-	    }
-	}
-	return file;
     }
 
     void printSipmInfo(const int ch = 0)

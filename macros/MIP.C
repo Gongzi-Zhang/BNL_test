@@ -5,7 +5,7 @@ void MIP(const int run, const int ch, const char* gain = "HG")
 {
     int caen = ch/64;
 
-    TFile *fin = new TFile(cali::getRootFile(run).c_str(), "read");
+    TFile *fin = new TFile(cali::getFile(Form("Run%d.root", run)).c_str(), "read");
     TTree *tin = (TTree*) fin->Get(Form("raw_CAEN%d", caen));
     if (!tin)
     {

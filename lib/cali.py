@@ -237,6 +237,14 @@ def getSipmXYZ(ch):
     z = 24.0526*mm + sp.layer*27.1526*mm
     return pos.x, pos.y, z
 
+def getFile(file):
+    for d in [".", f'{CALIROOT}/data', f'{backupDir}/data']:
+        fullPath = f'{d}/{file}'
+        if (os.path.exists(fullPath)):
+            return fullPath
+    logger.error(f"{file} doesn't exist")
+    return None
+
 def printSipmXYZ():
     for ch in range(0, nChannels):
         pos = getSipmXY(ch)

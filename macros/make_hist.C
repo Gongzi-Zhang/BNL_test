@@ -7,7 +7,7 @@ void make_hist(const char *, const char*);
 
 void make_hist(const int run)
 {
-    make_hist(cali::getRootFile(run).c_str(), Form("Run%d", run));
+    make_hist(cali::getFile(Form("Run%d.root", run)).c_str(), Form("Run%d", run));
 }
 
 void make_hist(const char *fname = "input.edm4hep.root", 

@@ -13,10 +13,14 @@ int main(int argc, char *argv[])
     const int run = atoi(argv[1]);
     cali::setRun(run);
 
-    string rootFile = cali::getRootFile(run);
-    const char* outDir = "data";
+    char buf[1024];
+    sprintf(buf, "Run%d.root", run);
+    string rootFile = cali::getFile(buf);
 
-    makeEdm4eic *maker = new makeEdm4eic(rootFile.c_str(), Form("%s/Run%d.edm4eic.root", outDir, run));
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "%s/data/Run%d.edm4eic.root", cali::CALIROOT, run);
+
+    makeEdm4eic *maker = new makeEdm4eic(rootFile.c_str(), buf);
     maker->make();
     delete maker;
 }
