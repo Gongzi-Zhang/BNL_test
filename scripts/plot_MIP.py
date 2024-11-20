@@ -54,10 +54,10 @@ hep.style.use("CMS")
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(32, 24), sharex=True)
 
 configurations = {
-    'Hex tile, 3mm SiPM': {'ranges': [(-1, 55), (83, 90), (97, 111), (123, 127), (183, 187)], 'color': 'tab:red'},
-    'Hex tile, 1.3mm SiPM': {'ranges': [(55,83),(90, 97), (119,123)], 'color': 'tab:blue'},
-    'Square tile, 3mm SiPM': {'ranges': [(111,119),(127,183),(187,191)], 'color': 'tab:green'},
-    'Hex tile, 3mm SiPM, Unpainted': {'ranges': [(34,41),(83,90),(97,111),(123,127)], 'color': 'y'}
+    'Hex tile, 3mm SiPM': {'ranges': [(7, 55), (124, 127)], 'color': 'tab:red'},
+    'Hex tile, 1.3mm SiPM': {'ranges': [(56,83), (91, 97), (120, 123)], 'color': 'tab:blue'},
+    'Square tile, 3mm SiPM': {'ranges': [(112, 119),(128, 191)], 'color': 'tab:green'},
+    'Hex tile, 3mm SiPM, Unpainted': {'ranges': [(0, 6), (34,41),(84, 90), (98, 111)], 'color': 'y'}
 }
 
 x = np.array(range(0, cali.nChannels))
@@ -68,7 +68,7 @@ labels_added = set()
 for label, config in configurations.items():
     color = config['color']
     for start, end in config['ranges']:
-        indices = np.where((x > start) & (x <= end))
+        indices = np.where((x >= start) & (x <= end))
 
         if label not in labels_added:
             ax1.scatter(x[indices], y1[indices], color=color, label=label)
@@ -81,11 +81,11 @@ for label, config in configurations.items():
 ax1.legend(fontsize=30, loc='upper right')
 
 # plt.suptitle("MIP")
-ax1.set_title("MIP")
+ax1.set_title(f"Run {run}")
 ax1.set_ylabel("HG MIP [ADC]")
 ax2.set_ylabel("HG MIP/Ped RMS")
 ax2.set_xlabel("Ch")
 # plt.ylim(-50,600)
 plt.subplots_adjust(hspace=0)
-plt.savefig(f'Run{run}_MIP.png')
+plt.savefig(f'{cali.CALIROOT}/figures/{run}/MIP.png')
 
