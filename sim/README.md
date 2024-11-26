@@ -13,16 +13,12 @@ curl --location https://get.epic-eic.org | bash
 ./eic-shell
 ```
 
-### Compilation
+### Detector
 The standard `ZDC_Sampling` type in the 'epic' repository doesn't support the
-polyhedra shape, so we construct our `Polyhedra_ZDC_Sampling` type detector.
-To use it, one needs to compile it first:
-```
-cd dd4hep
-cmake -B build -S . -DCMAKE_INSTALL_PREFIX=.
-cd build
-make install
-```
+polyhedra shape, so we construct our own `Polyhedra_ZDC_Sampling` type detector.
+To use it, one needs to compile it first. Following the instructions in the 
+dd4hep dir. to compile it.
+
 To make the new detector type available, add the newly built library to 
 LD_LIBRARY_PATH:
 ```
@@ -57,16 +53,12 @@ for more available options.
 We are now using the [JANA](https://jeffersonlab.github.io/JANA2/index.html) based 
 [eicrecon](https://github.com/eic/EICrecon) for reconstruction. To do that, one
 needs to compile the [CALI](CALI) plugin, which is not a standard eicrecon plugin 
-yet. To compile it:
-* compile and install eicrecon, and make it the default executable
-```
-    cmake -S CALI -B CALI/build -DCMAKE_INSTALL_PREFIX=plugins
-    cd CALI/build
-    make install
-```
+yet. Follow the instructions in the CALI dir. to compile it. 
+
 * now, we can use the CALI plugin
 ```
-    eicrecon -Pplugins=CALI -Ppodio:output_include_collection=CALIRawHits,CALIRecHits input.edm4hep.root
+export EICrecon_MY=./CALI
+eicrecon -Pplugins=CALI -Ppodio:output_include_collection=CALIRawHits,CALIRecHits input.edm4hep.root
 ```
 
 ### Detector geometry

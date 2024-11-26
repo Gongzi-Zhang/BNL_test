@@ -113,7 +113,7 @@ fi
 if [ -f $recoFile ]; then
     echo -e "INFO:\treco file already exist, skip reconstruction: ${recoFile}"
 else
-    export EICrecon_MY=${ROOTDIR}
+    export EICrecon_MY=${ROOTDIR}/CALI
     eicrecon -Pplugins=CALI \
 	-Pjana:nevents=$numberOfEvents \
 	-Pdd4hep:xml_files=${compactFile} \
