@@ -55,9 +55,9 @@ fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(32, 24), sharex=True)
 
 configurations = {
     'Hex tile, 3mm SiPM': {'ranges': [(7, 55), (124, 127)], 'color': 'tab:red'},
-    'Hex tile, 1.3mm SiPM': {'ranges': [(56,83), (91, 97), (120, 123)], 'color': 'tab:blue'},
-    'Square tile, 3mm SiPM': {'ranges': [(112, 119),(128, 191)], 'color': 'tab:green'},
-    'Hex tile, 3mm SiPM, Unpainted': {'ranges': [(0, 6), (34,41),(84, 90), (98, 111)], 'color': 'y'}
+    'Hex tile, 1.3mm SiPM': {'ranges': [(56,83), (91, 97)], 'color': 'tab:blue'},
+    'Square tile, 3mm SiPM': {'ranges': [(112, 123),(128, 191)], 'color': 'tab:green'},
+    'Hex tile, 3mm SiPM, Unpainted': {'ranges': [(0, 6), (34, 41), (84, 90), (98, 111)], 'color': 'y'}
 }
 
 x = np.array(range(0, cali.nChannels))
@@ -67,8 +67,12 @@ y2 = np.array(mipOverPed)
 labels_added = set()
 for label, config in configurations.items():
     color = config['color']
+    count = 0
+    total = 0
     for start, end in config['ranges']:
-        indices = np.where((x >= start) & (x <= end))
+        indices = np.where((x >= start) & (x <= end) & (y1[x] != 0))
+        count += np.count_nonzero(indices)
+        total += np.sum(y1[indices])
 
         if label not in labels_added:
             ax1.scatter(x[indices], y1[indices], color=color, label=label)
@@ -77,6 +81,8 @@ for label, config in configurations.items():
             ax1.scatter(x[indices], y1[indices], color=color)
 
         ax2.scatter(x[indices], y2[indices], color=color)
+
+    ax1.axhline(y=total/count, color=color)
 
 ax1.legend(fontsize=30, loc='upper right')
 
