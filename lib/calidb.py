@@ -25,6 +25,9 @@ class caliDB:
     def getRunPedRun(self, run):
         return int(self.getRunValue(run, 'PedRun'))
 
+    def getRunStartTime(self, run):
+        return self.getRunValue(run, 'StartTime')
+
 if __name__ == '__main__':
     ''' test '''
     db = caliDB()

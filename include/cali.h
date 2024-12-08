@@ -85,14 +85,14 @@ namespace cali {
     const int nNineLayerBoards  = 9*nLayerBoards;
     const int channelMax = 300;
 
-    const double gapX = 0*mm;
-    const double gapY = 2.54*mm;	// 0.1 in
-    const double pcbX = 131.92*mm;	// 177.64 - 45.72
-    const double pcbY = 97.99*mm;	// 130.91 - 32.92
-    const double layerZ = 27.1526*mm;
-    const double X = 70*cm;
-    const double Y = 0;
-    const double Z = 7*m;
+    const float gapX = 0*mm;
+    const float gapY = 2.54*mm;	// 0.1 in
+    const float pcbX = 131.92*mm;	// 177.64 - 45.72
+    const float pcbY = 97.99*mm;	// 130.91 - 32.92
+    const float layerZ = 27.1526*mm;
+    const float X = 70*cm;
+    const float Y = 0;
+    const float Z = 7*m;
 
 
     void setRun(const int r)
@@ -143,7 +143,7 @@ namespace cali {
     } SiPM;
 
     struct sipmXY{
-	double x, y;
+	float x, y;
 	
 	inline void   operator=(sipmXY a)   { x=a.x; y=a.y; }
 	inline sipmXY operator-()	    { return {-x, -y}; }
@@ -323,6 +323,20 @@ namespace cali {
 
 	cerr << FATAL << "can't find file: " << fname << endl;
 	return NULL;
+    }
+
+    string getListFile(const int run)
+    {
+	char buf[1024];
+	sprintf(buf, "Run%d_list.txt", run);
+	return getFile(buf);
+    }
+
+    string getRootFile(const int run)
+    {
+	char buf[1024];
+	sprintf(buf, "Run%d.root", run);
+	return getFile(buf);
     }
 
     void printSipmInfo(const int ch = 0)

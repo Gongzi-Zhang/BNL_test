@@ -88,9 +88,9 @@ void calibrate::init()
     }
 
     fio = new TFile(rootFile.c_str(), "update");
-      for (const char *var : {"cor", "mip"})
-	if (fio->Get(var))
- 	    fio->Delete(Form("%s;*", var));
+    for (const char *var : {/*"cor",*/ "mip"})
+      if (fio->Get(var))
+          fio->Delete(Form("%s;*", var));
 
     traw = (TTree*) fio->Get("raw");
     tcor = new TTree("cor", "corrected ADC values");
@@ -249,7 +249,7 @@ void calibrate::fillCorMIP()
 void calibrate::write()
 {
     fio->cd();
-    tcor->Write();
+    // tcor->Write();
     tmip->Write();
     fio->Close();
 }

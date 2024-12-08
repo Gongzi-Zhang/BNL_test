@@ -9,9 +9,13 @@ cali_libs  = -Llib/ -lmakeTree
 # include file
 calo 	:= calo.h
 cali 	:= cali.h
+caliType := caliType.h
 utilities   := utilities.h
 db	    := db.C
 makeTree  := makeTree.C
+
+# dictionary
+Dict	:= caliTypeDict.cxx
 
 # libraries
 libdb	:= libdb.so
@@ -53,6 +57,16 @@ makeEdm4eic: makeEdm4eic.C
 	    exit 1
 	fi
 	# g++ -o edm4hep edm4hep.cpp -I../EDM4hep/install/include/ -I../podio/install/include/ -I/home/weibin/local/root/include -L../DEM4hep/install/lib/ -ledm4hep -L../podio/install/lib -lpodio -lpodioRootIO
+	mv $@ bin/
+
+$(Dict): $(caliType) LinkDef.h
+	rootcling -f $@ -c $^
+
+makeRecTree: makeRecTree.C $(Dict)
+	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
+	mv $@ bin/
+showerShape: showerShape.C $(Dict)
+	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)
 	mv $@ bin/
 
 convert1: convert1.C

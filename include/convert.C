@@ -39,18 +39,8 @@ int main(int argc, char *argv[])
 
     cout << INFO << "processing run: " << run << endl;
 
-    char listFile[1024];
-    sprintf(listFile, "%s/data/Run%d_list.txt", cali::CALIROOT, run);
-    if (!fileExists(listFile))
-    {
-	sprintf(listFile, "%s/data/Run%d_list.txt", cali::backupDir, run);
-	if (!fileExists(listFile))
-	{
-	    cerr << FATAL << "no list file for run " << run << endl;
-	    exit(4);
-	}
-    }
-    listReader* reader = new listReader(listFile);
+    string listFile = cali::getListFile(run);
+    listReader* reader = new listReader(listFile.c_str());
 
     if (runType == "data" || runType == "cmdata")
     {
