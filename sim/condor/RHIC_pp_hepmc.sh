@@ -59,7 +59,7 @@ echo -e "INFO\tproducing ${numberOfJobs} hepmc files with ${inputFile}"
 for ((i=1; i<=$numberOfJobs; i++))
 do
     CONDOR_JOB=condor_${count}.job
-    output=${outputDir}/${outputName}_${i}.hepmc
+    output=${outputDir}/${outputName}_${count}.hepmc
     [ -f $CONDOR_JOB ] && rm $CONDOR_JOB
     cat << END >> ${CONDOR_JOB}
 Universe        = vanilla

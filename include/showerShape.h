@@ -21,7 +21,7 @@ class showerShape {
     void setMinClusterHitE(double e) { minClusterHitE = e; }
     void setMinClusterE(double e) { minClusterE = e; }
     void setMinClusterNhits(size_t n) { minClusterNhits = n; }
-    bool isNeighbor(caliHit &h1, caliHit &h2) { return (abs(h1.x - h2.x) < neighbor_x) && (abs(h1.y - h2.y) < neighbor_z) && (abs(h1.z - h2.z) < neighbor_z); }
+    bool isNeighbor(caliHit &h1, caliHit &h2) { return (abs(h1.x - h2.x) <= neighbor_x) && (abs(h1.y - h2.y) <= neighbor_y) && (abs(h1.z - h2.z) <= neighbor_z); }
 
     void init();
     void process();

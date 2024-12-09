@@ -87,7 +87,7 @@ void make_hepmc_hist(const char* input, TString outFile="") {
 	    m  = sqrt(e*e - p*p);
 
 	    // check if the particle will reach our CALI prototype
-	    if (e > 5)  // require particle energy to be larger than 1 GeV
+	    if (e > 1)  // require particle energy to be larger than 1 GeV
 	    {
 		bool hit = false;
 		// the front face

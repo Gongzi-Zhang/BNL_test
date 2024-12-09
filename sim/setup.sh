@@ -3,7 +3,7 @@ if [ -f $epic ]; then
     source $epic
 fi
 export CALISIMROOT=$(realpath -- $(dirname -- ${BASH_SOURCE[0]}))
-export EICrecon_MY=${CALISIMROOT}/CALI
+export EICrecon_MY=${CALISIMROOT}
 
 function add_c_include_path {
     for path in $@; do

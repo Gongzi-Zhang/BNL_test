@@ -23,6 +23,7 @@ extern "C" {
 
 	InitJANAPlugin(app);
 // Make sure digi and reco use the same value
+	const double MIP = 1;
 	decltype(CalorimeterHitDigiConfig::capADC)        HCAL_capADC = 8192;
 	decltype(CalorimeterHitDigiConfig::dyRangeADC)    HCAL_dyRangeADC = 200 * dd4hep::MeV;
 	decltype(CalorimeterHitDigiConfig::pedMeanADC)    HCAL_pedMeanADC = 150;
@@ -32,7 +33,11 @@ extern "C" {
 	app->Add(new JOmniFactoryGeneratorT<CalorimeterHitDigi_factory>(
              "CALIRawHits", 
 	    {"CALIHits"}, 
+#if EDM4EIC_VERSION_MAJOR >= 7
+	    {"CALIRawHits", "CALIRawHitsAssociations"},
+#else
 	    {"CALIRawHits"},
+#endif
 	    {
 		.eRes = {},
 		.tRes = 0.0 * dd4hep::ns,
@@ -60,14 +65,14 @@ extern "C" {
 		.resolutionTDC = HCAL_resolutionTDC,
 		.thresholdFactor = 0.,
 		.thresholdValue = 0, // 0.25 MeV --> 0.52 / 400 * 4096 = 2.56
-
-		.sampFrac = "1",
+		.sampFrac = "0.000495",	    // convert to MIP; 1MIP = 0.495 MeV
 		.readout = "CALIHits",
 		.layerField = "layer",
 		.sectorField = "system",
 	    },
 	    app   // TODO: Remove me once fixed
 	));
+	/*
 	app->Add(new JOmniFactoryGeneratorT<CalorimeterHitsMerger_factory>(
 	     "CALIMergedHits", 
 	    {"CALIRecHits"},
@@ -97,27 +102,33 @@ extern "C" {
 	    },
 	    app   // TODO: Remove me once fixed
 	));
+	*/
 	app->Add(new JOmniFactoryGeneratorT<ImagingTopoCluster_factory>(
 	     "CALIImagingTopoClusters",
 	    {"CALIRecHits"},
 	    {"CALIImagingTopoClusters"},
 	    {
 		.neighbourLayersRange = 1,
-		.localDistXY = {55*dd4hep::mm, 50*dd4hep::mm},
+		.localDistXY = {50*dd4hep::mm, 50*dd4hep::mm},
 		// .layerDistEtaPhi = {0.9, 0.5},
 		// .sectorDist = 10.0 * dd4hep::cm,
-		.minClusterHitEdep = 10.0 * dd4hep::MeV,
-		.minClusterCenterEdep = 500.0 * dd4hep::MeV,
-		.minClusterEdep = 1000.0 * dd4hep::MeV,
-		.minClusterNhits = 1,
+		.minClusterHitEdep = 0.5,
+		.minClusterCenterEdep = 2,
+		.minClusterEdep = 5,
+		.minClusterNhits = 3,
 	    },
 	    app   // TODO: Remove me once fixed
 	));
 
+	/*
 	app->Add(new JOmniFactoryGeneratorT<CalorimeterClusterRecoCoG_factory>(
              "CALIIslandClusters",
             {"CALIIslandProtoClusters",     // edm4eic::ProtoClusterCollection
+#if EDM4EIC_VERSION_MAJOR >= 7
+	     "CALIRawHitsAssociations"},
+#else
 	     "CALIHits"},
+#endif
             {"CALIIslandClusters",		    // edm4eic::Cluster
              "CALIIslandClusterAssociations"},    // edm4eic::MCRecoClusterParticleAssociation
 	    {
@@ -129,10 +140,15 @@ extern "C" {
 	    app   // TODO: Remove me once fixed
 	    )
 	);
+	 */
 	app->Add(new JOmniFactoryGeneratorT<CalorimeterClusterRecoCoG_factory>(
              "CALIImagingClusters",
             {"CALIImagingTopoClusters",     // edm4eic::ProtoClusterCollection
+#if EDM4EIC_VERSION_MAJOR >= 7
+	     "CALIRawHitsAssociations"},
+#else
 	     "CALIHits"},
+#endif
             {"CALIImagingClusters",		    // edm4eic::Cluster
              "CALIImagingClusterAssociations"},    // edm4eic::MCRecoClusterParticleAssociation
 	    {

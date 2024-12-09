@@ -37,17 +37,19 @@ void make_hist(const char *fname = "output.hit.root",
     // TTreeReaderValue<int> hit_mul(tr, "hit.mul");
     // TTreeReaderArray<float> hit_energy(tr, "hit.e");
 
-    string eRanges[] = {"150MIP", "150-300MIP", "300-600MIP", "600MIP"};
+    string eRanges[] = {"100MIP", "100-150MIP", "150MIP", "150-300MIP", "300-600MIP", "600MIP"};
     map<string, const double> minEventEnergy = {                                
+	{"100MIP",	50},                                                   
+	{"100-150MIP",	50},                                                   
 	{"150MIP",	100},                                                   
-	// {"100-150MIP",	50},                                                   
 	{"150-300MIP",  100},                                                   
 	{"300-600MIP",  250},                                                   
 	{"600MIP",	550},                                                   
     };                                                                          
     map<string, const double> maxEventEnergy = {                                
+	{"100MIP",	1000},                                                   
+	{"100-150MIP",	200},                                                   
 	{"150MIP",	1000},                                                   
-	// {"100-150MIP",	200},                                                   
 	{"150-300MIP",  350},                                                   
 	{"300-600MIP",  650},                                                   
 	{"600MIP",	1000},                                                   
@@ -82,7 +84,7 @@ void make_hist(const char *fname = "output.hit.root",
     double event_x, event_y, event_z;
     double x, y, z, theta, eta;
     int hit_mul, hit_mul1, hit_mul2, hit_mul3, hit_mul4;
-    string eRange;
+    vector<size_t> eRange_idx;
 
     const int ne = tin->GetEntries();
     for (int ei = 0; ei<ne; ei++)
@@ -93,12 +95,9 @@ void make_hist(const char *fname = "output.hit.root",
 	event_e = 0;
 	event_x = event_y = event_z = 0;
 
-	// b0_mul = b1_mul = b2_mul = 0;
-	// b0_e = b1_e = b2_e = 0;
-
 	// trigger
 	// if (T1 < 0.18 || T2 < 0.05 || T3 < 0.6)
-	if (T1 < 2.5)
+	if (T3 < 4)
 	    continue;
 
 	for (int hi=0; hi<hits.mul; hi++)
@@ -116,16 +115,24 @@ void make_hist(const char *fname = "output.hit.root",
 	    event_e += e;
 	}
 
-	if (event_e < 150)  // 30 MIP ~ 1 GeV
+	eRange_idx.clear();
+
+	if (event_e < 100)  // 30 MIP ~ 1 GeV
 	    continue;
-	// if (event_e < 150)   
-	//     eRange = "100-150MIP";
-	else if (event_e < 300)   
-	    eRange = "150-300MIP";  // 5 - 10 GeV
-	else if (event_e < 600)
-	    eRange = "300-600MIP";  // 10 - 20 GeV
+
+	eRange_idx.push_back(0);
+	if (event_e < 150)  // 30 MIP ~ 1 GeV
+	eRange_idx.push_back(1);
 	else 
-	    eRange = "600MIP";	    // 20 GeV -
+	{
+	    eRange_idx.push_back(2);
+	    if (event_e < 300)   
+		eRange_idx.push_back(3);  // 5 - 10 GeV
+	    else if (event_e < 600)
+		eRange_idx.push_back(4);  // 10 - 20 GeV
+	    else 
+		eRange_idx.push_back(5);  // 20 GeV -
+	}
 
 	hit_mul = 0;
 	event_e = 0;
@@ -156,31 +163,33 @@ void make_hist(const char *fname = "output.hit.root",
 	    else if (e > 0.5)                                                   
 		hit_mul1++;       
 
-	    h1["150MIP"]["hit_MIP"]->Fill(e);
-	    h1[eRange]["hit_MIP"]->Fill(e);
+	    for (const auto idx : eRange_idx)
+	    {
+		h1[eRanges[idx]]["hit_MIP"]->Fill(e);
+	    }
 	}
 
 	{
-	    for (const string r : {"150MIP", eRange.c_str()})
+	    x = event_x/event_e + cali::X;
+	    y = event_y/event_e + cali::Y;
+	    z = event_z/event_e*cali::layerZ + cali::Z;
+	    theta = atan(sqrt(x*x + y*y)/z);                                    
+	    eta = -log(tan(theta/2));
+
+	    for (const auto idx : eRange_idx)
 	    {
-		x = event_x/event_e + cali::X;
-		y = event_y/event_e + cali::Y;
-		z = event_z/event_e*cali::layerZ + cali::Z;
-		theta = atan(sqrt(x*x + y*y)/z);                                    
-		eta = -log(tan(theta/2));
-		
-		h1[r]["hit_mul"]->Fill(hit_mul);
-		h1[r]["hit_mul1"]->Fill(hit_mul1);
-		h1[r]["hit_mul2"]->Fill(hit_mul2);
-		h1[r]["hit_mul3"]->Fill(hit_mul3);
-		h1[r]["hit_mul4"]->Fill(hit_mul4);
-		h1[r]["event_MIP"]->Fill(event_e);
-		h1[r]["event_x"]->Fill(event_x/event_e/cm);
-		h1[r]["event_y"]->Fill(event_y/event_e/cm);
-		h1[r]["event_z"]->Fill(event_z/event_e);
-		h2[r]["event_MIP_vs_hit_mul"]->Fill(hits.mul, event_e);
-		h2[r]["event_MIP_vs_eta"]->Fill(eta, event_e);
-		h2[r]["x_vs_y"]->Fill(event_x/event_e/cm, event_y/event_e/cm);
+		h1[eRanges[idx]]["hit_mul"]->Fill(hit_mul);
+		h1[eRanges[idx]]["hit_mul1"]->Fill(hit_mul1);
+		h1[eRanges[idx]]["hit_mul2"]->Fill(hit_mul2);
+		h1[eRanges[idx]]["hit_mul3"]->Fill(hit_mul3);
+		h1[eRanges[idx]]["hit_mul4"]->Fill(hit_mul4);
+		h1[eRanges[idx]]["event_MIP"]->Fill(event_e);
+		h1[eRanges[idx]]["event_x"]->Fill(event_x/event_e/cm);
+		h1[eRanges[idx]]["event_y"]->Fill(event_y/event_e/cm);
+		h1[eRanges[idx]]["event_z"]->Fill(event_z/event_e);
+		h2[eRanges[idx]]["event_MIP_vs_hit_mul"]->Fill(hits.mul, event_e);
+		h2[eRanges[idx]]["event_MIP_vs_eta"]->Fill(eta, event_e);
+		h2[eRanges[idx]]["x_vs_y"]->Fill(event_x/event_e/cm, event_y/event_e/cm);
 	    }
 	}
     }

@@ -10,9 +10,9 @@ const double s = 1;
 const double ms = 1e-3*s;
 const double us = 1e-6*s;
 
-const double m = 1;
-const double cm = 1e-2*m;
-const double mm = 1e-3*m;
+const double mm = 1;
+const double cm = 10*mm;
+const double m = 100*cm;
 
 namespace calo {
     const char* gains[] = {"LG", "HG"};

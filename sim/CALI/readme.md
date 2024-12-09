@@ -1,6 +1,5 @@
 # Compilation
 ```
-cmake -S . -B build -DCMAKE_INSTALL_PREFIX=plugins
-cd build
-make install
-```
+* make sure EICrecon_MY is set
+cmake -S . -B build
+cmake --build build --target install

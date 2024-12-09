@@ -107,7 +107,7 @@ void check(const char *fname = "output.hit.root",
 	    h1["hit_MIP"]->Fill(e);
 	}
 
-	if (event_e > 0)
+	if (event_e > 100)
 	{
 	    x = event_x/event_e + cali::X;
 	    y = event_y/event_e + cali::Y;

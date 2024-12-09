@@ -92,11 +92,13 @@
     <constant name="PCB_t"		    value="0.8*mm"/>
     <constant name="layer_t"		    value="absorber_t + cover_t + 2*ESR_t + scintillator_t + PCB_t"/>
 
-    <constant name="trigger_x"		    value="3*cm" />
-    <constant name="trigger_y"		    value="trigger_x" />
+    <constant name="trigger12_x"	    value="7*cm" />
+    <constant name="trigger12_y"	    value="trigger12_x" />
+    <constant name="trigger34_x"	    value="3.5*cm" />
+    <constant name="trigger34_y"	    value="trigger34_x" />
     <constant name="trigger_t"		    value="cover_t + 2*ESR_t + scintillator_t + PCB_t"/>
     <constant name="trigger12_x_offset"	    value="0*cm"/>
-    <constant name="trigger12_y_offset"	    value="-1*cm"/>
+    <constant name="trigger12_y_offset"	    value="0*cm"/>
     <constant name="trigger34_x_offset"	    value="up_right_x+0.5*cm"/>
     <constant name="trigger34_y_offset"	    value="up_right_y-1.5*cm"/>
 
@@ -128,14 +130,14 @@
       <!-- Triggers Tiles -->
       <layer repeat="2">
 	<!-- scintillator cover -->
-        <Box name="Cover"   material="Polylactide"  x="trigger_x" y="trigger_y" thickness="cover_t"	    x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="AnlTeal"	sensitive="false"/>
+        <Box name="Cover"   material="Polylactide"  x="trigger12_x" y="trigger12_y" thickness="cover_t"	    x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="AnlTeal"	sensitive="false"/>
 	<!-- ESR foil 1 -->                                                                                                                      y
-        <Box name="ESR_1"   material="Polystyrene"  x="trigger_x" y="trigger_y" thickness="ESR_t"	    x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="BlueVis"	sensitive="false"/>
-        <Box name="Scint"   material="Polystyrene"  x="trigger_x" y="trigger_y" thickness="scintillator_t"  x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="AnlOrange"	sensitive="true"/>
+        <Box name="ESR_1"   material="Polystyrene"  x="trigger12_x" y="trigger12_y" thickness="ESR_t"	    x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="BlueVis"	sensitive="false"/>
+        <Box name="Scint"   material="Polystyrene"  x="trigger12_x" y="trigger12_y" thickness="scintillator_t"  x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="AnlOrange"	sensitive="true"/>
 	<!-- ESR foil 2 -->                                                                                                                      y
-        <Box name="ESR_2"   material="Polystyrene"  x="trigger_x" y="trigger_y" thickness="ESR_t"	    x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="BlueVis"	sensitive="false"/>
+        <Box name="ESR_2"   material="Polystyrene"  x="trigger12_x" y="trigger12_y" thickness="ESR_t"	    x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="BlueVis"	sensitive="false"/>
 	<!-- PCB -->                                                                                                                             y
-        <Box name="PCB"     material="Fr4" 	    x="trigger_x" y="trigger_y" thickness="PCB_t"	    x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="CyanVis"	sensitive="false"/>
+        <Box name="PCB"     material="Fr4" 	    x="trigger12_x" y="trigger12_y" thickness="PCB_t"	    x_offset="trigger12_x_offset" y_offset="trigger12_y_offset"  vis="CyanVis"	sensitive="false"/>
       </layer>
 
       <!-- Hexagon Tiles: Layer 0 - 3 -->
@@ -427,13 +429,13 @@
         <Box name="Absorber_dn_right"	material="Steel235" 	x="megacell_outer_x" y="megacell_outer_y" thickness="absorber_t" x_offset="dn_right_x" y_offset="dn_right_y" count="1" vis="AnlGreen" sensitive="false"/>
 
 	<!-- scintillator cover -->
-        <Box name="Cover_up_right"	material="Polylactide"	x="trigger_x" y="trigger_y" thickness="cover_t"    x_offset="trigger34_x_offset" y_offset="trigger34_y_offset" count="0" vis="AnlTeal" sensitive="false"/>
+        <Box name="Cover_up_right"	material="Polylactide"	x="trigger34_x" y="trigger34_y" thickness="cover_t"    x_offset="trigger34_x_offset" y_offset="trigger34_y_offset" count="0" vis="AnlTeal" sensitive="false"/>
         <Box name="Cover_up_left"	material="Polylactide"	x="megacell_outer_x" y="megacell_outer_y" thickness="cover_t"   x_offset="up_left_x"  y_offset="up_left_y"  count="0" vis="AnlTeal" sensitive="false"/>
         <Box name="Cover_dn_left"	material="Polylactide" 	x="megacell_outer_x" y="megacell_outer_y" thickness="cover_t"   x_offset="dn_left_x"  y_offset="dn_left_y"  count="0" vis="AnlTeal" sensitive="false"/>
         <Box name="Cover_dn_right"	material="Polylactide" 	x="megacell_outer_x" y="megacell_outer_y" thickness="cover_t"	x_offset="dn_right_x" y_offset="dn_right_y" count="1" vis="AnlTeal" sensitive="false"/>
 
 	<!-- ESR foil 1 -->
-        <Box name="ESR_1_up_right"	material="Polystyrene"	x="trigger_x" y="trigger_y" thickness="ESR_t"	     x_offset="trigger34_x_offset" y_offset="trigger34_y_offset" count="0" vis="BlueVis" sensitive="false"/>
+        <Box name="ESR_1_up_right"	material="Polystyrene"	x="trigger34_x" y="trigger34_y" thickness="ESR_t"	     x_offset="trigger34_x_offset" y_offset="trigger34_y_offset" count="0" vis="BlueVis" sensitive="false"/>
         <Box name="ESR_1_up_left"	material="Polystyrene"	x="megacell_outer_x" y="megacell_outer_y" thickness="ESR_t" x_offset="up_left_x"  y_offset="up_left_y"  count="0" vis="BlueVis" sensitive="false"/>
         <Box name="ESR_1_dn_left"	material="Polystyrene" 	x="megacell_outer_x" y="megacell_outer_y" thickness="ESR_t" x_offset="dn_left_x"  y_offset="dn_left_y"  count="0" vis="BlueVis" sensitive="false"/>
         <Box name="ESR_1_dn_right"	material="Polystyrene" 	x="megacell_outer_x" y="megacell_outer_y" thickness="ESR_t" x_offset="dn_right_x" y_offset="dn_right_y" count="1" vis="BlueVis" sensitive="false"/>
@@ -441,7 +443,7 @@
 	<!-- square tile -->
 	     
 	<!-- up right: Triggers Tile -->
-        <Box name="Scint" material="Polystyrene" x="trigger_x" y="trigger_y" thickness="scintillator_t" x_offset="trigger34_x_offset" y_offset="trigger34_y_offset" vis="AnlOrange" sensitive="true" count="0"/>
+        <Box name="Scint" material="Polystyrene" x="trigger34_x" y="trigger34_y" thickness="scintillator_t" x_offset="trigger34_x_offset" y_offset="trigger34_y_offset" vis="AnlOrange" sensitive="true" count="0"/>
 
 	<!-- up left -->
 	<PolyhedraRegular name="Scint_up_left_0" material="Polystyrene" numsides="4" rmin="square_scint_rmin" rmax="square_scint_rmax" thickness="scintillator_t" angle="45*degree" x_offset="up_left_x+sqacell_0_offset_x" y_offset="up_left_y+sqacell_0_offset_y" count="0" vis="AnlOrange" sensitive="true"/>
@@ -480,13 +482,13 @@
 	<PolyhedraRegular name="Frame_dn_right_megacell"    material="Polylactide" numsides="4" rmin="megacell_inner_x/2+frame_w/2" rmax="megacell_outer_x/2" thickness="frame_t" angle="45*degree" x_offset="dn_right_x" y_offset="dn_right_y" count="1" vis="CyanVis" sensitive="false"/>
 
 	<!-- ESR foil 2 -->
-        <Box name="ESR_2_up_right"	material="Polystyrene"	x="trigger_x" y="trigger_y" thickness="ESR_t" x_offset="trigger34_x_offset"  y_offset="trigger34_y_offset"  count="0" vis="BlueVis" sensitive="false"/>
+        <Box name="ESR_2_up_right"	material="Polystyrene"	x="trigger34_x" y="trigger34_y" thickness="ESR_t" x_offset="trigger34_x_offset"  y_offset="trigger34_y_offset"  count="0" vis="BlueVis" sensitive="false"/>
         <Box name="ESR_2_up_left"	material="Polystyrene"	x="megacell_outer_x" y="megacell_outer_y" thickness="ESR_t" x_offset="up_left_x"  y_offset="up_left_y"  count="0" vis="BlueVis" sensitive="false"/>
         <Box name="ESR_2_dn_left"	material="Polystyrene" 	x="megacell_outer_x" y="megacell_outer_y" thickness="ESR_t" x_offset="dn_left_x"  y_offset="dn_left_y"  count="0" vis="BlueVis" sensitive="false"/>
         <Box name="ESR_2_dn_right"	material="Polystyrene" 	x="megacell_outer_x" y="megacell_outer_y" thickness="ESR_t" x_offset="dn_right_x" y_offset="dn_right_y" count="1" vis="BlueVis" sensitive="false"/>
 
 	<!-- PCB -->
-        <Box name="PCB_up_right"	material="Fr4"		x="trigger_x" y="trigger_y" thickness="PCB_t" x_offset="trigger34_x_offset"  y_offset="trigger34_y_offset"  count="0" vis="CyanVis" sensitive="false"/>
+        <Box name="PCB_up_right"	material="Fr4"		x="trigger34_x" y="trigger34_y" thickness="PCB_t" x_offset="trigger34_x_offset"  y_offset="trigger34_y_offset"  count="0" vis="CyanVis" sensitive="false"/>
         <Box name="PCB_up_left"		material="Fr4"		x="megacell_outer_x" y="megacell_outer_y" thickness="PCB_t" x_offset="up_left_x"  y_offset="up_left_y"  count="0" vis="CyanVis" sensitive="false"/>
         <Box name="PCB_dn_left"	    	material="Fr4" 		x="megacell_outer_x" y="megacell_outer_y" thickness="PCB_t" x_offset="dn_left_x"  y_offset="dn_left_y"  count="0" vis="CyanVis" sensitive="false"/>
         <Box name="PCB_dn_right"    	material="Fr4" 		x="megacell_outer_x" y="megacell_outer_y" thickness="PCB_t" x_offset="dn_right_x" y_offset="dn_right_y" count="1" vis="CyanVis" sensitive="false"/>
