@@ -6,13 +6,16 @@
 #include "utilities.h"
 
 // units
-const double s = 1;
-const double ms = 1e-3*s;
-const double us = 1e-6*s;
+const float s = 1;
+const float ms = 1e-3*s;
+const float us = 1e-6*s;
 
-const double mm = 1;
-const double cm = 10*mm;
-const double m = 100*cm;
+const float mm = 1;
+const float cm = 10*mm;
+const float m = 100*cm;
+
+const float GeV = 1;
+const float MeV = 1e-3*GeV;
 
 namespace calo {
     const char* gains[] = {"LG", "HG"};

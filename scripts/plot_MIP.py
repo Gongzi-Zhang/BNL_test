@@ -84,7 +84,7 @@ for label, config in configurations.items():
 
     ax1.axhline(y=total/count, color=color)
 
-ax1.legend(fontsize=30, loc='upper right')
+ax1.legend(fontsize=40, loc='upper right', prop={'family': 'monospace'})
 
 # plt.suptitle("MIP")
 ax1.set_title(f"Run {run}")

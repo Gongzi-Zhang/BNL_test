@@ -1,5 +1,5 @@
-#ifndef _QA_
-#define _QA_
+#ifndef __QA__
+#define __QA__
 
 #include "TError.h"
 #include "TFile.h"
@@ -209,9 +209,9 @@ void QA::fillData()
 	    h1["event_z"][gain]->Fill(values["event_z"][gain]);
 	    h2["event_MIP_vs_hit_mul"][gain]->Fill(values["hit_mul"][gain], e);
 
-	    x = values["event_x"][gain] + cali::X;
+	    x = values["event_x"][gain] + cali::x0;
 	    y = values["event_y"][gain];
-	    z = values["event_z"][gain]*cali::layerZ + cali::Z;
+	    z = values["event_z"][gain]*cali::lt + cali::z0;
 	    theta = atan(sqrt(x*x + y*y)/z);
 	    eta = -log(tan(theta/2));
 	    hp["event_MIP_vs_eta"][gain]->Fill(eta, e, 1);

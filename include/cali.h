@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <cmath>
 #include <stdlib.h>
 #include <cassert>
 #include "calo.h"
@@ -18,6 +19,7 @@ namespace cali {
 	: ".";
     const char* backupDir = "/media/arratialab/CALI/BNL_test/";
 
+    // Run 2024
     const char* run24Start	= "2024-04-24";
     const char* run24End	= "2024-10-21";
     const char* run24PPStart	= "2024-04-24";
@@ -31,6 +33,9 @@ namespace cali {
     const int   run24AuAuStartRun = 2324;
     const int   run24AuAuEndRun	= 2587;
 
+	  int   run = 1000;
+
+    // Trigger
     map<int, const char*> trigger = 
     {
 	{-2,	"mip"}, 
@@ -54,6 +59,7 @@ namespace cali {
 	{240,	"T1 && T2 && T3 && T4"},
     };
 
+    // geometry and channels
     /* CAEN:	  CAEN unit
      * channel:   channel count: 0-192
      * layer:	  sampling layers
@@ -61,12 +67,11 @@ namespace cali {
      * quadrant:  quadrant count in a layer: 0-3
      * sipm:      SiPM count in a PCB: 0-6
      */
-	  int run = -1;
     	  int nCAENs = 3;
     const int CAENMax = 5;
     const int nCAENChannels = 64;
 	  int nChannels = nCAENs*nCAENChannels;
-          int nLayers = 11;
+          int nLayers = 10;
     const int layerMax = 20;
 	  int nHexLayers = 4;
     const int transLayer = 4;	// Layer 5
@@ -85,16 +90,26 @@ namespace cali {
     const int nNineLayerBoards  = 9*nLayerBoards;
     const int channelMax = 300;
 
+    const float x0 = 65*cm;
+    const float y0 = 0;
+    const float z0 = 800*cm;
+    const float xw = 192*mm;
+    const float yw = 194*mm;
+    const float lt = 24.5*mm;    // layer thickness
+    const float xmin = x0 - xw/2;
+    const float xmax = x0 + xw/2;
+    const float ymin = y0 - yw/2;
+    const float ymax = y0 + yw/2;
+    const float zmax = z0 + nLayers*lt;
+    const float etamin = 0.5*log(1 + 4*z0*z0/(xmax*xmax));
+    const float etamax = 0.5*log(1 + 4*z0*z0/(xmin*xmin));
+
     const float gapX = 0*mm;
     const float gapY = 2.54*mm;	// 0.1 in
-    const float pcbX = 131.92*mm;	// 177.64 - 45.72
-    const float pcbY = 97.99*mm;	// 130.91 - 32.92
-    const float layerZ = 27.1526*mm;
-    const float X = 70*cm;
-    const float Y = 0;
-    const float Z = 7*m;
+    const float pcbX = 96*mm;	// simulation value; real value: 177.64 - 45.72
+    const float pcbY = 97*mm;	// simulation value; real value: 130.91 - 32.92
 
-
+    // run dependent info
     void setRun(const int r)
     {
 	run = r;
@@ -137,9 +152,9 @@ namespace cali {
     }
 
     typedef struct {
-	int layer;	
-	int quadrant;	
-	int sipm;
+	int layer;	// starts from 0
+	int quadrant;	// 0-3
+	int sipm;	// 0-3 or 0-6
     } SiPM;
 
     struct sipmXY{
@@ -171,11 +186,12 @@ namespace cali {
 	{ 0,  0,  0, 29},   // sauqre
     };
 
+    // left right PCBs are rotated w.r.t. each other
     sipmXY pcbAnchor[] = {
-	{-gapX/2, gapY/2 + pcbY},
-	{ gapX/2, gapY/2},
-	{ gapX/2, -(gapY/2 + pcbY)},
-	{-gapX/2, -gapY/2},
+	{-gapX/2, gapY/2 + pcbY},   // top right PCB, anchor at top left point
+	{ gapX/2, gapY/2},	    // top left PCB, anchor at top bottom right point
+	{ gapX/2, -(gapY/2 + pcbY)},	// bottom left PCB, anchor at bottom right point
+	{-gapX/2, -gapY/2},	    // bottom right PCB, anchor at top left point
     };
 					    
     sipmXY hexBoardSipmXY[nHexBoardChannels] = {

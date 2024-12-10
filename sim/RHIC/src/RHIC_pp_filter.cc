@@ -71,12 +71,12 @@ int main(int argc, char* argv[]) {
 
   // CALI prototype geometry
   const double margin = 0*cm;
-  const double xmin   = cali_xmin;
-  const double xmax   = cali_xmax + margin;
-  const double ymin   = cali_ymin - margin;
-  const double ymax   = cali_ymax + margin;
-  const double zmin   = cali_z0;
-  const double zmax   = cali_zmax - cali_lt;
+  const double xmin   = cali::xmin;
+  const double xmax   = cali::xmax + margin;
+  const double ymin   = cali::ymin - margin;
+  const double ymax   = cali::ymax + margin;
+  const double zmin   = cali::z0;
+  const double zmax   = cali::zmax - cali::lt;
 
   // Begin event loop.
   int iAbort = 0;
@@ -125,8 +125,8 @@ int main(int argc, char* argv[]) {
 	if (e > 1 && pz > 0) // require particle energy to be larger than 5 GeV
 	{
 	    // the front face
-	    x1 = x0 + (cali_z0 - z0)*px/pz;
-	    y1 = y0 + (cali_z0 - z0)*py/pz;
+	    x1 = x0 + (cali::z0 - z0)*px/pz;
+	    y1 = y0 + (cali::z0 - z0)*py/pz;
 	    if (xmin < x1 && x1 < xmax 
 	     && ymin < y1 && y1 < ymax)	
 	    {
@@ -135,8 +135,8 @@ int main(int argc, char* argv[]) {
 	    }
 
 	    // the right face
-	    y1 = y0 + (cali_xmin - x0)*py/px;
-	    z1 = z0 + (cali_xmin - x0)*pz/px;
+	    y1 = y0 + (cali::xmin - x0)*py/px;
+	    z1 = z0 + (cali::xmin - x0)*pz/px;
 	    if (ymin < y1 && y1 < ymax
 	     && zmin < z1 && z1 < zmax)
 	    {

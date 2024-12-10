@@ -1,16 +1,19 @@
-#ifndef _SHOWERSHAPE_
-#define _SHOWERSHAPE_
+#ifndef __CLUSTERING__
+#define __CLUSTERING__
 
 /* showershape analysis */
+#include <iostream>
+
 #include "TFile.h"
 #include "TTree.h"
 #include "TClonesArray.h"
 
+#include "utilities.h"
 #include "caliType.h"
 
 using namespace std;
 
-class showerShape {
+class clustering {
   public:
     void setInput(string f)  { inFileName = f; }
     void setOutput(string f) { outFileName = f; }
@@ -45,7 +48,7 @@ class showerShape {
     size_t minClusterNhits;
 };
 
-void showerShape::bfsGroup(vector<size_t> &group, const size_t idx)
+void clustering::bfsGroup(vector<size_t> &group, const size_t idx)
 {
     visits[idx] = true;
 
@@ -70,7 +73,7 @@ void showerShape::bfsGroup(vector<size_t> &group, const size_t idx)
     }
 }
 
-void showerShape::findClusters()
+void clustering::findClusters()
 {
     for (size_t i=0; i<hits->GetEntries(); i++)
     {
@@ -83,7 +86,7 @@ void showerShape::findClusters()
     }
 }
 
-void showerShape::init()
+void clustering::init()
 {
     if (minClusterCenterE < minClusterHitE)
     {
@@ -97,28 +100,23 @@ void showerShape::init()
     }
 }
 
-void showerShape::process()
+void clustering::process()
 {
     // input
-    TFile *fin = new TFile(inFileName.c_str(), "update");
-    TTree *tin = (TTree*) fin->Get("hit");
-    tin->SetBranchAddress("CALIHits", &hits);
-
-    const char* toutName = "cluster";
-    if (fin->Get(toutName))
-	fin->Delete(toutName);
-    TTree *tout = new TTree(toutName, "reconstructed clusters");
+    TFile *fio = new TFile(inFileName.c_str(), "update");
+    TTree *tio = (TTree*) fio->Get("events");
+    tio->SetBranchAddress("CALIHits", &hits);
 
     TClonesArray *clus = new TClonesArray("caliCluster");
-    tout->Branch("CALIClusters", &clus);
+    tio->Branch("CALIClusters", &clus);
 
-    const size_t N = tin->GetEntries();
+    const size_t N = tio->GetEntries();
     for (size_t ei=0; ei<N; ei++)
     {
 	if (ei % 10000 == 0)
 	    cout << INFO << "reading event " << ei << endl;
 	hits->Clear();
-	tin->GetEntry(ei);
+	tio->GetEntry(ei);
 	visits.resize(hits->GetEntries(), false);
 
 	groups.clear();
@@ -142,11 +140,11 @@ void showerShape::process()
 	    new((*clus)[nc]) caliCluster(group.size(), energy);
 	    nc++;
 	}
-	tout->Fill();
+	tio->Fill();
     }
 
-    fin->Write();
-    fin->Close();
+    fio->Write();
+    fio->Close();
 }
 
 #endif

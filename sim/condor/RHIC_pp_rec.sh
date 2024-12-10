@@ -7,6 +7,8 @@ WORKDIR=`pwd`
 usage(){
     echo "${me} 
     --help		    show this help message
+    --numberOfEvents N
+    --compactFile f
     --rootDir		    dir. contains root files
     --outputDir dir 
     "
@@ -15,6 +17,8 @@ usage(){
 # Input simulation parameters
 OPTIONS=$(getopt --options h --longoptions  \
 help,\
+numberOfEvents:,\
+compactFile:,\
 rootDir:,\
 outputDir: \
 --name "${me}" \
@@ -23,12 +27,16 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 eval set -- "$OPTIONS"
 
+numberOfEvents=1000
+compactFile=${ROOTDIR}/prototype.xml
 rootDir=`pwd`
 outputDir=`pwd`
 
 while true; do
     case "$1" in
 	-h | --help)	    usage;	exit 0 ;;
+	--numberOfEvents)   numberOfEvents=$2; shift 2;;
+	--compactFile)	    compactFile=$(realpath "$2"); shift 2;;
 	--rootDir)	    rootDir=$(realpath "$2");	shift 2 ;;
 	--outputDir)	    outputDir=$(realpath "$2");   shift 2 ;;
 	--) shift; break ;;
@@ -36,18 +44,21 @@ while true; do
     esac
 done
 
-echo -e "INFO\trunning analysis over root files in ${rootDir}"
-
 i=1
-ls $rootDir/reco_*.edm4hep.root | while read file; do
+ls $rootDir/sim_*.edm4hep.root | while read simFile; do
     CONDOR_JOB=condor_${i}.job
-    output=${file%.edm4hep.root}_hist.root
+    recFile=${simFile/sim_/rec_}
     [ -f $CONDOR_JOB ] && rm $CONDOR_JOB
     cat << END >> ${CONDOR_JOB}
 Universe        = vanilla
 Notification    = Never
 Executable      = ${CONDOR}/run_eic.csh
-Arguments       = root -l -q '${ROOTDIR}/macros/read_rec.C(\"${file}\", \"${output}\")'
+Arguments       = source ${ROOTDIR}/setup.sh && eicrecon -Pplugins=CALI \
+	-Pjana:nevents=${numberOfEvents} \
+	-Pdd4hep:xml_files=${compactFile} \
+	-Ppodio:output_file=${recFile} \
+	-Ppodio:output_include_collections=CALIHits,CALIRawHits,CALIRecHits,CALIImagingTopoClusters,CALIImagingClusters \
+	${simFile}
 Requirements    = (CPU_Speed >= 2)
 Rank		= CPU_Speed
 request_memory  = 2GB

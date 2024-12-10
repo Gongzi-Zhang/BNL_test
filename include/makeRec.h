@@ -1,5 +1,6 @@
-#ifndef _MAKERECTREE_
-#define _MAKERECTREE_
+// extract caliHit from calibrated root files for clustering
+#ifndef __MAKEREC__
+#define __MAKEREC__
 
 #include "TFile.h"
 #include "TTree.h"
@@ -7,16 +8,15 @@
 #include "TLeaf.h"
 #include "TClonesArray.h"
 
-#include "calo.h"
 #include "cali.h"
 #include "caliType.h"
 
 using namespace std;
 
-class makeRecTree {
+class makeRec {
   public:
-    makeRecTree() {}
-    ~makeRecTree() {}
+    makeRec() {}
+    ~makeRec() {}
     void setInFile(string fin) { inFile = fin; }
     void setOutFile(string fout) { outFile = fout; }
     void init();
@@ -26,11 +26,11 @@ class makeRecTree {
     string inFile;
     string outFile;
 
-    cali::sipmXY pos[cali::channelMax];
-    int layerNumber[cali::channelMax];
+    vector<cali::sipmXY> pos;
+    vector<int> layerNumber;
 };
 
-void makeRecTree::init()
+void makeRec::init()
 {
     if (outFile.empty())
     {
@@ -42,12 +42,12 @@ void makeRecTree::init()
     // channel map
     for (int ch=0; ch<cali::nChannels; ch++)
     {
-	layerNumber[ch] = cali::getSipm(ch).layer;
-	pos[ch] = cali::getSipmXY(ch);
+	layerNumber.push_back(cali::getSipm(ch).layer);
+	pos.push_back(cali::getSipmXY(ch));
     }
 }
 
-void makeRecTree::make()
+void makeRec::make()
 {
     // input
     TFile *fin = new TFile(inFile.c_str(), "read");
@@ -69,7 +69,7 @@ void makeRecTree::make()
 
     // output
     TFile *fout = new TFile(outFile.c_str(), "recreate");
-    TTree *tout = new TTree("hit", "CALIHits in MIPs");
+    TTree *tout = new TTree("events", "CALIHits in MIPs");
     TClonesArray*  hits = new TClonesArray("caliHit");
     tout->Branch("CALIHits", &hits);
 
@@ -85,7 +85,7 @@ void makeRecTree::make()
 	    e = chMIP[ch];
 	    if (e > 0)
 	    {
-		new((*hits)[nh]) caliHit(pos[ch].x, pos[ch].y, (float)layerNumber[ch], e);
+		new((*hits)[nh]) caliHit(pos[ch].x, pos[ch].y, layerNumber[ch], e);
 		nh++;
 	    }
 	}
@@ -97,6 +97,5 @@ void makeRecTree::make()
     tout->Write();
     fout->Close();
 }
-
 
 #endif

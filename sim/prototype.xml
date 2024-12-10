@@ -119,7 +119,7 @@
       <position x="0" y="0" z="EPD_z"/>
       <rotation x="0" y="0" z="0"/>
       <dimensions x="2*EPD_rmax" y="2*EPD_rmax" z="EPD_t"/>
-      <Tube name="EPD" material="Polystyrene" rmin="EPD_rmin" rmax="EPD_rmax" thickness="EPD_t" vis="AnlOrange"/>
+      <Tube name="EPD" material="Polystyrene" rmin="EPD_rmin" rmax="EPD_rmax" thickness="EPD_t" vis="AnlOrange" sensitive="false"/>
     </detector>
 
     <detector id="2" name="CALI" type="Polyhedra_ZDC_Sampling" readout="CALIHits" vis="GreenVis">

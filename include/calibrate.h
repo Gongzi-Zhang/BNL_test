@@ -1,5 +1,5 @@
-#ifndef _CALIBRATE_
-#define _CALIBRATE_
+#ifndef __CALIBRATE__
+#define __CALIBRATE__
 /* calibrate a run:
  * 1. ped subtraction
  * 2. MIP conversion
