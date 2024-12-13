@@ -3,29 +3,30 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TTreeReader.h"
-#include "TClonesArray"
+#include "TClonesArray.h"
 
 #include "calisim.h"
 #include "caliType.h"
 
-void make_rec_tree(const char *fname = "output.edm4hep.root", 
-	  const char*out_name = "output.root")
+void make_rec_tree(const char *fname = "rec.edm4hep.root", 
+	  const char*out_name = "output.rec.root")
 {
-    const char * prefix = "sim";
-
     TFile *fin = new TFile(fname, "read");
     TTree *tin = (TTree*) fin->Get("events");
     TTreeReader tr(tin);
 
-    TTreeReaderArray<unsigned long> hit_cellID(tr, "CALIHits.cellID");
-    TTreeReaderArray<float> hit_energy(tr, "CALIHits.energy");
-    TTreeReaderArray<float> hit_x(tr, "CALIHits.x");
-    TTreeReaderArray<float> hit_y(tr, "CALIHits.y");
-    TTreeReaderArray<float> hit_z(tr, "CALIHits.z");
+    const char* branch = "CALIRecHits";
+    TTreeReaderArray<unsigned long> hit_cellID(tr, Form("%s.cellID", branch));
+    TTreeReaderArray<float> hit_energy(tr, Form("%s.energy", branch));
 
     TFile *fout = new TFile(out_name, "recreate");
-    TTree *tout = new TTree("hits", "reconstructed CALIHits");
+    TTree *tout = new TTree("events", "CALIHits for clustering");
+    float T1, T2, T3, T4;
     TClonesArray*  hits = new TClonesArray("caliHit");
+    tout->Branch("T1", &T1);
+    tout->Branch("T2", &T2);
+    tout->Branch("T3", &T3);
+    tout->Branch("T4", &T4);
     tout->Branch("CALIHits", &hits);
 
     cali::sipmXY pos[cali::nChannels];
@@ -33,7 +34,7 @@ void make_rec_tree(const char *fname = "output.edm4hep.root",
     for (size_t ch=0; ch<cali::nChannels; ch++)
     {
 	layerNumber[ch] = cali::getSipm(ch).layer;
-        pos[ch] = cali::getSipmXY(ch)
+        pos[ch] = cali::getSipmXY(ch);
     }
 
     const int ne = tin->GetEntries();
@@ -43,19 +44,24 @@ void make_rec_tree(const char *fname = "output.edm4hep.root",
     {
 	tr.Next();
 
+        T1 = T2 = T3 = T4 = 0;
 	size_t nh = 0;
 	for (int hi=0; hi<hit_cellID.GetSize(); hi++)
 	{
 	    ch = calisim::getChId(hit_cellID[hi]);
-	    if (ch < 0 
+	    if (ch == -1024 
 	    || (128 <= ch && ch <= 135)   // channel 128 - 135                
             || 5 == ch || 27 == ch || 32 == ch || 50 == ch)
 		continue;
 
 	    e = hit_energy[hi];
-	    if (e > 0)
+	    if	    (ch == -1)	T1 = e;
+	    else if (ch == -2)  T2 = e;
+	    else if (ch == -9)  T3 = e;
+	    else if (ch == -10) T4 = e;
+	    else
 	    {
-		new((*hits)[nh]) caliHit(x, y, layerNumber[ch], e);
+		new((*hits)[nh]) caliHit(pos[ch].x, pos[ch].y, layerNumber[ch], e);
                 nh++;
 	    }
 	}

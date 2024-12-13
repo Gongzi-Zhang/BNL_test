@@ -21,7 +21,7 @@ void printSipmPos(const char* fname)
 	t->SetTextAlign(22);
 	t->Draw();
 
-	for (int b=0; b<nLayerBoards; b++)
+	for (int b=0; b<cali::nLayerBoards; b++)
 	{
 	    TLatex *t1 = new TLatex(quaPos[b].first, quaPos[b].second, Form("%d", cali::boardLabel[l][b]));
 	    t1->SetTextColor(kRed);
@@ -36,16 +36,19 @@ void printSipmPos(const char* fname)
     TTreeReaderArray<unsigned long> hit_cellID(tr, "CALIHits.cellID");
     TTreeReaderArray<float> hit_x(tr, "CALIHits.position.x");
     TTreeReaderArray<float> hit_y(tr, "CALIHits.position.y");
+    TTreeReaderArray<float> hit_z(tr, "CALIHits.position.z");
 
     bool visits[cali::nChannels];
     for (size_t ch=0; ch<cali::nChannels; ch++)
 	visits[ch] = false;
 
     const int ne = tin->GetEntries();
+    // const int ne = 10;
     int ch = 0;
+    float x, y;
+    int z;
     for (int ei = 0; ei<ne; ei++)
     {
-	cout << DEBUG << ei << endl;
 	tr.Next();
 
 	for (int hi=0; hi<hit_cellID.GetSize(); hi++)
@@ -56,9 +59,10 @@ void printSipmPos(const char* fname)
 
 	    x = hit_x[hi] - cali::x0;
 	    y = hit_y[hi] - cali::y0;
-	    z = round((hit_z[hi] - cali::z0) / cali::lt);  // round to closet integer
+	    z = round((hit_z[hi] - cali::z0) / cali::lt) - 1;  // round to closet integer
             c[z]->cd();
-	    TLatex *text = new TLatex(-pos.x/cm, pos.y/cm, Form("%d", ch));
+	    TLatex *text = new TLatex(-x/cm, y/cm, Form("%d", ch));
+	    text->Draw();
             c[z]->Update();
 
 	    visits[ch] = true;

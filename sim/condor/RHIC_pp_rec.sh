@@ -10,7 +10,6 @@ usage(){
     --numberOfEvents N
     --compactFile f
     --rootDir		    dir. contains root files
-    --outputDir dir 
     "
 }
 
@@ -19,8 +18,7 @@ OPTIONS=$(getopt --options h --longoptions  \
 help,\
 numberOfEvents:,\
 compactFile:,\
-rootDir:,\
-outputDir: \
+rootDir: \
 --name "${me}" \
 -- "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
@@ -30,7 +28,6 @@ eval set -- "$OPTIONS"
 numberOfEvents=1000
 compactFile=${ROOTDIR}/prototype.xml
 rootDir=`pwd`
-outputDir=`pwd`
 
 while true; do
     case "$1" in
@@ -38,7 +35,6 @@ while true; do
 	--numberOfEvents)   numberOfEvents=$2; shift 2;;
 	--compactFile)	    compactFile=$(realpath "$2"); shift 2;;
 	--rootDir)	    rootDir=$(realpath "$2");	shift 2 ;;
-	--outputDir)	    outputDir=$(realpath "$2");   shift 2 ;;
 	--) shift; break ;;
 	*) break ;;
     esac
@@ -57,7 +53,7 @@ Arguments       = source ${ROOTDIR}/setup.sh && eicrecon -Pplugins=CALI \
 	-Pjana:nevents=${numberOfEvents} \
 	-Pdd4hep:xml_files=${compactFile} \
 	-Ppodio:output_file=${recFile} \
-	-Ppodio:output_include_collections=CALIHits,CALIRawHits,CALIRecHits,CALIImagingTopoClusters,CALIImagingClusters \
+	-Ppodio:output_collections=CALIHits,CALIRecHits,CALIImagingTopoClusters,CALIImagingClusters \
 	${simFile}
 Requirements    = (CPU_Speed >= 2)
 Rank		= CPU_Speed

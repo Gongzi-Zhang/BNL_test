@@ -1,8 +1,9 @@
+// check position of simulated hits; making sure they align with real prototype
 #include "cali.h"
 #include "calisim.h"
 
-void check_pos(const char *fname = "output.edm4hep.root", 
-	  const char*out_name = "output.root")
+void check_sim(const char *fname = "sim.edm4hep.root", 
+	  const char*out_name = "check_sim.root")
 {
     float MIP = 0.495*MeV;
     const char * prefix = "sim";
@@ -44,12 +45,12 @@ void check_pos(const char *fname = "output.edm4hep.root",
 		continue;
 
 	    x = hit_x[hi];
-	    y = hit_x[hi];
+	    y = hit_y[hi];
 	    z = hit_z[hi];
 	    h1["hit_x_diff"]->Fill(pos[ch].x + cali::x0 - x);
 	    h1["hit_y_diff"]->Fill(pos[ch].y + cali::y0 - y);
 
-	    if (round((z - cali::z0)/cali::lt) != layerNumber[ch])
+	    if (round((z - cali::z0)/cali::lt) - 1 != layerNumber[ch])
 		cout << ERROR << "Wrong channel decoding:\t" 
 		     << "cellID - " << hit_cellID[hi] << "\t"
 		     << "ch - " << ch << "\t" 
@@ -60,5 +61,7 @@ void check_pos(const char *fname = "output.edm4hep.root",
 
     fin->Close();
     fout->cd();
+    h1["hit_x_diff"]->Write();
+    h1["hit_y_diff"]->Write();
     fout->Close();
 }

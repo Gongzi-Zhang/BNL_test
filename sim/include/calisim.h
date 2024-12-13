@@ -9,15 +9,15 @@ namespace calisim
     int getChId(const int cellID)
     {   // 0-191
 	// for 20241002
-	int orderedRightHex[]    = {3, 2, 0, 1, 5, 6, 4};
-	int orderedLeftHex[]     = {3, 1, 0, 2, 4, 6, 5};
-	int disorderedRightHex[] = {3, 4, 6, 5, 2, 0, 1};
-	int disorderedLeftHex[]  = {3, 2, 0, 1, 4, 6, 5};
-	int orderedRightSqa[]    = {0, 1, 3, 2};
-	int orderedLeftSqa[]     = {0, 1, 3, 2};	// 41
-	int disorderedRightSqa1[]= {3, 2, 0, 1};	// 30, 44, 47, 31
-	int disorderedRightSqa2[]= {2, 3, 1, 0};	// 50
-	int disorderedLeftSqa[]  = {1, 0, 2, 3};
+	int orderedRightHex[]    = {3, 1, 0, 2, 4, 6, 5};
+	int orderedLeftHex[]	 = {3, 2, 0, 1, 5, 6, 4};   
+	int disorderedRightHex[] = {3, 5, 6, 4, 1, 0, 2};   
+	int disorderedLeftHex[]	 = {3, 1, 0, 2, 5, 6, 4};   
+	int orderedRightSqa[]    = {1, 0, 2, 3};
+	int orderedLeftSqa[]	 = {1, 0, 2, 3};	// 41
+	int disorderedRightSqa1[]= {2, 3, 1, 0};	// 30, 44, 47, 31
+	int disorderedRightSqa2[]= {3, 2, 0, 1};	// 50
+	int disorderedLeftSqa[]	 = {0, 1, 3, 2};
 
 	int system =  cellID & 0x000000FF;		// start from 1
 	int layer  = (cellID & 0x0000FF00) >> 8;	// start from 1
