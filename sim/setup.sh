@@ -5,6 +5,10 @@ fi
 export CALISIMROOT=$(realpath -- $(dirname -- ${BASH_SOURCE[0]}))
 export EICrecon_MY=${CALISIMROOT}
 
+if [ -z "${CALIROOT+x}" ]; then
+    source  ${CALISIMROOT}/../setup.sh
+fi
+
 function add_c_include_path {
     for path in $@; do
 	if [ -z "$CPLUS_INCLUDE_PATH" ]; then

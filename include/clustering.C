@@ -7,16 +7,15 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    if (argc != 3)
+    if (argc != 2)
     {
-	cerr << FATAL << "2 parameters expected" << endl;
-	cerr << INFO << argv[0] << " input output" << endl;
+	cerr << FATAL << "1 parameter expected" << endl;
+	cerr << INFO << argv[0] << " input" << endl;
 	exit(4);
     }
 
     clustering *cs = new clustering();
     cs->setInput(argv[1]);
-    cs->setOutput(argv[2]);
     cs->setNeighborX(5*cm);
     cs->setNeighborY(5*cm);
     cs->setNeighborZ(1.3);

@@ -1,21 +1,28 @@
+// check various distributions for data
 #include "cali.h"
+#include "caliType.h"
 
+void check(const char* , const char*);
+
+void check(const int run)
+{
+    string rootFile = cali::getFile(Form("Run%d.rec.root", run));
+    check(rootFile.c_str(), Form("./Run%d.root", run));
+}
 void check(const char *fname = "input.rec.root", 
 	  const char*out = "check.root")
 {
     float hit_energy_cut = 0.5;
+    string unit = "MIP";
 
     TFile *fin = new TFile(fname, "read");
     TTree *tin = (TTree*) fin->Get("events");
 
     TTreeReader tr(tin);
-    TTreeReaderValue<float> T1(tr, "T1");
-    TTreeReaderValue<float> T2(tr, "T2");
-    TTreeReaderValue<float> T3(tr, "T3");
-    TTreeReaderArray<float> hit_e(tr, "CALIHits.e");
     TTreeReaderArray<float> hit_x(tr, "CALIHits.x");
     TTreeReaderArray<float> hit_y(tr, "CALIHits.y");
     TTreeReaderArray<int>   hit_z(tr, "CALIHits.z");
+    TTreeReaderArray<float> hit_e(tr, "CALIHits.e");
 
     const double minEventEnergy = 0;
     const double maxEventEnergy = 1000;
@@ -26,14 +33,6 @@ void check(const char *fname = "input.rec.root",
     fout = new TFile(out, "recreate");
     fout->cd();
 
-    // channel MIP
-    h1["T1"] = new TH1F("T1", "T1;MIP", 100, 0, 10);
-    h1["T2"] = new TH1F("T2", "T2;MIP", 100, 0, 10);
-    h1["T3"] = new TH1F("T3", "T3;MIP", 100, 0, 10);
-    // h1["T4"] = new TH1F("T4", "T4;MIP", 100, 0, 10);
-    // for (size_t ch=0; ch<cali::nChannels; ch++)
-    //     h1[Form("ch_%zu", ch)] = new TH1F(Form("ch_%zu", ch), Form("ch_%zu;MIP", ch), 100, 0, 10);
-    
     // layer energy
     h2["layer_energy"] = new TH2F("layer_energy", "Layer Energy;Layer;Energy (NIP);", 11, 0, 11, 100, 0, 20);
     for (size_t l=0; l<cali::nLayers; l++)
@@ -59,29 +58,18 @@ void check(const char *fname = "input.rec.root",
     h2["event_MIP_vs_eta"] = new TH2F("event_MIP_vs_eta", "event MIP vs #eta", 100, 2.5, 3.5, 100, minEventEnergy, maxEventEnergy);
     h2["x_vs_y"] = new TH2F("x_vs_y", "X vs Y;cm;cm", 100, -10, 10, 100, -10, 10);
 
+    int ch;
     double e, event_e;
     double event_x, event_y, event_z;
     double layer_e[cali::nLayers];
     double x, y, theta, eta;
     int z;
     int hit_mul, hit_mul1, hit_mul2, hit_mul3, hit_mul4;
-    string eRange;
 
-    // const int ne = tin->GetEntries();
-    const int ne = 100000;
+    const int ne = tin->GetEntries();
     for (int ei = 0; ei<ne; ei++)
     {
 	tr.Next();
-	// if (T1 > 0)
-	//     h1["T1"]->Fill(T1);
-	// if (T2 > 0)
-	//     h1["T2"]->Fill(T2);
-	// if (T3 > 0)
-	//     h1["T3"]->Fill(T3);
-	// if (T4 > 0)
-	//     h1["T4"]->Fill(T4);
-	if ((*T3) < 3)
-	    continue;
 
 	hit_mul = hit_e.GetSize();
 	hit_mul1 = hit_mul2 = hit_mul3 = hit_mul4 = 0;
@@ -96,6 +84,8 @@ void check(const char *fname = "input.rec.root",
 	    x = hit_x[hi];
 	    y = hit_y[hi];
 	    z = hit_z[hi];
+	    // if (e < hit_energy_cut)
+	    //     continue;
 
 	    event_e += e;
 	    event_x += x*e;

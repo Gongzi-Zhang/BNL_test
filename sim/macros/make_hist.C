@@ -1,5 +1,6 @@
 #include "calo.h"
 #include "cali.h"
+#include "caliType.h"
 
 void make_hist(const char *fname = "output.hit.root", 
 	  const char*out_prefix = "output")
@@ -7,52 +8,36 @@ void make_hist(const char *fname = "output.hit.root",
     float hit_energy_cut = 0.5;
     string unit = "MIP";
 
-    float T1, T2, T3, T4;
-    struct hit_t {                                                              
-	int mul;                                                                
-	int ch[192];                                                            
-	float e[192];                                                           
-    };                                                                          
-    hit_t hits;    
-
-    cali::sipmXY pos[cali::channelMax];                                         
-    int layerNumber[cali::channelMax];                                          
-    for (int ch=0; ch<cali::nChannels; ch++)                                    
-    {                                                                           
-	layerNumber[ch] = cali::getSipm(ch).layer;                              
-	pos[ch] = cali::getSipmXY(ch);                                          
-    }               
-
     TFile *fin = new TFile(fname, "read");
     TTree *tin = (TTree*) fin->Get("events");
 
-    tin->SetBranchAddress("T1", &T1);
-    tin->SetBranchAddress("T2", &T2);
-    tin->SetBranchAddress("T3", &T3);
-    tin->SetBranchAddress("T4", &T4);
-    tin->SetBranchAddress("Hits", &hits);
-    // TTreeReader tr(tin);
-    // TTreeReaderValue<float> T1(tr, "T1");
-    // TTreeReaderValue<float> T3(tr, "T3");
-    // TTreeReaderValue<int> hit_mul(tr, "hit.mul");
-    // TTreeReaderArray<float> hit_energy(tr, "hit.e");
+    TTreeReader tr(tin);
+    TTreeReaderValue<float> T1(tr, "T1");
+    TTreeReaderValue<float> T2(tr, "T2");
+    TTreeReaderValue<float> T3(tr, "T3");
+    TTreeReaderArray<float> hit_e(tr, "CALIHits.e");
+    TTreeReaderArray<float> hit_x(tr, "CALIHits.x");
+    TTreeReaderArray<float> hit_y(tr, "CALIHits.y");
+    TTreeReaderArray<int>   hit_z(tr, "CALIHits.z");
+    TTreeReaderArray<float> clu_e(tr, "CALIClusters.e");
+    TTreeReaderArray<size_t> clu_nhits(tr, "CALIClusters.nhits");
 
     string eRanges[] = {"100MIP", "100-150MIP", "150MIP", "150-300MIP", "300-600MIP", "600MIP"};
-    map<string, const double> minEventEnergy = {                                
-	{"100MIP",	50},                                                   
-	{"100-150MIP",	50},                                                   
-	{"150MIP",	100},                                                   
-	{"150-300MIP",  100},                                                   
-	{"300-600MIP",  250},                                                   
-	{"600MIP",	550},                                                   
-    };                                                                          
-    map<string, const double> maxEventEnergy = {                                
-	{"100MIP",	1000},                                                   
-	{"100-150MIP",	200},                                                   
-	{"150MIP",	1000},                                                   
-	{"150-300MIP",  350},                                                   
-	{"300-600MIP",  650},                                                   
-	{"600MIP",	1000},                                                   
+    map<string, const double> minEventEnergy = {
+	{"100MIP",	50},
+	{"100-150MIP",	50},
+	{"150MIP",	100},
+	{"150-300MIP",  100},
+	{"300-600MIP",  250},
+	{"600MIP",	550},
+    };
+    map<string, const double> maxEventEnergy = {
+	{"100MIP",	1000},
+	{"100-150MIP",	200}, 
+	{"150MIP",	1000},
+	{"150-300MIP",  350}, 
+	{"300-600MIP",  650}, 
+	{"600MIP",	1000},
     };                                 
     map<string, TFile*> fout;
     map<string, map<string, TH1F*>> h1;
@@ -73,13 +58,15 @@ void make_hist(const char *fname = "output.hit.root",
 	h1[eRange]["event_x"] = new TH1F("event_x", "COG X;cm", 100, -10, 10);
 	h1[eRange]["event_y"] = new TH1F("event_y", "COG Y;cm", 100, -10, 10);
 	h1[eRange]["event_z"] = new TH1F("event_z", "COG Z;layer", 100, 0, cali::nLayers);
+	h1[eRange]["clu_mul"] = new TH1F("clu_mul", "Cluster Multiplicity", 10, 0, 10);
+	h1[eRange]["clu_MIP"] = new TH1F("clu_MIP", "Cluster Energy;MIP", 100, 0, 200);
+	h1[eRange]["clu_nhits"] = new TH1F("clu_nhits", "Cluster Number of Hits", 20, 0, 20);
 
 	h2[eRange]["event_MIP_vs_hit_mul"] = new TH2F("event_MIP_vs_hit_mul", "event MIP vs hit mul", 100, 0, 100, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
 	h2[eRange]["event_MIP_vs_eta"] = new TH2F("event_MIP_vs_eta", "event MIP vs #eta", 100, 2.5, 3.5, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
 	h2[eRange]["x_vs_y"] = new TH2F("x_vs_y", "X vs Y;cm;cm", 100, -10, 10, 100, -10, 10);
     }
 
-    int ch;
     double e, event_e;
     double event_x, event_y, event_z;
     double x, y, z, theta, eta;
@@ -89,26 +76,21 @@ void make_hist(const char *fname = "output.hit.root",
     const int ne = tin->GetEntries();
     for (int ei = 0; ei<ne; ei++)
     {
-	tin->GetEntry(ei);
-	// tr.Next();
+	// tin->GetEntry(ei);
+	tr.Next();
+
 	hit_mul = hit_mul1 = hit_mul2 = hit_mul3 = hit_mul4 = 0;
 	event_e = 0;
 	event_x = event_y = event_z = 0;
 
 	// trigger
-	// if (T1 < 0.18 || T2 < 0.05 || T3 < 0.6)
-	if (T3 < 4)
+	if ((*T1) < 10)
 	    continue;
 
-	for (int hi=0; hi<hits.mul; hi++)
+	// Hits
+	for (int hi=0; hi<hit_e.GetSize(); hi++)
 	{
-	    ch = hits.ch[hi];
-	    if ( (128 <= ch && ch <= 135)   // channel 128 - 135
-	      || 5 == ch || 27 == ch || 32 == ch || 50 == ch
-	       )
-		continue;
-
-	    e = hits.e[hi];
+	    e = hit_e[hi];
 	    if (e < hit_energy_cut)
 		continue;
 	    hit_mul++;
@@ -122,7 +104,7 @@ void make_hist(const char *fname = "output.hit.root",
 
 	eRange_idx.push_back(0);
 	if (event_e < 150)  // 30 MIP ~ 1 GeV
-	eRange_idx.push_back(1);
+	    eRange_idx.push_back(1);
 	else 
 	{
 	    eRange_idx.push_back(2);
@@ -134,33 +116,26 @@ void make_hist(const char *fname = "output.hit.root",
 		eRange_idx.push_back(5);  // 20 GeV -
 	}
 
-	hit_mul = 0;
-	event_e = 0;
-	for (int hi=0; hi<hits.mul; hi++)
+	for (int hi=0; hi<hit_e.GetSize(); hi++)
 	{
-	    ch = hits.ch[hi];
-	    if ( (128 <= ch && ch <= 135)   // channel 128 - 135
-	      || 5 == ch || 27 == ch || 32 == ch || 50 == ch
-	       )
-		continue;
-
-	    e = hits.e[hi];
+	    e = hit_e[hi];
 	    if (e < hit_energy_cut)
 		continue;
 
-	    hit_mul++;
-	    event_e += e;
-	    event_x += pos[ch].x*e;
-	    event_y += pos[ch].y*e;
-	    event_z += layerNumber[ch]*e;
+	    x = hit_x[hi];
+	    y = hit_y[hi];
+	    z = hit_z[hi];
+	    event_x += x*e;
+	    event_y += y*e;
+	    event_z += z*e;
 
-	    if (e > 10)                                                          
-		hit_mul4++;                                                     
-	    else if (e > 5)                                                          
-		hit_mul3++;                                                     
-	    else if (e > 2)                                                     
-		hit_mul2++;                                                     
-	    else if (e > 0.5)                                                   
+	    if (e > 10)
+		hit_mul4++;
+	    else if (e > 5)
+		hit_mul3++;
+	    else if (e > 2)
+		hit_mul2++;
+	    else if (e > 0.5)
 		hit_mul1++;       
 
 	    for (const auto idx : eRange_idx)
@@ -169,11 +144,21 @@ void make_hist(const char *fname = "output.hit.root",
 	    }
 	}
 
+	// Clusters
+	for (int ci=0; ci<clu_e.GetSize(); ci++)
 	{
-	    x = event_x/event_e + cali::X;
-	    y = event_y/event_e + cali::Y;
-	    z = event_z/event_e*cali::layerZ + cali::Z;
-	    theta = atan(sqrt(x*x + y*y)/z);                                    
+	    for (const auto idx : eRange_idx)
+	    {
+		h1[eRanges[idx]]["clu_MIP"]->Fill(clu_e[ci]);
+		h1[eRanges[idx]]["clu_nhits"]->Fill(clu_nhits[ci]);
+	    }
+	}
+
+	{
+	    x = event_x/event_e + cali::x0;
+	    y = event_y/event_e + cali::y0;
+	    z = event_z/event_e*cali::lt + cali::z0;
+	    theta = atan(sqrt(x*x + y*y)/z);
 	    eta = -log(tan(theta/2));
 
 	    for (const auto idx : eRange_idx)
@@ -187,7 +172,8 @@ void make_hist(const char *fname = "output.hit.root",
 		h1[eRanges[idx]]["event_x"]->Fill(event_x/event_e/cm);
 		h1[eRanges[idx]]["event_y"]->Fill(event_y/event_e/cm);
 		h1[eRanges[idx]]["event_z"]->Fill(event_z/event_e);
-		h2[eRanges[idx]]["event_MIP_vs_hit_mul"]->Fill(hits.mul, event_e);
+		h1[eRanges[idx]]["clu_mul"]->Fill(clu_e.GetSize());
+		h2[eRanges[idx]]["event_MIP_vs_hit_mul"]->Fill(hit_mul, event_e);
 		h2[eRanges[idx]]["event_MIP_vs_eta"]->Fill(eta, event_e);
 		h2[eRanges[idx]]["x_vs_y"]->Fill(event_x/event_e/cm, event_y/event_e/cm);
 	    }
