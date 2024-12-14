@@ -16,7 +16,6 @@ using namespace std;
 class clustering {
   public:
     void setInput(string f)  { inFileName = f; }
-    void setOutput(string f) { outFileName = f; }
     void setNeighborX(double x) { neighbor_x = x; }
     void setNeighborY(double y) { neighbor_y = y; }
     void setNeighborZ(double z) { neighbor_z = z; }
@@ -104,19 +103,20 @@ void clustering::process()
 {
     // input
     TFile *fio = new TFile(inFileName.c_str(), "update");
-    TTree *tio = (TTree*) fio->Get("events");
-    tio->SetBranchAddress("CALIHits", &hits);
+    TTree *tin = (TTree*) fio->Get("events");
+    tin->SetBranchAddress("CALIHits", &hits);
 
+    TTree *tout = new TTree("clusters", "reconstructed clusters");
     TClonesArray *clus = new TClonesArray("caliCluster");
-    tio->Branch("CALIClusters", &clus);
+    tout->Branch("CALIClusters", &clus);
 
-    const size_t N = tio->GetEntries();
+    const size_t N = tin->GetEntries();
     for (size_t ei=0; ei<N; ei++)
     {
 	if (ei % 10000 == 0)
 	    cout << INFO << "reading event " << ei << endl;
 	hits->Clear();
-	tio->GetEntry(ei);
+	tin->GetEntry(ei);
 	visits.resize(hits->GetEntries(), false);
 
 	groups.clear();
@@ -140,9 +140,11 @@ void clustering::process()
 	    new((*clus)[nc]) caliCluster(group.size(), energy);
 	    nc++;
 	}
-	tio->Fill();
+	tout->Fill();
     }
 
+    fio->cd();
+    tout->Write();
     fio->Write();
     fio->Close();
 }
