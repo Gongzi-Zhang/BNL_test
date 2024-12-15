@@ -12,7 +12,7 @@
 #include "calibrate.h"
 #include "QA.h"
 #include "MIP.h"
-#include "makeRec.h"
+#include "makeMyrec.h"
 #include "clustering.h"
 
 using namespace std;
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 
 	string rootFile = cali::getRootFile(run);
 
-	makeRec *maker = new makeRec();
+	makeMyrec *maker = new makeMyrec();
 	maker->setInFile(rootFile);
 	maker->init();
 	maker->make();
@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
 	    exit(1);
 	}
 	char buf[1024];
-	sprintf(buf, "Run%d.rec.root", run);
+	sprintf(buf, "Run%d.myrec.root", run);
 	string recFile = cali::getFile(buf);
 
 	clustering *cs = new clustering();

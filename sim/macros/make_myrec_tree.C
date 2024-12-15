@@ -8,7 +8,7 @@
 #include "calisim.h"
 #include "caliType.h"
 
-void make_rec_tree(const char *fname = "rec.edm4hep.root", 
+void make_myrec_tree(const char *fname = "rec.edm4hep.root", 
 	  const char*out_name = "output.rec.root")
 {
     TFile *fin = new TFile(fname, "read");
@@ -45,6 +45,7 @@ void make_rec_tree(const char *fname = "rec.edm4hep.root",
 	tr.Next();
 
         T1 = T2 = T3 = T4 = 0;
+	hits->Clear();
 	size_t nh = 0;
 	for (int hi=0; hi<hit_cellID.GetSize(); hi++)
 	{

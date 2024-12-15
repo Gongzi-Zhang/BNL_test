@@ -7,8 +7,7 @@ WORKDIR=`pwd`
 usage(){
     echo "${me} 
     --help		    show this help message
-    --recDir		    dir. contains hepmc files
-    --outputDir dir 
+    --simDir		    dir. contains hepmc files
     --countStart c
     "
 }
@@ -16,8 +15,7 @@ usage(){
 # Input simulation parameters
 OPTIONS=$(getopt --options h --longoptions  \
 help,\
-recDir:,\
-outputDir:,\
+simDir:,\
 countStart: \
 --name "${me}" \
 -- "$@")
@@ -25,32 +23,29 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
 eval set -- "$OPTIONS"
 
-recDir=`pwd`
-outputDir=`pwd`
+simDir=`pwd`
 count=1
 
 while true; do
     case "$1" in
 	-h | --help)	    usage;	exit 0 ;;
-	--recDir)	    recDir=$(realpath "$2");	shift 2 ;;
-	--outputDir)	    outputDir=$(realpath "$2"); shift 2 ;;
+	--simDir)	    simDir=$(realpath "$2");	shift 2 ;;
 	--countStart)	    count=$2;			shift 2 ;;
 	--) shift; break ;;
 	*) break ;;
     esac
 done
 
-echo -e "INFO\trunning analysis over sim files in ${recDir}"
+echo -e "INFO\trunning analysis over sim files in ${simDir}"
 
-ls $recDir/reco_*.edm4hep.root | while read f; do
+ls $simDir/rec_*.edm4hep.root | while read f; do
     CONDOR_JOB=condor_${count}.job
-    output=${f/.edm4hep/_hist}
     [ -f $CONDOR_JOB ] && rm $CONDOR_JOB
     cat << END >> ${CONDOR_JOB}
 Universe        = vanilla
 Notification    = Never
 Executable      = ${CONDOR}/run_eic.csh
-Arguments       = root -l -q '${ROOTDIR}/calibrate_reco.C(\"${f}\", \"${output}\")'
+Arguments       = ${ROOTDIR}/run_myrec.sh $f
 Requirements    = (CPU_Speed >= 2)
 Rank		= CPU_Speed
 request_memory  = 2GB

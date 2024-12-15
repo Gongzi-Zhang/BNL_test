@@ -94,7 +94,7 @@ else
     fi
 fi
 simFile="${outputDir}/sim_${outputFileName}.edm4hep.root"
-recoFile="${outputDir}/reco_${outputFileName}.edm4hep.root"
+recFile="${outputDir}/rec_${outputFileName}.edm4hep.root"
 parameter+=" --outputFile ${simFile}"
 
 echo $LD_LIBRARY_PATH
@@ -110,25 +110,22 @@ else
 fi
 
 # Running reconstruction
-if [ -f $recoFile ]; then
-    echo -e "INFO:\treco file already exist, skip reconstruction: ${recoFile}"
+if [ -f $recFile ]; then
+    echo -e "INFO:\treco file already exist, skip reconstruction: ${recFile}"
 else
     # export EICrecon_MY=${ROOTDIR}/
     eicrecon -Pplugins=CALI \
 	-Pjana:nevents=$numberOfEvents \
 	-Pdd4hep:xml_files=${compactFile} \
-	-Ppodio:output_file=${recoFile} \
-	-Ppodio:output_include_collections=CALIHits,CALIRawHits,CALIRecHits,CALIMergedHits,CALIIslandProtoClusters,CALIImagingTopoClusters,CALIIslandClusters,CALIImagingClusters \
+	-Ppodio:output_file=${recFile} \
+	-Ppodio:output_collections=CALIHits,CALIRecHits,CALIImagingTopoClusters,CALIImagingClusters \
 	${simFile}
 fi
 
 # analysis
-# output=${recoFile%.edm4hep.root}.root
-# if [ -f $output ]; then
-#     echo -e "INFO:\toutput file already exist, skip analysis: $output"
-# else
-#     level=reco
-#     make_tree="${ROOTDIR}/analysis/sim/make_tree.py"
-#     CONFIG_FILE="${ROOTDIR}/analysis/sim/config.cfg"
-#     $make_tree -c $CONFIG_FILE -o ${output} -l $level ${recoFile}
-# fi
+myrecFile="${outputDir}/${outputFileName}.myrec.root"
+if [ -f "$myrecFile" ]; then
+    echo -e "INFO:\toutput file already exist, skip it: $myrecFile"
+else
+    root -l -q "${ROOTDIR}/macros/make_myrec_tree.C(\"$recFile\", \"$myrecFile\")"
+fi

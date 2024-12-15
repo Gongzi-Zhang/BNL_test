@@ -1,6 +1,6 @@
 // extract caliHit from calibrated root files for clustering
-#ifndef __MAKEREC__
-#define __MAKEREC__
+#ifndef __MAKEMYREC__
+#define __MAKEMYREC__
 
 #include "TFile.h"
 #include "TTree.h"
@@ -13,10 +13,10 @@
 
 using namespace std;
 
-class makeRec {
+class makeMyrec {
   public:
-    makeRec() {}
-    ~makeRec() {}
+    makeMyrec() {}
+    ~makeMyrec() {}
     void setInFile(string fin) { inFile = fin; }
     void setOutFile(string fout) { outFile = fout; }
     void init();
@@ -30,13 +30,13 @@ class makeRec {
     vector<int> layerNumber;
 };
 
-void makeRec::init()
+void makeMyrec::init()
 {
     if (outFile.empty())
     {
 	outFile = inFile;
 	size_t pos = outFile.find(".root");
-	outFile.replace(pos, 5, ".rec.root");
+	outFile.replace(pos, 5, ".myrec.root");
     }
 
     // channel map
@@ -47,7 +47,7 @@ void makeRec::init()
     }
 }
 
-void makeRec::make()
+void makeMyrec::make()
 {
     // input
     TFile *fin = new TFile(inFile.c_str(), "read");
