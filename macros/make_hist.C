@@ -10,6 +10,7 @@ void make_hist(const char *fname = "output.hit.root",
 
     TFile *fin = new TFile(fname, "read");
     TTree *tin = (TTree*) fin->Get("events");
+    tin->AddFriend("clusters");
 
     TTreeReader tr(tin);
     // TTreeReaderValue<float> T1(tr, "T1");

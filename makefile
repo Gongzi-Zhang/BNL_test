@@ -17,7 +17,7 @@ calibrate   := calibrate.h
 QA	    := QA.h
 MIP	    := MIP.h
 
-cali_include = calo.h cali.h caliType.h utilities.h db.h convert.h calibrate.h QA.h MIP.h makeRec.h clustering.h
+cali_include = calo.h cali.h caliType.h utilities.h db.h convert.h calibrate.h QA.h MIP.h makeMyrec.h clustering.h
 
 # dictionary
 Dict	:= caliTypeDict.cxx
@@ -65,6 +65,7 @@ makeEdm4eic: makeEdm4eic.C
 	mv $@ bin/
 
 # $(Dict): $(caliType) LinkDef.h
+# 	cd include
 # 	rootcling -f $@ -c $^
 
 makeRecTree: makeRecTree.C $(Dict)

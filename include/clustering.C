@@ -16,13 +16,13 @@ int main(int argc, char *argv[])
 
     clustering *cs = new clustering();
     cs->setInput(argv[1]);
-    cs->setNeighborX(5*cm);
+    cs->setNeighborX(6*cm);
     cs->setNeighborY(5*cm);
     cs->setNeighborZ(1.3);
     cs->setMinClusterNhits(3);
-    cs->setMinClusterCenterE(2);
+    cs->setMinClusterCenterE(5);
     cs->setMinClusterHitE(0.5);
-    cs->setMinClusterE(5);
+    cs->setMinClusterE(20);
     cs->init();
     cs->process();
     delete cs;

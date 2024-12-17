@@ -20,10 +20,11 @@ class caliCluster : public TObject
 {
   public:
     size_t nhits;
+    float x, y, z;
     float e;
 
-    caliCluster() : nhits(0), e(0) {}
-    caliCluster(size_t n, float _e) : nhits(n), e(_e) {}
+    caliCluster() : nhits(0), x(0), y(0), z(0), e(0) {}
+    caliCluster(size_t n, float _x, float _y, float _z, float _e) : nhits(n), x(_x), y(_y), z(_z), e(_e) {}
 
     ClassDef(caliCluster, 1)
 };

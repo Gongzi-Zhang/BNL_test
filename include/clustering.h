@@ -125,19 +125,28 @@ void clustering::process()
 	// form clusters
 	clus->Clear();
 	size_t nc = 0;
+	float energy = 0;
+	float clu_x, clu_y, clu_z;
+	float clu_e;
 	for (const auto &group : groups)
 	{
 	    if (group.size() < minClusterNhits)
 		continue;
-	    float energy = 0;
+
+	    clu_x = clu_y = clu_z = 0;
+	    clu_e = 0;
 	    for (size_t idx : group)
 	    {
-		energy += ((caliHit*)hits->At(idx))->e;
+		energy = ((caliHit*)hits->At(idx))->e;
+		clu_e += energy;
+		clu_x += energy*((caliHit*)hits->At(idx))->x;
+		clu_y += energy*((caliHit*)hits->At(idx))->y;
+		clu_z += energy*((caliHit*)hits->At(idx))->z;
 	    }
-	    if (energy < minClusterE)
+	    if (clu_e < minClusterE)
 		continue;
 
-	    new((*clus)[nc]) caliCluster(group.size(), energy);
+	    new((*clus)[nc]) caliCluster(group.size(), clu_x/clu_e, clu_y/clu_e, clu_z/clu_e, clu_e);
 	    nc++;
 	}
 	tout->Fill();
