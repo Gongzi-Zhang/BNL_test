@@ -6,7 +6,7 @@ void plot_sim()
 
     TCanvas *c = new TCanvas("c", "c", 800, 600);
 
-    const char* dir = "/gpfs02/eic/wbzhang/epic/BNL_test/sim/work/";
+    const char* dir = "/gpfs02/eic/wbzhang/epic/BNL_test/sim/freeze/roots/sim/";
     const char* files[] = {"HE_1GeV_gamma", "HE_1GeV_piminus", "HE_1GeV_proton", "HE_1GeV_neutron"};
     TFile *fins[4];
     for (int i=0; i<4; i++)

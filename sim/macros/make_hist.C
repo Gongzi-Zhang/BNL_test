@@ -2,7 +2,7 @@
 #include "cali.h"
 #include "caliType.h"
 
-void make_hist(const char *fname = "output.hit.root", 
+void make_hist(const char *fname = "output.myrec.root", 
 	  const char*out_prefix = "output")
 {
     float hit_energy_cut = 0.5;
@@ -10,6 +10,7 @@ void make_hist(const char *fname = "output.hit.root",
 
     TFile *fin = new TFile(fname, "read");
     TTree *tin = (TTree*) fin->Get("events");
+    tin->AddFriend("clusters");
 
     TTreeReader tr(tin);
     TTreeReaderValue<float> T1(tr, "T1");
@@ -20,6 +21,9 @@ void make_hist(const char *fname = "output.hit.root",
     TTreeReaderArray<float> hit_y(tr, "CALIHits.y");
     TTreeReaderArray<int>   hit_z(tr, "CALIHits.z");
     TTreeReaderArray<float> clu_e(tr, "CALIClusters.e");
+    TTreeReaderArray<float> clu_x(tr, "CALIClusters.x");
+    TTreeReaderArray<float> clu_y(tr, "CALIClusters.y");
+    TTreeReaderArray<float> clu_z(tr, "CALIClusters.z");
     TTreeReaderArray<size_t> clu_nhits(tr, "CALIClusters.nhits");
 
     string eRanges[] = {"100MIP", "100-150MIP", "150MIP", "150-300MIP", "300-600MIP", "600MIP"};
@@ -60,11 +64,19 @@ void make_hist(const char *fname = "output.hit.root",
 	h1[eRange]["event_z"] = new TH1F("event_z", "COG Z;layer", 100, 0, cali::nLayers);
 	h1[eRange]["clu_mul"] = new TH1F("clu_mul", "Cluster Multiplicity", 10, 0, 10);
 	h1[eRange]["clu_MIP"] = new TH1F("clu_MIP", "Cluster Energy;MIP", 100, 0, 200);
+	h1[eRange]["clu_x"] = new TH1F("clu_x", "Cluster X;cm", 100, -10, 10);
+	h1[eRange]["clu_y"] = new TH1F("clu_y", "Cluster Y;cm", 100, -10, 10);
+	h1[eRange]["clu_z"] = new TH1F("clu_z", "Cluster Z;cm", 100, 0, cali::nLayers);
 	h1[eRange]["clu_nhits"] = new TH1F("clu_nhits", "Cluster Number of Hits", 20, 0, 20);
 
 	h2[eRange]["event_MIP_vs_hit_mul"] = new TH2F("event_MIP_vs_hit_mul", "event MIP vs hit mul", 100, 0, 100, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
 	h2[eRange]["event_MIP_vs_eta"] = new TH2F("event_MIP_vs_eta", "event MIP vs #eta", 100, 2.5, 3.5, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
 	h2[eRange]["x_vs_y"] = new TH2F("x_vs_y", "X vs Y;cm;cm", 100, -10, 10, 100, -10, 10);
+	h2[eRange]["clu_x_vs_y"] = new TH2F("clu_x_vs_y", "Cluster X vs Y;cm;cm", 100, -10, 10, 100, -10, 10);
+	h2[eRange]["clu_x_vs_y_weighted"] = new TH2F("clu_x_vs_y_weighted", "Cluster X vs Y (weighted by cluster energy);cm;cm", 100, -10, 10, 100, -10, 10);
+	h2[eRange]["clu_e_vs_x"] = new TH2F("clu_e_vs_x", "Cluster Energy vs X;cm;cm", 100, -10, 10, 100, 0, 200);
+	h2[eRange]["clu_e_vs_y"] = new TH2F("clu_e_vs_y", "Cluster Energy vs Y;cm;cm", 100, -10, 10, 100, 0, 200);
+	h2[eRange]["clu_e_vs_z"] = new TH2F("clu_e_vs_z", "Cluster Energy vs Z;cm;cm", 100, 0, cali::nLayers, 100, 0, 200);
     }
 
     double e, event_e;
@@ -84,7 +96,7 @@ void make_hist(const char *fname = "output.hit.root",
 	event_x = event_y = event_z = 0;
 
 	// trigger
-	if ((*T1) < 10)
+	if ((*T3) < 3)
 	    continue;
 
 	// Hits
@@ -151,6 +163,14 @@ void make_hist(const char *fname = "output.hit.root",
 	    {
 		h1[eRanges[idx]]["clu_MIP"]->Fill(clu_e[ci]);
 		h1[eRanges[idx]]["clu_nhits"]->Fill(clu_nhits[ci]);
+		h1[eRanges[idx]]["clu_x"]->Fill(clu_x[ci]/cm);
+		h1[eRanges[idx]]["clu_y"]->Fill(clu_y[ci]/cm);
+		h1[eRanges[idx]]["clu_z"]->Fill(clu_z[ci]);
+		h2[eRanges[idx]]["clu_x_vs_y"]->Fill(clu_x[ci]/cm, clu_y[ci]/cm);
+		h2[eRanges[idx]]["clu_x_vs_y_weighted"]->Fill(clu_x[ci]/cm, clu_y[ci]/cm, clu_e[ci]);
+		h2[eRanges[idx]]["clu_e_vs_x"]->Fill(clu_e[ci], clu_x[ci]/cm);
+		h2[eRanges[idx]]["clu_e_vs_y"]->Fill(clu_e[ci], clu_y[ci]/cm);
+		h2[eRanges[idx]]["clu_e_vs_z"]->Fill(clu_e[ci], clu_z[ci]);
 	    }
 	}
 
