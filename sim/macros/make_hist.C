@@ -68,6 +68,7 @@ void make_hist(const char *fname = "output.myrec.root",
 	h1[eRange]["clu_y"] = new TH1F("clu_y", "Cluster Y;cm", 100, -10, 10);
 	h1[eRange]["clu_z"] = new TH1F("clu_z", "Cluster Z;cm", 100, 0, cali::nLayers);
 	h1[eRange]["clu_nhits"] = new TH1F("clu_nhits", "Cluster Number of Hits", 20, 0, 20);
+	h1[eRange]["pi0_mass"] = new TH1F("pi0_mass", "Invariant Mass of Top Two Clusters;MeV", 100, 0, 1000);
 
 	h2[eRange]["event_MIP_vs_hit_mul"] = new TH2F("event_MIP_vs_hit_mul", "event MIP vs hit mul", 100, 0, 100, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
 	h2[eRange]["event_MIP_vs_eta"] = new TH2F("event_MIP_vs_eta", "event MIP vs #eta", 100, 2.5, 3.5, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
@@ -168,9 +169,56 @@ void make_hist(const char *fname = "output.myrec.root",
 		h1[eRanges[idx]]["clu_z"]->Fill(clu_z[ci]);
 		h2[eRanges[idx]]["clu_x_vs_y"]->Fill(clu_x[ci]/cm, clu_y[ci]/cm);
 		h2[eRanges[idx]]["clu_x_vs_y_weighted"]->Fill(clu_x[ci]/cm, clu_y[ci]/cm, clu_e[ci]);
-		h2[eRanges[idx]]["clu_e_vs_x"]->Fill(clu_e[ci], clu_x[ci]/cm);
-		h2[eRanges[idx]]["clu_e_vs_y"]->Fill(clu_e[ci], clu_y[ci]/cm);
-		h2[eRanges[idx]]["clu_e_vs_z"]->Fill(clu_e[ci], clu_z[ci]);
+		h2[eRanges[idx]]["clu_e_vs_x"]->Fill(clu_x[ci]/cm, clu_e[ci]);
+		h2[eRanges[idx]]["clu_e_vs_y"]->Fill(clu_y[ci]/cm, clu_e[ci]);
+		h2[eRanges[idx]]["clu_e_vs_z"]->Fill(clu_z[ci], clu_e[ci]);
+	    }
+	}
+	// get pi0
+	if (clu_e.GetSize() >= 2)
+	{
+	    auto swap = [](size_t& idx1, size_t& idx2) {
+		size_t idx = idx2;
+		idx2 = idx1;
+		idx1 = idx;
+	    };
+
+	    size_t idx1 = 0;	// highest energy
+	    size_t idx2 = 1;	// second highest
+	    if (clu_e[idx1] < clu_e[idx2])
+	    {
+		swap(idx1, idx2);
+	    }
+	    for (size_t idx = 2; idx < clu_e.GetSize(); idx++)
+	    {
+                if (clu_e[idx] > clu_e[idx2])
+		{
+		    swap(idx, idx2);
+
+		    if (clu_e[idx2] > clu_e[idx1])
+			swap(idx1, idx2);
+		}
+	    }
+
+	    float e1 = clu_e[idx1], e2 = clu_e[idx2];
+	    float x1 = clu_x[idx1], x2 = clu_x[idx2];
+	    float y1 = clu_y[idx1], y2 = clu_y[idx2];
+	    float z1 = cali::z0 + cali::lt*clu_z[idx1];
+	    float z2 = cali::z0 + cali::lt*clu_z[idx2];
+	    float l1 = sqrt(x1*x1 + y1*y1 + z1*z1);
+	    float l2 = sqrt(x2*x2 + y2*y2 + z2*z2);
+	    float px1 = x1/l1*e1, px2 = x2/l2*e2;
+	    float py1 = y1/l1*e1, py2 = y2/l2*e2;
+	    float pz1 = z1/l1*e1, pz2 = z2/l2*e2;
+	    float e = e1 + e2;
+	    float px = px1 + px2;
+	    float py = py1 + py2;
+	    float pz = pz1 + pz2;
+	    float mass = sqrt(e*e - px*px - py*py - pz*pz);
+
+	    for (const auto idx : eRange_idx)
+	    {
+		h1[eRanges[idx]]["pi0_mass"]->Fill(mass/MeV);
 	    }
 	}
 

@@ -1,17 +1,15 @@
 #include "cali.h"
 
 const int nChannels = 192;
-const float mip_cut = 0.3;
+const float mip_cut = 0.5;
 const int colors[] = {1, 2, 3, 4, 6, 7, 8, 9};
 const int markers[] = {20, 21, 22, 23, 33, 34, 35};
-
-gROOT->SetBatch(1);
 
 void rate_scan()                                                           
 {                                                                               
     gROOT->SetBatch(1);
-    string inputs[] = {"macros/T1.txt", "macros/T3.txt"};                            
-    string legends[] = {"T1", "T3"};                                       
+    string inputs[] = {"macros/T1.txt", "macros/T2.txt", "macros/T3.txt"};                            
+    string legends[] = {"T1", "T2", "T3"};                                       
     const int n = sizeof(inputs)/sizeof(inputs[0]);
     TGraph* g[n];                                                               
     float volt, rate;                                                           
@@ -44,25 +42,26 @@ void rate_scan()
     l->Draw();                                                                  
     c->SetLogx();
     c->Update();
-    c->SaveAs("scan.png");                                                      
+    c->SaveAs("scan.pdf");                                                      
 }
 
 
 void energy_scan()
 {
+    gROOT->SetBatch(1);
     // int runs[] = {1856, 1857, 1858, 1859, 1860}; // T1
     // int runs[] = {1954, /* 1955, 1956, */ 1962, 1961, 1960, 1959, 1958}; // T1
     // int runs[] = {1866, 1867, 1868, 1869, 1870}; // T2
     // int runs[] = {1877, 1878, 1879, 1880, 1881}; // T3
     // int runs[] = {2053, 1963, 2055, 2056, 2058, 1968};	// T3
     // int runs[] = {2229, 2210, 2191, 2173, 2153};
-    // map<int, string> rootFile = {  
-    //     {2229, "T1_0.02_T3_0.02.root"}, // 2229-2234
-    //	   {2210, "T1_0.02_T3_0.03.root"}, // 2210-2226 
-    //     {2191, "T1_0.03_T3_0.03.root"}, // 2191-2207
-    //     {2173, "T1_0.03_T3_0.04.root"}, // 2173-2188 
-    //     {2153, "T1_0.03_T3_0.05.root"}, // 2153-2168
-    // };
+    map<int, string> rootFile = {  
+        {2229, "T1_0.02_T3_0.02.root"}, // 2229-2234
+        {2210, "T1_0.02_T3_0.03.root"}, // 2210-2226 
+        {2191, "T1_0.03_T3_0.03.root"}, // 2191-2207
+        {2173, "T1_0.03_T3_0.04.root"}, // 2173-2188 
+        {2153, "T1_0.03_T3_0.05.root"}, // 2153-2168
+    };
 
     // AuAu
     // int runs[] = {2526, 2520, 2535, 2558, 2559};
@@ -74,13 +73,13 @@ void energy_scan()
     //     {2559, "T3_0.15.root"},
     // };
 
-    int runs[] = {2579, 2563, 2577, 2570};
-    map<int, string> rootFile = {
-	{2579, "T1_0.07.root"},	
-	{2563, "T1_0.1.root"},	// 2563-2569
-	{2577, "T1_0.15.root"},
-	{2570, "T1_0.2.root"},	// 2570-2576
-    };
+    // int runs[] = {2579, 2563, 2577, 2570};
+    // map<int, string> rootFile = {
+    //     {2579, "T1_0.07.root"},	
+    //     {2563, "T1_0.1.root"},	// 2563-2569
+    //     {2577, "T1_0.15.root"},
+    //     {2570, "T1_0.2.root"},	// 2570-2576
+    // };
 
     map<int, string> legend = {
 	{1856, "T1 = 0.05 V"},
@@ -201,7 +200,7 @@ void energy_scan()
     }
     l->Draw();
     c->SetLogy(1);
-    c->SaveAs("threshold_scan.png");
+    c->SaveAs("threshold_scan.pdf");
 }
 
 void threshold_scan()

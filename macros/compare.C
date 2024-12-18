@@ -30,7 +30,7 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
     l->SetFillStyle(0);
     c->SetLogy(1);
     map<string, TH1F *> h;
-    for (const char* var : {"hit_MIP", "event_MIP", "hit_mul", "hit_mul1", "hit_mul2", "hit_mul3", "hit_mul4", "event_x", "event_y", "event_z", "clu_mul", "clu_MIP", "clu_nhits"})
+    for (const char* var : {"hit_MIP", "event_MIP", "hit_mul", "hit_mul1", "hit_mul2", "hit_mul3", "hit_mul4", "event_x", "event_y", "event_z", "clu_mul", "clu_MIP", "clu_x", "clu_y", "clu_z", "clu_nhits"})
     {
 	c->Clear();
 	l->Clear();
@@ -91,14 +91,23 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
     map<string, TH2F *> h2;
     TCanvas* c1 = new TCanvas("c1", "c1", 1200, 600);
     c1->Divide(2, 1);
-    const char* var = "event_MIP_vs_hit_mul";
+    map<string, string> title = {
+	{"event_MIP_vs_hit_mul", ";Hit Multiplicity;Event Energy [MIP]"},
+	{"clu_x_vs_y", "Cluster Position;X [cm];Y [cm]"},
+	{"clu_x_vs_y_weighted", "Energy Weighted Cluster Position;X [cm];Y [cm]"},
+	{"clu_e_vs_x", "Cluster Energy vs X;X [cm]; E [MIP]"},
+	{"clu_e_vs_y", "Cluster Energy vs Y;Y [cm]; E [MIP]"},
+	{"clu_e_vs_z", "Cluster Energy vs Z;Z [cm]; E [MIP]"},
+    };
+    for(const char* var : {"event_MIP_vs_hit_mul", "clu_x_vs_y", "clu_x_vs_y_weighted", 
+	    "clu_e_vs_x", "clu_e_vs_y", "clu_e_vs_z"}) 
     {
 	size_t i = 0;
 	for (const char* name : {name1, name2})
 	{
 	    h2[name] = (TH2F*) fin[name]->Get(var);
 	    h2[name]->SetName(name);
-	    h2[name]->SetTitle(Form("%s;Hit Multiplicity;Event Energy [MIP]", name));
+	    h2[name]->SetTitle(title[var].c_str());
 	    h2[name]->SetLineColor(colors[i]);
 	    i++;
 	}
