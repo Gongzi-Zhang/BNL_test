@@ -23,6 +23,7 @@ class caliDB {
     ~caliDB();
     bool createConnection();
     bool closeConnection();
+    vector<int> getRuns(const char* cond);
     string getRunValue(const int run, const char* field);
     string getRunType(const int run);
     string getRunFlag(const int run);
@@ -51,6 +52,34 @@ caliDB::caliDB()
 caliDB::~caliDB() 
 {
     sqlite3_close(db);
+}
+
+vector<int> caliDB::getRuns(const char* cond)
+{
+    vector<int> runs;
+
+    sqlite3_stmt* stmt;
+    char sql[1024];
+    sprintf(sql, "SELECT Run FROM %s WHERE %s", caliTableName, cond);
+    const char* errMsg = 0;
+    int rc = sqlite3_prepare_v2(db, sql, strlen(sql), &stmt, &errMsg);
+    if (rc == SQLITE_OK)
+    {
+	while (sqlite3_step(stmt) == SQLITE_ROW) 
+	{
+	    // Get the data from the current row
+	    int run = sqlite3_column_int(stmt, 0); // First column (index 0)
+	    runs.push_back(run);
+	}
+    }
+    else
+    {
+	const char* error = sqlite3_errmsg(db);
+	cerr << ERROR << error << endl;;
+    }
+
+    sqlite3_finalize(stmt);
+    return runs;
 }
 
 string caliDB::getRunValue(const int run, const char* field)

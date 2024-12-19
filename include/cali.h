@@ -338,7 +338,7 @@ namespace cali {
 	}
 
 	cerr << FATAL << "can't find file: " << fname << endl;
-	return NULL;
+	return "";
     }
 
     string getListFile(const int run)

@@ -2,6 +2,8 @@
 #include "db.h"
 #include "cali.h"
 
+#include "cali_style.C"
+
 int fill(TGraph* g, const int startRun, const int endRun, int shift = 0)
 {
     if (!g)
@@ -63,8 +65,8 @@ int fill(TGraph* g, const int startRun, const int endRun, int shift = 0)
 void statistics()
 {
     gROOT->SetBatch(1);
-    gStyle->SetPadTickX(1);
-    gStyle->SetPadTickY(1); 
+
+    cali_style();
 
     TDatime xminDate(2024, 4, 20, 0, 0, 0);
     // TDatime commission(2024, 4, 22, 0, 0, 0);
@@ -76,12 +78,16 @@ void statistics()
     const double ymin = 0;
     const double ymax = 1.5e8;
     TGraph *gPP = new TGraph();
-    gPP->SetTitle("Number of Good Event;Date;Count");
+    gPP->SetTitle(";Date;Count");
     gPP->SetMinimum(ymin);
     gPP->SetMaximum(ymax);
     gPP->GetXaxis()->SetTimeDisplay(1);
     gPP->GetXaxis()->SetTimeFormat("%m/%d");
     gPP->GetXaxis()->SetTimeOffset(0, "gmt");
+    gPP->GetXaxis()->SetLabelSize(0.04);
+    gPP->GetYaxis()->SetLabelSize(0.04);
+    gPP->GetXaxis()->SetTitleSize(0.04);
+    gPP->GetYaxis()->SetTitleSize(0.04);
     gPP->SetLineColor(kOrange);
     gPP->SetFillColor(kOrange);
 
@@ -93,16 +99,12 @@ void statistics()
     int AuAuEvents = fill(gAuAu, cali::run24AuAuStartRun, cali::run24AuAuEndRun);
 
     TLegend *lgd = new TLegend(0.6, 0.65, 0.8, 0.85);
-    lgd->SetLineColor(0); 
-    lgd->SetLineStyle(0);
-    lgd->SetFillStyle(0);
-    lgd->SetTextSize(0.03);
 
     int x = collision.Convert();
     TLine *l1 = new TLine(x, ymin, x, ymax);
     l1->SetLineWidth(2);
     l1->SetLineColor(kRed);
-    TText *t1 = new TText(x, ymax/2, "First Physical Collision");
+    TText *t1 = new TText(x, ymax/2, "First PP Collision");
     t1->SetTextSize(0.03);
     t1->SetTextColor(kRed);
     t1->SetTextAngle(90);

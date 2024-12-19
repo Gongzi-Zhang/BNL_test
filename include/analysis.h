@@ -79,6 +79,9 @@ bool getMIP(const int mipRun, mip_t &res)
 {
     char buf[32];
     sprintf(buf, "Run%d_MIP.json", mipRun);
+    string jsonFile = cali::getFile(buf);
+    if (jsonFile.empty())
+	return false;
     return getMIP(cali::getFile(buf).c_str(), res);
 }
 #endif

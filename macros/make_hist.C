@@ -60,11 +60,11 @@ void make_hist(const char *fname = "output.myrec.root",
 	h1[eRange]["event_y"] = new TH1F("event_y", "COG Y;cm", 100, -10, 10);
 	h1[eRange]["event_z"] = new TH1F("event_z", "COG Z;layer", 100, 0, cali::nLayers);
 	h1[eRange]["clu_mul"] = new TH1F("clu_mul", "Cluster Multiplicity", 10, 0, 10);
-	h1[eRange]["clu_MIP"] = new TH1F("clu_MIP", "Cluster Energy;MIP", 100, 0, 200);
+	h1[eRange]["clu_MIP"] = new TH1F("clu_MIP", "Cluster Energy;MIP", 100, 0, 500);
 	h1[eRange]["clu_x"] = new TH1F("clu_x", "Cluster X;cm", 100, -10, 10);
 	h1[eRange]["clu_y"] = new TH1F("clu_y", "Cluster Y;cm", 100, -10, 10);
 	h1[eRange]["clu_z"] = new TH1F("clu_z", "Cluster Z;cm", 100, 0, cali::nLayers);
-	h1[eRange]["clu_nhits"] = new TH1F("clu_nhits", "Cluster Number of Hits", 20, 0, 20);
+	h1[eRange]["clu_nhits"] = new TH1F("clu_nhits", "Cluster Number of Hits", 50, 0, 50);
 	h1[eRange]["pi0_mass"] = new TH1F("pi0_mass", "Invariant Mass of Top Two Clusters;MeV", 100, 0, 1000);
 
 	h2[eRange]["event_MIP_vs_hit_mul"] = new TH2F("event_MIP_vs_hit_mul", "event MIP vs hit mul", 100, 0, 100, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);

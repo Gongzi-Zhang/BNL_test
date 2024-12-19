@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# plot MIP over channels for a mip run
+
 import sys
 import json
 import matplotlib.pyplot as plt
@@ -51,13 +53,13 @@ plt.rcParams['savefig.bbox'] = 'tight'
 hep.style.use(hep.style.CMS)
 hep.style.use("CMS")
 
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(32, 24), sharex=True)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(36, 12))
 
 configurations = {
-    'Hex tile, 3mm SiPM': {'ranges': [(7, 55), (124, 127)], 'color': 'tab:red'},
+    'Hex tile, 3mm SiPM': {'ranges': [(7, 34), (42, 55), (124, 127)], 'color': 'tab:red'},
     'Hex tile, 1.3mm SiPM': {'ranges': [(56,83), (91, 97)], 'color': 'tab:blue'},
     'Square tile, 3mm SiPM': {'ranges': [(112, 123),(128, 191)], 'color': 'tab:green'},
-    'Hex tile, 3mm SiPM, Unpainted': {'ranges': [(0, 6), (34, 41), (84, 90), (98, 111)], 'color': 'y'}
+    'Hex tile, 3mm SiPM, Unpainted': {'ranges': [(0, 6), (35, 41), (84, 90), (98, 111)], 'color': 'y'}
 }
 
 x = np.array(range(0, cali.nChannels))
@@ -75,23 +77,24 @@ for label, config in configurations.items():
         total += np.sum(y1[indices])
 
         if label not in labels_added:
-            ax1.scatter(x[indices], y1[indices], color=color, label=label)
+            ax2.scatter(x[indices], y2[indices], color=color, label=label)
             labels_added.add(label)
         else:
-            ax1.scatter(x[indices], y1[indices], color=color)
+            ax2.scatter(x[indices], y2[indices], color=color)
 
-        ax2.scatter(x[indices], y2[indices], color=color)
+        ax1.scatter(x[indices], y1[indices], color=color)
 
     ax1.axhline(y=total/count, color=color)
 
-ax1.legend(fontsize=40, loc='upper right', prop={'family': 'monospace'})
+ax2.legend(fontsize=40, loc='upper right', prop={'family': 'monospace'})
 
-# plt.suptitle("MIP")
-ax1.set_title(f"Run {run}")
+# plt.suptitle(f"Run {run}")
+ax1.set_xlabel(f"Ch")
 ax1.set_ylabel("HG MIP [ADC]")
-ax2.set_ylabel("HG MIP/Ped RMS")
+ax1.set_ylim(0, 5500)
 ax2.set_xlabel("Ch")
-# plt.ylim(-50,600)
-plt.subplots_adjust(hspace=0)
-plt.savefig(f'{cali.CALIROOT}/figures/{run}/MIP.png')
+ax2.set_ylabel("HG MIP/Ped RMS")
+ax2.set_ylim(0, 35)
+# plt.subplots_adjust(hspace=0)
+plt.savefig(f'{cali.CALIROOT}/figures/{run}/MIP.pdf')
 

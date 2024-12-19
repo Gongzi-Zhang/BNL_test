@@ -19,9 +19,9 @@ int main(int argc, char *argv[])
     cs->setNeighborX(6*cm);
     cs->setNeighborY(5*cm);
     cs->setNeighborZ(1.3);
-    cs->setMinClusterNhits(3);
+    cs->setMinClusterNhits(5);
     cs->setMinClusterCenterE(5);
-    cs->setMinClusterHitE(0.5);
+    cs->setMinClusterHitE(1);
     cs->setMinClusterE(20);
     cs->init();
     cs->process();

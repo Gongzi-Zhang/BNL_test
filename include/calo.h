@@ -20,10 +20,10 @@ const float MeV = 1e-3*GeV;
 namespace calo {
     const char* gains[] = {"LG", "HG"};
 
-    int nCAENs = 0;
-    int nChannels = 0;
-    std::vector<int> nCAENChannels;	// number of channels in each CAEN unit
-    std::vector<int> preChannels;	// number of channels before this CAEN unit
+    int nCAENs = 3;
+    int nChannels = 192;
+    std::vector<int> nCAENChannels = {64, 64, 64};	// number of channels in each CAEN unit
+    std::vector<int> preChannels = {0, 64, 128};	// number of channels before this CAEN unit
 
     void setnCAENChannels(std::vector<int> nCh)
     {

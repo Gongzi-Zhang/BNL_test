@@ -1,4 +1,4 @@
-const int colors[] = {kBlack, kRed};
+const int colors[] = {kOrange, kViolet};
 const double Y1[] = {0.5, 0.7};
 const double height = 0.2;
 
@@ -24,13 +24,13 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
     }
 
     TCanvas* c = new TCanvas("c", "c", 800, 600);
-    TLegend* l = new TLegend(0.65, 0.65, 0.82, 0.82);
+    TLegend* l = new TLegend(0.6, 0.75, 0.8, 0.85);
     l->SetLineColor(0);	// transparent
     l->SetLineStyle(0);
     l->SetFillStyle(0);
     c->SetLogy(1);
     map<string, TH1F *> h;
-    for (const char* var : {"hit_MIP", "event_MIP", "hit_mul", "hit_mul1", "hit_mul2", "hit_mul3", "hit_mul4", "event_x", "event_y", "event_z", "clu_mul", "clu_MIP", "clu_x", "clu_y", "clu_z", "clu_nhits"})
+    for (const char* var : {"hit_MIP", "event_MIP", "hit_mul", "hit_mul1", "hit_mul2", "hit_mul3", "hit_mul4", "event_x", "event_y", "event_z", "clu_mul", "clu_MIP", "clu_x", "clu_y", "clu_z", "clu_nhits", "pi0_mass"})
     {
 	c->Clear();
 	l->Clear();
@@ -62,6 +62,7 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 
 	l->AddEntry(h[name1], name1, "l");
 	l->AddEntry(h[name2], name2, "l");
+	l->SetTextSize(0.04);
 
 	// i = 0;
 	// for (const char* name : {name1, name2})

@@ -8,6 +8,9 @@ const int markers[] = {20, 21, 22, 23, 33, 34, 35};
 void rate_scan()                                                           
 {                                                                               
     gROOT->SetBatch(1);
+    gStyle->SetPadTickX(1);
+    gStyle->SetPadTickY(1); 
+
     string inputs[] = {"macros/T1.txt", "macros/T2.txt", "macros/T3.txt"};                            
     string legends[] = {"T1", "T2", "T3"};                                       
     const int n = sizeof(inputs)/sizeof(inputs[0]);
@@ -24,7 +27,10 @@ void rate_scan()
     }                                                                           
                                                                                 
     TCanvas *c = new TCanvas("c", "c", 800, 600);                               
-    TLegend *l = new TLegend(0.8, 0.7, 0.9, 0.9);                               
+    TLegend *l = new TLegend(0.75, 0.65, 0.85, 0.85);                               
+    l->SetLineColor(0); 
+    l->SetLineStyle(0);
+    l->SetFillStyle(0);
     for (int i=0; i<n; i++)                                                     
     {                                                                           
 	g[i]->SetMarkerStyle(20);
@@ -32,7 +38,7 @@ void rate_scan()
         g[i]->SetLineColor(colors[i]);                                           
         if (0 == i)                                                             
 	{
-	    g[i]->SetTitle("Threshold Scan;Voltage;Rate");
+	    g[i]->SetTitle("Rate Scan;Voltage [V];Rate [Hz]");
             g[i]->Draw("AP");                                                   
 	}
         else                                                                    
@@ -42,7 +48,7 @@ void rate_scan()
     l->Draw();                                                                  
     c->SetLogx();
     c->Update();
-    c->SaveAs("scan.pdf");                                                      
+    c->SaveAs("rate_scan.pdf");                                                      
 }
 
 
@@ -54,7 +60,7 @@ void energy_scan()
     // int runs[] = {1866, 1867, 1868, 1869, 1870}; // T2
     // int runs[] = {1877, 1878, 1879, 1880, 1881}; // T3
     // int runs[] = {2053, 1963, 2055, 2056, 2058, 1968};	// T3
-    // int runs[] = {2229, 2210, 2191, 2173, 2153};
+    int runs[] = {2229, 2210, 2191, 2173, 2153};
     map<int, string> rootFile = {  
         {2229, "T1_0.02_T3_0.02.root"}, // 2229-2234
         {2210, "T1_0.02_T3_0.03.root"}, // 2210-2226 
@@ -205,6 +211,6 @@ void energy_scan()
 
 void threshold_scan()
 {
-    // rate_scan();
-    energy_scan();
+    rate_scan();
+    // energy_scan();
 }
