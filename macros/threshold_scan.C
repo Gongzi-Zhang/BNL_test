@@ -1,15 +1,16 @@
 #include "cali.h"
+#include "cali_style.h"
 
 const int nChannels = 192;
 const float mip_cut = 0.5;
-const int colors[] = {1, 2, 3, 4, 6, 7, 8, 9};
-const int markers[] = {20, 21, 22, 23, 33, 34, 35};
 
-void rate_scan()                                                           
-{                                                                               
+void rate_scan() 
+{
     gROOT->SetBatch(1);
-    gStyle->SetPadTickX(1);
-    gStyle->SetPadTickY(1); 
+    cali_style();
+    colors[0] = kBlack;
+    colors[1] = kRed;
+    colors[2] = kGreen;
 
     string inputs[] = {"macros/T1.txt", "macros/T2.txt", "macros/T3.txt"};                            
     string legends[] = {"T1", "T2", "T3"};                                       
@@ -27,18 +28,19 @@ void rate_scan()
     }                                                                           
                                                                                 
     TCanvas *c = new TCanvas("c", "c", 800, 600);                               
-    TLegend *l = new TLegend(0.75, 0.65, 0.85, 0.85);                               
+    TLegend *l = new TLegend(0.8, 0.7, 0.88, 0.88);                               
     l->SetLineColor(0); 
     l->SetLineStyle(0);
     l->SetFillStyle(0);
     for (int i=0; i<n; i++)                                                     
     {                                                                           
-	g[i]->SetMarkerStyle(20);
+	g[i]->SetMarkerStyle(markers[i]);
         g[i]->SetMarkerColor(colors[i]);                                         
         g[i]->SetLineColor(colors[i]);                                           
+	g[i]->SetMarkerSize(1);
         if (0 == i)                                                             
 	{
-	    g[i]->SetTitle("Rate Scan;Voltage [V];Rate [Hz]");
+	    g[i]->SetTitle(";Voltage [V];Rate [Hz]");
             g[i]->Draw("AP");                                                   
 	}
         else                                                                    

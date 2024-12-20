@@ -3,11 +3,11 @@
 #include "db.h"
 #include "analysis.h"
 
-const int channels[] = {25, 62, 100, 160};
-const int nChannels = sizeof(channels)/sizeof(channels[0]);
-
 void plot_ch_HG2LG(const int run)
 {
+    const int channels[] = {25, 62, 100, 160};
+    const int nChannels = sizeof(channels)/sizeof(channels[0]);
+
     caliDB db;
     int pedRun = db.getPedRun(run);
     ped_t ped;
@@ -27,7 +27,7 @@ void plot_ch_HG2LG(const int run)
             rawADC[ch][gain] = 0;
             b->GetLeaf(gain)->SetAddress(&rawADC[ch][gain]);
         }
-	h2[ch] = new TH2F(Form("ch_%d", ch), ";LG [ADC];HG [ADC]", 100, 0, 500, 100, 0, 8000);
+	h2[ch] = new TH2F(Form("ch_%d", ch), Form("Ch %d;LG [ADC];HG [ADC]", ch), 100, 0, 300, 100, 0, 8000);
     }
 
     // filling histograms
@@ -42,7 +42,7 @@ void plot_ch_HG2LG(const int run)
                 if (corADC[ch][gain] < 5*ped[ch][gain].rms)
                     corADC[ch][gain] = 0;
             }
-            if (corADC[ch]["LG"] > 0 && corADC[ch]["HG"] < 7900)
+            if (corADC[ch]["LG"] > 0 && corADC[ch]["HG"] < 7700)
                 h2[ch]->Fill(corADC[ch]["LG"], corADC[ch]["HG"]);
 	}
     }
@@ -52,21 +52,24 @@ void plot_ch_HG2LG(const int run)
     c->Divide(4, 1);
     for (size_t i=0; i<nChannels; i++)
     {
+	c->cd(i+1);
+	gPad->SetLeftMargin(0.15);
+
 	int ch = channels[i];
 	TProfile * proX = h2[ch]->ProfileX(Form("ch%d_profileX", ch));
-        TF1 *fit = new TF1(Form("ch%d_fit", ch), "[0] + [1]*x", 0, 500);
+        TF1 *fit = new TF1(Form("ch%d_fit", ch), "[0] + [1]*x", 0, 300);
         fit->SetParameters(0, 30);
         proX->Fit(fit, "q");
 
-	c->cd(i+1);
 	h2[ch]->SetStats(false);
         h2[ch]->Draw("COLZ");
 	fit->Draw("SAME");
 
-	TText *t = new TText(0.6, 0.2, Form("slope = %.2f", fit->GetParameter(1)));
+	TText *t = new TText(0.5, 0.2, Form("slope = %.2f", fit->GetParameter(1)));
         t->SetNDC();
         t->SetTextColor(kRed);
         t->Draw();
     }
+    c->Update();
     c->SaveAs(Form("Run%d_HG2LG.pdf", run));
 }
