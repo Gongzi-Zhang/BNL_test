@@ -3,16 +3,17 @@
 #include "db.h"
 #include "analysis.h"
 
-#include "cali_style.C"
+#include "cali_style.h"
 
 /* compare HG ADC distribution for a few channels for checking MIP calibration */
 void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
 {
     const int channels[] = {25, 62, 100, 160};
-    const char* labels[] = {"Ch 25 -- Hex tile, 3mm SiPM", 
-			    "Ch 62 -- Hex tile, 1.3mm SiPM",
-			    "Ch 100 -- Square tile, 3mm SiPM",
-			    "Ch 160 -- Hex tile, 3mm SiPM, Unpainted"};
+    const char* labels[] = {"#splitline{Ch 25}{#splitline{Hex tile}{3mm SiPM}}", 
+			    "#splitline{Ch 62}{#splitline{Hex tile}{1.3mm SiPM}}", 
+			    "#splitline{Ch 100}{#splitline{Square tile}{3mm SiPM}}", 
+			    "#splitline{Ch 160}{#splitline{Hex tile, Unpainted}{3mm SiPM}}", 
+			    };
     const int nChannels = sizeof(channels)/sizeof(channels[0]);
 
     map<int, string> date;
@@ -46,20 +47,29 @@ void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
     }
 
     TCanvas *c = new TCanvas("c", "c", 400*2, 300*2);
-    c->SetTopMargin(0.1);
+    c->SetMargin(0, 0, 0, 0);
     c->Divide(2, 2, 0, 0);
+
     for (int ich=0; ich<nChannels; ich++)
     {
 	c->cd(ich+1);
-	// gPad->SetMargin(0, 0, 0, 0);
 	gPad->SetLogy(1);
 	if (ich == 0 || ich == 2)
 	{
-	    gPad->SetLeftMargin(0.1);
+	    gPad->SetLeftMargin(0.13);
 	}
-	if (ich == 2 || ich == 3)
+	else
 	{
-	    gPad->SetBottomMargin(0.1);
+	    gPad->SetRightMargin(0.13);
+	}
+
+	if (ich == 0 || ich == 1)
+	{
+	    gPad->SetTopMargin(0.13);
+	}
+	else
+	{
+	    gPad->SetBottomMargin(0.13);
 	}
 
 	size_t i = 0;
@@ -75,26 +85,38 @@ void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
 	    {
 		h->GetXaxis()->SetLabelSize(0); // Hide x-axis labels for top 2 pads
 	    }
-	    // else
-	    // {
-	    //     h->GetXaxis()->SetTitleOffset(1);
-	    // }
+	    else
+	    {
+	        h->GetXaxis()->SetTitleOffset(0.7);
+	        h->GetXaxis()->SetTitleSize(0.08);
+	    }
 
 	    if (ich == 1 || ich == 3)
+	    {
 		h->GetYaxis()->SetLabelSize(0); // Hide y-axis labels for right 2 pads
-	    // else
-	    //     h->GetYaxis()->SetTitleOffset(1);
+	    }
+	    else
+	    {
+	        h->GetYaxis()->SetTitleOffset(0.7);
+	        h->GetYaxis()->SetTitleSize(0.08);
+	    }
 
 	    
 	    if (0 == i)
 	    {
 		h->Draw("P");
 		TLatex *latex = new TLatex();
-		latex->SetTextSize(0.045);
+		latex->SetTextSize(0.07);
 		latex->SetTextAlign(22);
 		latex->SetTextColor(kRed);
-		latex->DrawLatexNDC(0.6, 0.8, labels[ich]);
-		//  h->GetXaxis()->SetLabelSize(0); // Hide x-axis labels except bottom row
+		if (0 == ich)
+		    latex->DrawLatexNDC(0.7, 0.7, labels[ich]);
+		else if (1 == ich)
+		    latex->DrawLatexNDC(0.6, 0.7, labels[ich]);
+		else if (2 == ich)
+		    latex->DrawLatexNDC(0.7, 0.8, labels[ich]);
+		else if (3 == ich)
+		    latex->DrawLatexNDC(0.6, 0.8, labels[ich]);
 	    }
 	    else
 		h->Draw("P SAME");
@@ -105,10 +127,10 @@ void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
     // title
     c->cd();
     TLatex *latex = new TLatex();
-    latex->SetTextSize(0.04);
+    latex->SetTextSize(0.05);
     latex->SetTextAlign(21);  // Centered alignment
 
-    latex->DrawLatexNDC(0.5, 0.96, Form("Run #color[797]{%d (%s)} vs #color[880]{%d (%s)}", run1, date[run1].c_str(), run2, date[run2].c_str()));
+    latex->DrawLatexNDC(0.5, 0.95, Form("Run #color[797]{%d (%s)} vs #color[880]{%d (%s)}", run1, date[run1].c_str(), run2, date[run2].c_str()));
     c->SaveAs(Form("run%d_vs_%d_HG_MIP.pdf", run1, run2));
 
     /*
@@ -226,6 +248,7 @@ void plot_ch_MIP_over_time()
 
     TCanvas *c = new TCanvas("c", "c", 800, 600);
     TLegend *l = new TLegend(0.13, 0.7, 0.26, 0.88);
+    l->SetTextSize(0.045);
 
     for (size_t i=0; i<nChannels; i++)
     {

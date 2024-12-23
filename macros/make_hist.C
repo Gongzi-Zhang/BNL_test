@@ -67,8 +67,8 @@ void make_hist(const char *fname = "output.myrec.root",
 	h1[eRange]["clu_nhits"] = new TH1F("clu_nhits", "Cluster Number of Hits", 50, 0, 50);
 	h1[eRange]["pi0_mass"] = new TH1F("pi0_mass", "Invariant Mass of Top Two Clusters;MeV", 100, 0, 1000);
 
-	h2[eRange]["event_MIP_vs_hit_mul"] = new TH2F("event_MIP_vs_hit_mul", "event MIP vs hit mul", 100, 0, 100, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
-	h2[eRange]["event_MIP_vs_eta"] = new TH2F("event_MIP_vs_eta", "event MIP vs #eta", 100, 2.5, 3.5, 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
+	h2[eRange]["hit_mul_vs_event_MIP"] = new TH2F("hit_mul_vs_event_MIP", "Hit mul vs event MIP", 100, minEventEnergy[eRange], maxEventEnergy[eRange], 100, 0, 100);
+	h2[eRange]["eta_vs_event_MIP"] = new TH2F("eta_vs_event_MIP", "#eta vs event MIP", 100, minEventEnergy[eRange], maxEventEnergy[eRange], 100, 2.5, 3.5);
 	h2[eRange]["x_vs_y"] = new TH2F("x_vs_y", "X vs Y;cm;cm", 100, -10, 10, 100, -10, 10);
 	h2[eRange]["clu_x_vs_y"] = new TH2F("clu_x_vs_y", "Cluster X vs Y;cm;cm", 100, -10, 10, 100, -10, 10);
 	h2[eRange]["clu_x_vs_y_weighted"] = new TH2F("clu_x_vs_y_weighted", "Cluster X vs Y (weighted by cluster energy);cm;cm", 100, -10, 10, 100, -10, 10);
@@ -234,8 +234,8 @@ void make_hist(const char *fname = "output.myrec.root",
 		h1[eRanges[idx]]["event_y"]->Fill(event_y/event_e/cm);
 		h1[eRanges[idx]]["event_z"]->Fill(event_z/event_e);
 		h1[eRanges[idx]]["clu_mul"]->Fill(clu_e.GetSize());
-		h2[eRanges[idx]]["event_MIP_vs_hit_mul"]->Fill(hit_mul, event_e);
-		h2[eRanges[idx]]["event_MIP_vs_eta"]->Fill(eta, event_e);
+		h2[eRanges[idx]]["hit_mul_vs_event_MIP"]->Fill(event_e, hit_mul);
+		h2[eRanges[idx]]["eta_vs_event_MIP"]->Fill(event_e, eta);
 		h2[eRanges[idx]]["x_vs_y"]->Fill(event_x/event_e/cm, event_y/event_e/cm);
 	    }
 	}

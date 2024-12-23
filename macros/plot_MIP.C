@@ -3,7 +3,7 @@
 #include "cali.h"
 #include "analysis.h"
 
-#include "cali_style.C"
+#include "cali_style.h"
 
 void plot_MIP(const int run = 2580) 
 {
@@ -31,10 +31,10 @@ void plot_MIP(const int run = 2580)
     ranges[2] = {{112, 123}, {128, 191}};
     ranges[3] = {{0, 6}, {35, 41}, {84, 90}, {98, 111}};
     map<int, const char *> labels = {
-	{0, "Hex tile, 3mm SiPM"}, 
-	{1, "Hex tile, 1.3mm SiPM"},
-	{2, "Square tile, 3mm SiPM"},
-	{3, "Hex tile, 3mm SiPM, Unpainted"}, 
+	{0, "Hex tile; 3mm SiPM"}, 
+	{1, "Hex tile; 1.3mm SiPM"},
+	{2, "Square tile; 3mm SiPM"},
+	{3, "Hex tile, unpainted; 3mm SiPM"}, 
     };
     map<int, TGraph*> g1;
     map<int, TGraph*> g2;
@@ -69,6 +69,7 @@ void plot_MIP(const int run = 2580)
 
     // plot
     TCanvas* c = new TCanvas("c", "c", 1600, 600);
+    c->SetMargin(0, 0, 0, 0);
     c->Divide(2, 1);
 
     c->cd(1);
@@ -81,6 +82,7 @@ void plot_MIP(const int run = 2580)
 	if (0 == i)
 	{
 	    g1[i]->SetTitle(";Ch;HG MIP [ADC]");
+	    g1[i]->GetYaxis()->SetTitleOffset(1.05);
 	    g1[i]->Draw("AP");
 	}
 	else
@@ -93,6 +95,7 @@ void plot_MIP(const int run = 2580)
 
     c->cd(2);
     TLegend *l = new TLegend(0.38, 0.7, 0.88, 0.9);
+    l->SetTextSize(0.045);
     for (size_t i=0; i<4; i++)
     {
 	g2[i]->SetMarkerStyle(markers[i]);

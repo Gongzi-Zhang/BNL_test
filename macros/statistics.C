@@ -1,8 +1,7 @@
 #include "utilities.h"
 #include "db.h"
 #include "cali.h"
-
-#include "cali_style.C"
+#include "cali_style.h"
 
 int fill(TGraph* g, const int startRun, const int endRun, int shift = 0)
 {
@@ -65,7 +64,6 @@ int fill(TGraph* g, const int startRun, const int endRun, int shift = 0)
 void statistics()
 {
     gROOT->SetBatch(1);
-
     cali_style();
 
     TDatime xminDate(2024, 4, 20, 0, 0, 0);
@@ -84,10 +82,6 @@ void statistics()
     gPP->GetXaxis()->SetTimeDisplay(1);
     gPP->GetXaxis()->SetTimeFormat("%m/%d");
     gPP->GetXaxis()->SetTimeOffset(0, "gmt");
-    gPP->GetXaxis()->SetLabelSize(0.04);
-    gPP->GetYaxis()->SetLabelSize(0.04);
-    gPP->GetXaxis()->SetTitleSize(0.04);
-    gPP->GetYaxis()->SetTitleSize(0.04);
     gPP->SetLineColor(kOrange);
     gPP->SetFillColor(kOrange);
 
@@ -98,14 +92,14 @@ void statistics()
     int ppEvents = fill(gPP, cali::run24PPStartRun, cali::run24PPEndRun);
     int AuAuEvents = fill(gAuAu, cali::run24AuAuStartRun, cali::run24AuAuEndRun);
 
-    TLegend *lgd = new TLegend(0.6, 0.65, 0.8, 0.85);
+    TLegend *lgd = new TLegend(0.62, 0.7, 0.82, 0.9);
 
     int x = collision.Convert();
     TLine *l1 = new TLine(x, ymin, x, ymax);
     l1->SetLineWidth(2);
     l1->SetLineColor(kRed);
     TText *t1 = new TText(x, ymax/2, "First PP Collision");
-    t1->SetTextSize(0.03);
+    t1->SetTextSize(0.04);
     t1->SetTextColor(kRed);
     t1->SetTextAngle(90);
     t1->SetTextAlign(23);
@@ -115,12 +109,12 @@ void statistics()
     l2->SetLineWidth(2);
     l2->SetLineColor(kRed);
     TText *t2 = new TText(x, ymax/2, "First Good CALI Run");
-    t2->SetTextSize(0.03);
+    t2->SetTextSize(0.04);
     t2->SetTextColor(kRed);
     t2->SetTextAngle(90);
     t2->SetTextAlign(23);
 
-    TCanvas *c = new TCanvas("c", "c", 1000, 800);
+    TCanvas *c = new TCanvas("c", "c", 800, 600);
     gPP->Draw("AF");
     c->Update();
     gPP->GetXaxis()->SetLimits(xminDate.Convert(), xmaxDate.Convert());

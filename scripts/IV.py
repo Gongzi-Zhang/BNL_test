@@ -9,7 +9,9 @@ from matplotlib.pyplot import cm
 
 
 breakV = 38.74096661764706
-directory = os.path.expanduser('~/labview/data')
+CALIROOT = os.getenv("CALIROOT")
+directory = os.path.expanduser(f'{CALIROOT}/work/labview/')
+# directory = os.path.expanduser('~/labview/data')
 Voltage = []
 Current = []
 date = []
@@ -39,9 +41,9 @@ for file in sorted(os.listdir(directory)):
 
 hep.style.use("CMS")
 plt.figure(figsize=(16,12))
-plt.title(f'Dark Current Monitor for Irradiated S14160 3015 SiPM')
-# plt.xlabel('Time (UTC)')
-plt.ylabel(r'Current ($\mu$A)')
+# plt.title(f'Dark Current Monitor for Irradiated S14160 3015 SiPM')
+plt.xlabel('Date')
+plt.ylabel(r'Dark Current [$\mu$A]')
 
 #timestamps = [datetime.strptime(ts, '%m/%d/%Y %I:%M:%S %p') for ts in date]
 
@@ -59,19 +61,17 @@ for dt, label in beamOffDates.items():
     plt.axvline(x=dt, color='red', linestyle='--')
     plt.text(dt, 4.4, label, color="red", ha="right", va="center", rotation=90)
 
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
 # plt.yscale('log')
-plt.xticks(rotation=45)
+# plt.xticks(rotation=45)
 plt.legend()
 # plt.show()
-fdir = os.path.expanduser('~/BNL_test/figures/misc/')
-plt.savefig(f'{fdir}/IV.png')
-
-
+fdir = os.path.expanduser(f'{CALIROOT}/figures/misc/')
+plt.savefig(f'{fdir}/IV.pdf')
 
 # benchmark IV curve
 plt.clf()
-path = os.path.expanduser('~/BNL_test/doc/Davis_test/')
+path = os.path.expanduser(f'{CALIROOT}/doc/Davis_test/')
 files = ['Hex_3015A8_UTC_20240724__23_44.txt','Hex_3015A9_UTC_20240725__00_04.txt','Hex_3015A10_UTC_20240725__16_55.txt','Hex_3015A11_UTC_20240725__17_35.txt','Hex_3015A12_UTC_20240724__18_12.txt','Hex_3015A13_UTC_20240725__20_03.txt']
 OV = [-0.5, 0.5, 1.0, 1.5, 2.0, 2.5]
 fluence = [8, 9, 10, 11, 12, 13]
@@ -95,11 +95,11 @@ for file in files:
         for i in range(6):
             DI[i].append(current[np.argmin(abs(voltage-breakV-OV[i]))])
 
-plt.ylabel(r'Dark Current ($\mu$A)')
+plt.ylabel(r'Dark Current [$\mu$A]')
 plt.xlabel('Over Voltage (V)')
 plt.yscale('log')
 plt.legend()
-plt.savefig(f'{fdir}/benchmark_IV.png')
+plt.savefig(f'{fdir}/benchmark_IV.pdf')
 
 # CALI radiation level
 plt.clf()
@@ -117,10 +117,10 @@ for i in range(6):
         plt.axvline(cali_fluence, c=color[i])
 # plt.axvline(9.52, c='r', linestyle='dashed')
 plt.legend()
-plt.title('Peak radiation level recorded on 09/30')
-plt.ylabel(r'Dark Current ($\mu$A)')
+# plt.title('Peak radiation level recorded on 09/30')
+plt.ylabel(r'Dark Current [$\mu$A]')
 plt.xlabel(r'log(Fluence) (log($N_{p^+}$/$cm^2$))')
-plt.savefig(f'{fdir}/radiation.png')
+plt.savefig(f'{fdir}/radiation.pdf')
 
 # plt.figure(figsize=(20,10))
 # plt.title(f'Dark Current Monitor for\n Insitu S14160 3015 SiPM \n Estimated Fluence: 10^{np.mean(average):.1f}'r' $N_{p+}$')

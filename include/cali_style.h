@@ -31,5 +31,5 @@ void cali_style()
     // gStyle->SetLegendLineColor(0);
     // gStyle->SetLegendLineStyle(0);
     // gStyle->SetLegendFillStyle(0);
-    gStyle->SetLegendTextSize(0.04);
+    gStyle->SetLegendTextSize(0.045);
 }

@@ -7,7 +7,7 @@ void check(const char* , const char*);
 void check(const int run)
 {
     string rootFile = cali::getFile(Form("Run%d.rec.root", run));
-    check(rootFile.c_str(), Form("./Run%d.root", run));
+    check(rootFile.c_str(), Form("./Run%d_hist.root", run));
 }
 void check(const char *fname = "input.rec.root", 
 	  const char*out = "check.root")
@@ -84,8 +84,8 @@ void check(const char *fname = "input.rec.root",
 	    x = hit_x[hi];
 	    y = hit_y[hi];
 	    z = hit_z[hi];
-	    // if (e < hit_energy_cut)
-	    //     continue;
+	    if (e < hit_energy_cut)
+	        continue;
 
 	    event_e += e;
 	    event_x += x*e;

@@ -1,9 +1,9 @@
-#include "cali_style.C"
+#include "cali_style.h"
 
 const double Y1[] = {0.5, 0.7};
 const double height = 0.2;
 
-void compare(const char* f1, const char* f2, const char* name1 = "data", const char* name2 = "sim", const char *prefix = NULL, const char* title = "")
+void compare(const char* f1, const char* f2, const char* name1 = "data", const char* name2 = "sim", const char *prefix = NULL, const char* title = "T1")
 {
     gROOT->SetBatch(1);
     cali_style();
@@ -24,11 +24,10 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
     }
 
     TCanvas* c = new TCanvas("c", "c", 800, 600);
-    TLegend* l = new TLegend(0.6, 0.75, 0.8, 0.85);
-    l->SetLineColor(0);	// transparent
-    l->SetLineStyle(0);
-    l->SetFillStyle(0);
-    c->SetLogy(1);
+    c->SetTopMargin(0.08);
+    c->SetBottomMargin(0.13);
+    c->SetLeftMargin(0.13);
+    TLegend* l = new TLegend(0.55, 0.75, 0.75, 0.85);
     map<string, TH1F *> h;
     map<string, const char*> xtitle = 
     {
@@ -58,6 +57,7 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    c->SetLogy(1);
 	else
 	    c->SetLogy(0);
+
 	size_t i = 0;
 	for (const char* name : {name1, name2})
 	{
@@ -66,9 +66,23 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    h[name]->SetTitle(Form("%s;%s;Count", title, xtitle[var]));
 	    h[name]->SetLineColor(colors[i]);
 	    h[name]->Scale(1/h[name]->Integral());
+	    h[name]->GetXaxis()->SetTitleSize(0.07);
+	    h[name]->GetXaxis()->SetTitleOffset(0.8);
+	    h[name]->GetXaxis()->SetLabelSize(0.05);
+	    h[name]->GetYaxis()->SetTitleSize(0.07);
+	    h[name]->GetYaxis()->SetTitleOffset(1.0);
+	    h[name]->GetYaxis()->SetLabelSize(0.05);
 	    i++;
 	}
 
+	// rebin pi0 mass histogram
+	if (strcmp(var, "pi0_mass") == 0)
+	{
+	    h[name1]->Rebin(2);
+	    h[name2]->Rebin(2);
+	}
+
+	string name;
 	if (h[name1]->GetMaximum() > h[name2]->GetMaximum())
 	{
 	    h[name1]->Draw("HIST");
@@ -81,29 +95,24 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	}
 	c->Update();
 
+	TPaveText* pt = (TPaveText*) c->GetPrimitive("title");
+	// update title
+	pt->SetTextSize(0.07);
+	c->Modified();
+
 	l->AddEntry(h[name1], name1, "l");
 	l->AddEntry(h[name2], name2, "l");
-	l->SetTextSize(0.04);
-
-	// i = 0;
-	// for (const char* name : {name1, name2})
-	// {
-	//     TPaveStats *st = (TPaveStats*) h[name]->FindObject("stats");
-	//     st->SetTextColor(colors[i]);
-	//     st->SetY1NDC(Y1[i]);
-	//     st->SetY2NDC(Y1[i] + height);
-	//     i++;
-	// }
-
-	// TText *tcut = new TText(0.5, 0.92, cut);
-	// tcut->SetNDC(true);
-	// tcut->SetTextSize(0.03);
-	// tcut->SetTextColor(kRed-2);
-	// tcut->SetTextAlign(22);
-	// tcut->Draw();
+	l->SetTextSize(0.055);
 
 	l->Draw();
 
+	if (strcmp(var, "pi0_mass") == 0)
+	{
+	    TLine *l_pi0 = new TLine(135, gPad->GetUymin(), 135, gPad->GetUymax());
+	    l_pi0->SetLineColor(kRed);
+	    l_pi0->SetLineWidth(2);
+	    l_pi0->Draw();
+	}
 	if (prefix)
 	    c->SaveAs(Form("%s_%s.pdf", prefix, var));
 	else
@@ -112,7 +121,8 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 
     map<string, TH2F *> h2;
     TCanvas* c1 = new TCanvas("c1", "c1", 1200, 600);
-    c1->Divide(2, 1);
+    c1->SetMargin(0, 0, 0, 0);
+    c1->Divide(2, 1, 0, 0);
     map<string, const char*> XYtitle = {
 	{"event_MIP_vs_hit_mul", "Hit Multiplicity;Event Energy [MIP]"},
 	{"clu_x_vs_y", "Cluster COG X [cm];Cluster COG Y [cm]"},
@@ -135,13 +145,36 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    h2[name]->SetName(name);
 	    h2[name]->SetTitle(Form("%s (%s);%s", title, dataset[name], XYtitle[var]));
 	    h2[name]->SetLineColor(colors[i]);
+	    h2[name]->GetXaxis()->SetTitleSize(0.07);
+	    h2[name]->GetXaxis()->SetTitleOffset(0.9);
+	    h2[name]->GetXaxis()->SetLabelSize(0.05);
+	    h2[name]->GetYaxis()->SetTitleSize(0.07);
+	    h2[name]->GetYaxis()->SetTitleOffset(1.18);
+	    h2[name]->GetYaxis()->SetLabelSize(0.05);
 	    i++;
 	}
 	c1->cd(1);
+	gPad->SetLeftMargin(0.18);
+	gPad->SetRightMargin(0.11);
+	gPad->SetBottomMargin(0.15);
+	gPad->SetTopMargin(0.07);
 	h2[name1]->Draw("colz");
+	gPad->Update();
+	// update title
+	TPaveText* pt1 = (TPaveText*) gPad->GetPrimitive("title");
+	pt1->SetTextSize(0.07);
+	gPad->Modified();
 
 	c1->cd(2);
+	gPad->SetLeftMargin(0.18);
+	gPad->SetRightMargin(0.11);
+	gPad->SetBottomMargin(0.15);
+	gPad->SetTopMargin(0.07);
 	h2[name2]->Draw("colz");
+	gPad->Update();
+	TPaveText* pt2 = (TPaveText*) gPad->GetPrimitive("title");
+	pt2->SetTextSize(0.07);
+	gPad->Modified();
 
 	if (prefix)
 	    c1->SaveAs(Form("%s_%s.pdf", prefix, var));

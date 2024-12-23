@@ -2,9 +2,13 @@
 #include "cali.h"
 #include "db.h"
 #include "analysis.h"
+#include "cali_style.h"
 
-void plot_ch_HG2LG(const int run)
+void plot_ch_HG2LG(const int run=2019)
 {
+    gROOT->SetBatch(1);
+    cali_style();
+
     const int channels[] = {25, 62, 100, 160};
     const int nChannels = sizeof(channels)/sizeof(channels[0]);
 
@@ -49,11 +53,15 @@ void plot_ch_HG2LG(const int run)
 
     // plot and fit
     TCanvas* c = new TCanvas("c", "c", 600*nChannels, 600);
-    c->Divide(4, 1);
+    c->SetMargin(0, 0, 0, 0);
+    c->Divide(4, 1, 0, 0);
     for (size_t i=0; i<nChannels; i++)
     {
 	c->cd(i+1);
-	gPad->SetLeftMargin(0.15);
+	gPad->SetLeftMargin(0.18);
+	gPad->SetRightMargin(0.11);
+	gPad->SetBottomMargin(0.15);
+	gPad->SetTopMargin(0.05);
 
 	int ch = channels[i];
 	TProfile * proX = h2[ch]->ProfileX(Form("ch%d_profileX", ch));
@@ -62,14 +70,24 @@ void plot_ch_HG2LG(const int run)
         proX->Fit(fit, "q");
 
 	h2[ch]->SetStats(false);
+	h2[ch]->SetTitle(";LG [ADC];HG [ADC]");
+	h2[ch]->GetXaxis()->SetTitleSize(0.07);
+	h2[ch]->GetXaxis()->SetTitleOffset(0.9);
+	h2[ch]->GetXaxis()->SetLabelSize(0.05);
+	h2[ch]->GetYaxis()->SetTitleSize(0.07);
+	h2[ch]->GetYaxis()->SetTitleOffset(1.18);
+	h2[ch]->GetYaxis()->SetLabelSize(0.05);
         h2[ch]->Draw("COLZ");
 	fit->Draw("SAME");
 
-	TText *t = new TText(0.5, 0.2, Form("slope = %.2f", fit->GetParameter(1)));
-        t->SetNDC();
-        t->SetTextColor(kRed);
-        t->Draw();
+	TLatex *latex = new TLatex();
+	latex->SetTextSize(0.06);
+	latex->SetTextAlign(22);
+	latex->SetTextColor(kRed);
+	latex->DrawLatexNDC(0.65, 0.3, Form("#splitline{Ch %d}{Slope = %.2f}", ch, fit->GetParameter(1)));
+        latex->SetTextColor(kRed);
+        latex->Draw();
     }
     c->Update();
-    c->SaveAs(Form("Run%d_HG2LG.pdf", run));
+    c->SaveAs(Form("%s/figures/%d/HG2LG.pdf", cali::CALIROOT, run));
 }
