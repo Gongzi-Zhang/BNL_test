@@ -12,6 +12,9 @@ void rate_scan()
     colors[1] = kRed;
     colors[2] = kGreen;
 
+    double V = 1;
+    double mV = 1e-3*V;
+
     string inputs[] = {"macros/T1.txt", "macros/T2.txt", "macros/T3.txt"};                            
     string legends[] = {"T1", "T2", "T3"};                                       
     const int n = sizeof(inputs)/sizeof(inputs[0]);
@@ -23,7 +26,7 @@ void rate_scan()
         ifstream fin(inputs[i]);                                                 
         int ipoint = 0;                                                         
         while (fin >> volt >> rate)                                             
-            g[i]->SetPoint(ipoint++, volt, rate);                               
+            g[i]->SetPoint(ipoint++, volt/mV, rate);                               
         fin.close();                                                            
     }                                                                           
                                                                                 
@@ -40,7 +43,7 @@ void rate_scan()
 	g[i]->SetMarkerSize(1);
         if (0 == i)                                                             
 	{
-	    g[i]->SetTitle(";Voltage [V];Rate [Hz]");
+	    g[i]->SetTitle(";Voltage [mV];Rate [Hz]");
             g[i]->Draw("AP");                                                   
 	}
         else                                                                    

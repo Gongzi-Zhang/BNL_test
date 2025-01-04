@@ -42,12 +42,12 @@ for file in sorted(os.listdir(directory)):
 hep.style.use("CMS")
 plt.figure(figsize=(16,12))
 # plt.title(f'Dark Current Monitor for Irradiated S14160 3015 SiPM')
-plt.xlabel('Date')
-plt.ylabel(r'Dark Current [$\mu$A]')
+plt.xlabel('Date', fontsize=26)
+plt.ylabel(r'Dark Current [$\mu$A]', fontsize=26)
 
 #timestamps = [datetime.strptime(ts, '%m/%d/%Y %I:%M:%S %p') for ts in date]
 
-for i in range(5):
+for i in range(6):
     index = np.argmin(abs(Voltage[-1]-breakV-OV[i]))
 
     plt.errorbar(date, np.array(Current)[:,index], label=f'OV = {np.average(np.array(Voltage)[:,index])-breakV:.1f} V', fmt='--o' if np.average(np.array(Voltage)[:,index])-breakV > 0 else '-^')
@@ -59,12 +59,12 @@ beamOffDates = {
 }
 for dt, label in beamOffDates.items():
     plt.axvline(x=dt, color='red', linestyle='--')
-    plt.text(dt, 4.4, label, color="red", ha="right", va="center", rotation=90)
+    plt.text(dt, 7.0, label, color="red", ha="right", va="center", rotation=90)
 
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
 # plt.yscale('log')
 # plt.xticks(rotation=45)
-plt.legend()
+plt.legend(loc='upper left', fontsize=24)
 # plt.show()
 fdir = os.path.expanduser(f'{CALIROOT}/figures/misc/')
 plt.savefig(f'{fdir}/IV.pdf')
@@ -119,7 +119,7 @@ for i in range(6):
 plt.legend()
 # plt.title('Peak radiation level recorded on 09/30')
 plt.ylabel(r'Dark Current [$\mu$A]')
-plt.xlabel(r'log(Fluence) (log($N_{p^+}$/$cm^2$))')
+plt.xlabel(r'log(Fluence) [log($N_{p^+}$/$cm^2$)]')
 plt.savefig(f'{fdir}/radiation.pdf')
 
 # plt.figure(figsize=(20,10))
