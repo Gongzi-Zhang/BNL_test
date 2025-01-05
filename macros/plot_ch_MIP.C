@@ -8,6 +8,8 @@
 /* compare HG ADC distribution for a few channels for checking MIP calibration */
 void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
 {
+    colors[0] = kRed;
+    colors[1] = kBlue;
     const int channels[] = {25, 62, 100, 160};
     const char* labels[] = {"#splitline{Ch 25}{#splitline{Hex tile}{3mm SiPM}}", 
 			    "#splitline{Ch 62}{#splitline{Hex tile}{1.3mm SiPM}}", 
@@ -89,6 +91,8 @@ void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
 	    {
 	        h->GetXaxis()->SetTitleOffset(0.7);
 	        h->GetXaxis()->SetTitleSize(0.08);
+	        h->GetXaxis()->SetLabelSize(0.06);
+	        h->GetXaxis()->SetNdivisions(505);
 	    }
 
 	    if (ich == 1 || ich == 3)
@@ -99,6 +103,7 @@ void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
 	    {
 	        h->GetYaxis()->SetTitleOffset(0.7);
 	        h->GetYaxis()->SetTitleSize(0.08);
+	        h->GetYaxis()->SetLabelSize(0.06);
 	    }
 
 	    
@@ -108,7 +113,7 @@ void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
 		TLatex *latex = new TLatex();
 		latex->SetTextSize(0.07);
 		latex->SetTextAlign(22);
-		latex->SetTextColor(kRed);
+		latex->SetTextColor(kBlack);
 		if (0 == ich)
 		    latex->DrawLatexNDC(0.7, 0.7, labels[ich]);
 		else if (1 == ich)
@@ -130,7 +135,7 @@ void compare_ch_MIP(const int run1 = 1032, const int run2 = 2580)
     latex->SetTextSize(0.05);
     latex->SetTextAlign(21);  // Centered alignment
 
-    latex->DrawLatexNDC(0.5, 0.95, Form("Run #color[797]{%d (%s)} vs #color[880]{%d (%s)}", run1, date[run1].c_str(), run2, date[run2].c_str()));
+    latex->DrawLatexNDC(0.5, 0.95, Form("Run #color[632]{%d (%s)} vs #color[600]{%d (%s)}", run1, date[run1].c_str(), run2, date[run2].c_str()));
     c->SaveAs(Form("run%d_vs_%d_HG_MIP.pdf", run1, run2));
 
     /*
@@ -220,6 +225,10 @@ void plot_ch_MIP_over_time()
     vector<int> runs = db.getRuns("Type = 'mip' AND Flag = 'good'");
     size_t ipoint = 0;
     int year, month, day, hour, minute;
+    map<size_t, double> sum;
+    map<size_t, double> mean;
+    map<size_t, size_t> count;
+
     for (const auto run : runs)
     {
 	// if (1249 <= run && run <= 1270)
@@ -241,9 +250,50 @@ void plot_ch_MIP_over_time()
 	    if (mip[ch]["HG"] < 10)
 		mip[ch]["HG"] = -999;
 
+	    if (mip[ch]["HG"] > 0)
+	    {
+		sum[ch] += mip[ch]["HG"];
+		count[ch] += 1;
+	    }
 	    g[ch]->SetPoint(ipoint, dt.Convert(), mip[ch]["HG"]); // the first data point is set to the day before the first good run
 	}
 	ipoint++;
+    }
+
+    for (const auto ch : channels)
+    {
+	mean[ch] = sum[ch] / count[ch];
+    }
+
+    // unceratinty
+    map<size_t, double> error;
+    for (const auto run : runs)
+    {
+	// if (1249 <= run && run <= 1270)
+	if (1297 == run || 1333 == run || 1702 == run || 1703 == run || 1704 == run)
+	    continue;
+
+	mip_t mip;
+	if (!getMIP(run, mip))
+	{
+	    cerr << FATAL << "unable to read mip for run " << run << endl;
+	    continue;
+	}
+
+	for (const auto ch : channels)
+	{
+	    if (mip[ch]["HG"] < 10)
+		continue;
+
+	    double e = abs(mip[ch]["HG"] - mean[ch]) / mean[ch];
+	    if (e > error[ch])
+		error[ch] = e;
+	}
+    }
+
+    for (const auto ch : channels)
+    {
+	cout << INFO << ch << "\t" << error[ch] << endl;
     }
 
     TCanvas *c = new TCanvas("c", "c", 800, 600);
@@ -270,8 +320,8 @@ void plot_ch_MIP()
 {
     gROOT->SetBatch(1);
     cali_style();
-    compare_ch_MIP();
     plot_ch_MIP_over_time();
+    compare_ch_MIP();
 }
 
 

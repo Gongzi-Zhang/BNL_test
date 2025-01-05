@@ -1,4 +1,4 @@
-int colors[] = {kBlack, kViolet, kRed, kBlue, kGreen+3, kAzure+9, kViolet+7};
+int colors[] = {kRed, kBlue, kViolet, kTeal+3, kGreen+3, kAzure+9, kViolet+7};
 int markers[] = {20, 21, 22, 23, 33, 34, 35};
 
 void cali_style() 

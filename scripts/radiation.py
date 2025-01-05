@@ -239,17 +239,19 @@ ax1.set_ylim(1e-3,1e4)
 ax2.set_ylim(1e-3,1e4)
 ax1.spines['right'].set_visible(False)
 ax2.spines['left'].set_visible(False)
-ax2.tick_params(axis='x', which='both',top=False)
+ax2.tick_params(axis='x', which='both', top=False)
 #ax2.tick_params(axis='y', length=0)
 #ax1.tick_params(axis='y', length=0)
 handles, labels = ax2.get_legend_handles_labels()
-ax1.legend(handles[::-1], labels[::-1], loc='upper left', fontsize=23)
+ax1.legend(handles[::-1], labels[::-1], loc='upper left', fontsize=25)
 #ax1.axhline(1e3,label='Saturation',c='black',linestyle='dashed')
 #ax2.axhline(1e3,label='Saturation',c='black',linestyle='dashed')
 ax1.set_xticks([0])
-ax1.set_ylabel(r'Dark Current [$\mu$A]', fontsize=26)
-plt.xlabel(r'log(Fluence) [log($N_{p^+}$/$cm^2$)]', fontsize=26)
+ax1.set_ylabel(r'Dark Current [$\mu$A]', fontsize=35)
+plt.xlabel(r'log(Fluence) [log($N_{p^+}$/$cm^2$)]', fontsize=35)
 plt.yscale('log')
+plt.xticks(fontsize=25)
+plt.yticks(fontsize=25)
 #plt.title('S14160 3015PS SiPM')
 d = 2.
 kwargs = dict(marker=[(-1, -d), (1, d)], markersize=12,
@@ -257,7 +259,8 @@ kwargs = dict(marker=[(-1, -d), (1, d)], markersize=12,
 ax1.plot([1, 1], [0, 1], transform=ax1.transAxes, **kwargs)
 ax2.plot([0, 0], [0, 1], transform=ax2.transAxes, **kwargs)
 ax22 = ax2.secondary_xaxis('top', functions=(lambda x: x+0.176, lambda x: x+0.176))
-ax22.set_xlabel(r'log(Fluence) [log($N_{n}$/$cm^2$)]', fontsize=26)
+ax22.tick_params(labelsize=25)
+ax22.set_xlabel(r'log(Fluence) [log($N_{n}$/$cm^2$)]', fontsize=35)
 
 for i in range(9):
     if OV[i] >= 1 and OV[i] < 4:

@@ -65,6 +65,11 @@ configurations = {
 x = np.array(range(0, cali.nChannels))
 y1 = np.array(mip)
 y2 = np.array(mipOverPed)
+mask = y1 > 0
+x = x[mask]
+print(x)
+y1 = y1[mask]
+y2 = y2[mask]
 
 labels_added = set()
 for label, config in configurations.items():
@@ -72,7 +77,7 @@ for label, config in configurations.items():
     count = 0
     total = 0
     for start, end in config['ranges']:
-        indices = np.where((x >= start) & (x <= end) & (y1[x] != 0))
+        indices = np.where((x >= start) & (x <= end))
         count += np.count_nonzero(indices)
         total += np.sum(y1[indices])
 

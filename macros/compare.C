@@ -133,68 +133,6 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    c->SaveAs(Form("%s.pdf", var));
     }
 
-    // TProfile plot
-    c->SetLeftMargin(0.1);
-    TLegend* lp = new TLegend(0.2, 0.75, 0.3, 0.85);
-
-    map<string, TProfile *> hp;
-    map<string, pair<const char*, const char*>> hp_title = {
-	{"hit_mul_vs_event_MIP", {"Event Energy [MIP]", "Hit Multiplicity"}},
-    };
-    for(const char* var : {"hit_mul_vs_event_MIP"})
-    {
-	c->Clear();
-	lp->Clear();
-	size_t i = 0;
-	for (const char* name : {name1, name2})
-	{
-	    TH2F* h2 = (TH2F*) fin[name]->Get(var);
-	    hp[name] = h2->ProfileX();
-	    hp[name]->SetName(name);
-	    hp[name]->SetTitle(Form("%s;%s;%s", title, hp_title[var].first, hp_title[var].second));
-	    hp[name]->SetMarkerStyle(20);
-	    hp[name]->SetMarkerColor(colors[i]);
-	    hp[name]->SetLineColor(colors[i]);
-	    hp[name]->SetLineWidth(2);
-	    // hp[name]->Scale(1/h[name]->Integral());
-	    hp[name]->GetXaxis()->SetTitleSize(0.07);
-	    hp[name]->GetXaxis()->SetTitleOffset(0.8);
-	    hp[name]->GetXaxis()->SetLabelSize(0.05);
-	    hp[name]->GetYaxis()->SetTitleSize(0.07);
-	    hp[name]->GetYaxis()->SetTitleOffset(0.6);
-	    hp[name]->GetYaxis()->SetLabelSize(0.05);
-	    i++;
-	}
-
-	if (hp[name1]->GetMaximum() > hp[name2]->GetMaximum())
-	{
-	    hp[name1]->Draw("P");
-	    hp[name2]->Draw("HIST SAMES");
-	}
-	else
-	{
-	    hp[name2]->Draw("HIST");
-	    hp[name1]->Draw("P SAMES");
-	}
-	c->Update();
-
-	TPaveText* pt = (TPaveText*) c->GetPrimitive("title");
-	// update title
-	pt->SetTextSize(0.07);
-	pt->SetY1NDC(0.88);
-	c->Modified();
-
-	lp->AddEntry(hp[name1], name1, "lep");
-	lp->AddEntry(hp[name2], name2, "lp");
-	lp->SetTextSize(0.055);
-	lp->Draw();
-
-	if (prefix)
-	    c->SaveAs(Form("%s_%s_profileX.pdf", prefix, var));
-	else
-	    c->SaveAs(Form("%s_profileX.pdf", var));
-    }
-
     // 2D histograms
     map<string, TH2F *> h2;
     TCanvas* c1 = new TCanvas("c1", "c1", 1200, 600);
@@ -246,16 +184,6 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    TPaveText* pt = (TPaveText*) gPad->GetPrimitive("title");
 	    pt->SetTextSize(0.07);
 	    gPad->Modified();
-
-	    if (strcmp(var, "hit_mul_vs_event_MIP") == 0)
-	    {
-		TProfile* hp = h2[names[i]]->ProfileX();
-		hp->SetMarkerStyle(20);
-		hp->SetMarkerSize(0.6);
-		hp->SetMarkerColor(kRed);
-		hp->Draw("SAME HIST P");
-		gPad->Update();
-	    }
 	}
 
 
@@ -264,4 +192,70 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	else
 	    c1->SaveAs(Form("%s.pdf", var));
     }
+
+    // TProfile plot
+    c->SetLeftMargin(0.1);
+    TLegend* lp = new TLegend(0.15, 0.75, 0.25, 0.85);
+
+    map<string, TProfile *> hp;
+    map<string, pair<const char*, const char*>> hp_title = {
+	{"hit_mul_vs_event_MIP", {"Event Energy [MIP]", "Average Hit Multiplicity"}},
+    };
+    for(const char* var : {"hit_mul_vs_event_MIP"})
+    {
+	c->Clear();
+	lp->Clear();
+	size_t i = 0;
+	for (const char* name : {name1, name2})
+	{
+	    TH2F* h2 = (TH2F*) fin[name]->Get(var);
+	    h2->GetXaxis()->SetRangeUser(150, 700);
+	    hp[name] = h2->ProfileX();
+	    hp[name]->SetName(name);
+	    hp[name]->SetTitle(Form("%s;%s;%s", title, hp_title[var].first, hp_title[var].second));
+	    hp[name]->SetMaximum(85);
+	    hp[name]->SetMinimum(0);
+	    hp[name]->SetMarkerStyle(20);
+	    hp[name]->SetMarkerColor(colors[i]);
+	    hp[name]->SetLineColor(colors[i]);
+	    hp[name]->SetLineWidth(2);
+	    // hp[name]->Scale(1/h[name]->Integral());
+	    hp[name]->GetXaxis()->SetTitleSize(0.07);
+	    hp[name]->GetXaxis()->SetTitleOffset(0.8);
+	    hp[name]->GetXaxis()->SetLabelSize(0.05);
+	    hp[name]->GetYaxis()->SetTitleSize(0.07);
+	    hp[name]->GetYaxis()->SetTitleOffset(0.6);
+	    hp[name]->GetYaxis()->SetLabelSize(0.05);
+	    i++;
+	}
+
+	if (hp[name1]->GetMaximum() > hp[name2]->GetMaximum())
+	{
+	    hp[name1]->Draw("P");
+	    hp[name2]->Draw("HIST SAMES");
+	}
+	else
+	{
+	    hp[name2]->Draw("HIST");
+	    hp[name1]->Draw("P SAMES");
+	}
+	c->Update();
+
+	TPaveText* pt = (TPaveText*) c->GetPrimitive("title");
+	// update title
+	pt->SetTextSize(0.07);
+	pt->SetY1NDC(0.88);
+	c->Modified();
+
+	lp->AddEntry(hp[name1], name1, "lep");
+	lp->AddEntry(hp[name2], name2, "lp");
+	lp->SetTextSize(0.055);
+	lp->Draw();
+
+	if (prefix)
+	    c->SaveAs(Form("%s_%s_profileX.pdf", prefix, var));
+	else
+	    c->SaveAs(Form("%s_profileX.pdf", var));
+    }
+
 }

@@ -42,8 +42,10 @@ for file in sorted(os.listdir(directory)):
 hep.style.use("CMS")
 plt.figure(figsize=(16,12))
 # plt.title(f'Dark Current Monitor for Irradiated S14160 3015 SiPM')
-plt.xlabel('Date', fontsize=26)
-plt.ylabel(r'Dark Current [$\mu$A]', fontsize=26)
+plt.xlabel('Date', fontsize=35)
+plt.ylabel(r'Dark Current [$\mu$A]', fontsize=35)
+plt.xticks(fontsize=25)
+plt.yticks(fontsize=25)
 
 #timestamps = [datetime.strptime(ts, '%m/%d/%Y %I:%M:%S %p') for ts in date]
 
@@ -59,12 +61,12 @@ beamOffDates = {
 }
 for dt, label in beamOffDates.items():
     plt.axvline(x=dt, color='red', linestyle='--')
-    plt.text(dt, 7.0, label, color="red", ha="right", va="center", rotation=90)
+    plt.text(dt, 7.0, label, color="red", ha="right", va="center", fontsize=29, rotation=90)
 
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
 # plt.yscale('log')
 # plt.xticks(rotation=45)
-plt.legend(loc='upper left', fontsize=24)
+plt.legend(loc='upper left', fontsize=30)
 # plt.show()
 fdir = os.path.expanduser(f'{CALIROOT}/figures/misc/')
 plt.savefig(f'{fdir}/IV.pdf')
