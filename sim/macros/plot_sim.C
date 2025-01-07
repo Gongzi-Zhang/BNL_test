@@ -21,7 +21,8 @@ void plot_sim()
 	{"hit_MIP", ";Hit Energy [MIP];Count"},
 	{"hit_mul", ";Hit Multiplicity;Count"},
     };
-    TLegend *l = new TLegend(0.6, 0.6, 0.8, 0.85);
+    TLegend *l = new TLegend(0.7, 0.7, 0.9, 0.9);
+    l->SetTextSize(0.045);
     for (auto var : {"event_MIP", "hit_MIP", "hit_mul"})
     {
 	c->Clear();
@@ -36,6 +37,12 @@ void plot_sim()
 	    h1->Scale(1/h1->Integral());
 	    h1->SetStats(0);
 	    h1->SetTitle(title[var]);
+	    h1->GetXaxis()->SetTitleSize(0.05);
+	    h1->GetXaxis()->SetLabelSize(0.05);
+	    h1->GetXaxis()->SetTitleOffset(0.95);
+	    h1->GetYaxis()->SetTitleSize(0.05);
+	    h1->GetYaxis()->SetLabelSize(0.05);
+	    h1->GetYaxis()->SetTitleOffset(1.1);
 	    c->cd();
 	    h1->SetLineColor(colors[i]);
 	    if (0 == i)

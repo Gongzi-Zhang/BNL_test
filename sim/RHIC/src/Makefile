@@ -11,6 +11,9 @@ RHIC_pp: RHIC_pp.cc
 RHIC_pp_filter:	RHIC_pp_filter.cc 
 	$(CXX) $(CXXFLAGS)  $^ $(CPPFLAGS) $(LDFLAGS) -o $@
 
+RHIC_pp_filt_T1: RHIC_pp_filt_T1.cc 
+	$(CXX) $(CXXFLAGS)  $^ $(CPPFLAGS) $(LDFLAGS) -o $@
+
 RHIC_pp_pi0_filter: RHIC_pp_pi0_filter.cc 
 	$(CXX) $(CXXFLAGS)  $^ $(CPPFLAGS) $(LDFLAGS) -o $@
 

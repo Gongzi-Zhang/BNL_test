@@ -18,12 +18,12 @@ void check_rec(const char *fname = "rec.edm4hep.root",
     TTreeReader tr(tin);
 
     // TTreeReaderArray<unsigned long> hit_cellID(tr, "CALIHits.cellID");
-    TTreeReaderArray<float> hit_energy(tr, "CALIHits.energy");
+    TTreeReaderArray<float> hit_e(tr, "CALIHits.energy");
     TTreeReaderArray<float> hit_x(tr, "CALIHits.position.x");
     TTreeReaderArray<float> hit_y(tr, "CALIHits.position.y");
     TTreeReaderArray<float> hit_z(tr, "CALIHits.position.z");
     // TTreeReaderArray<unsigned long> rec_hit_cellID(tr, "CALIRecHits.cellID");
-    TTreeReaderArray<float> rec_hit_energy(tr, "CALIRecHits.energy");
+    TTreeReaderArray<float> rec_hit_e(tr, "CALIRecHits.energy");
     TTreeReaderArray<float> rec_hit_x(tr, "CALIRecHits.position.x");
     TTreeReaderArray<float> rec_hit_y(tr, "CALIRecHits.position.y");
     TTreeReaderArray<float> rec_hit_z(tr, "CALIRecHits.position.z");
@@ -52,12 +52,12 @@ void check_rec(const char *fname = "rec.edm4hep.root",
 
 	// raw hits
 	event_e = event_x = event_y = event_z = 0;
-	for (int hi=0; hi<hit_energy.GetSize(); hi++)
+	for (int hi=0; hi<hit_e.GetSize(); hi++)
 	{
 	    e = hit_e[hi];
-	    x = hit_x[hi];
-	    y = hit_y[hi];
-	    z = hit_z[hi];
+	    x = hit_x[hi] - cali::x0;
+	    y = hit_y[hi] - cali::y0;
+	    z = (hit_z[hi] - cali::z0)/cali::lt;
 	    event_e += e;
 	    event_x += x*e;
 	    event_y += y*e;
@@ -68,7 +68,7 @@ void check_rec(const char *fname = "rec.edm4hep.root",
 	    h1["raw"]["hit_y"]->Fill(y/cm);
 	    h1["raw"]["hit_z"]->Fill(z/cm);
 	}
-	h1["raw"]["hit_mul"]->Fill(hit_energy.GetSize());
+	h1["raw"]["hit_mul"]->Fill(hit_e.GetSize());
 	h1["raw"]["event_e"]->Fill(event_e/MIP);
 	h1["raw"]["event_x"]->Fill(event_x/event_e/cm);
 	h1["raw"]["event_y"]->Fill(event_y/event_e/cm);
@@ -76,24 +76,24 @@ void check_rec(const char *fname = "rec.edm4hep.root",
 
 	// rec hits
 	event_e = event_x = event_y = event_z = 0;
-	for (int hi=0; hi<rec_hit_energy.GetSize(); hi++)
+	for (int hi=0; hi<rec_hit_e.GetSize(); hi++)
 	{
 	    e = rec_hit_e[hi];
-	    x = rec_hit_x[hi];
-	    y = rec_hit_y[hi];
-	    z = rec_hit_z[hi];
+	    x = rec_hit_x[hi] - cali::x0;
+	    y = rec_hit_y[hi] - cali::y0;
+	    z = (rec_hit_z[hi] - cali::z0)/cali::lt;
 	    event_e += e;
 	    event_x += x*e;
 	    event_y += y*e;
 	    event_z += z*e;
 
-	    h1["rec"]["hit_e"]->Fill(e/MIP);
+	    h1["rec"]["hit_e"]->Fill(e);
 	    h1["rec"]["hit_x"]->Fill(x/cm);
 	    h1["rec"]["hit_y"]->Fill(y/cm);
 	    h1["rec"]["hit_z"]->Fill(z/cm);
 	}
-	h1["rec"]["hit_mul"]->Fill(rec_hit_energy.GetSize());
-	h1["rec"]["event_e"]->Fill(event_e/MIP);
+	h1["rec"]["hit_mul"]->Fill(rec_hit_e.GetSize());
+	h1["rec"]["event_e"]->Fill(event_e);
 	h1["rec"]["event_x"]->Fill(event_x/event_e/cm);
 	h1["rec"]["event_y"]->Fill(event_y/event_e/cm);
 	h1["rec"]["event_z"]->Fill(event_z/event_e/cm);

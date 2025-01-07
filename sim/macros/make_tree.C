@@ -1,8 +1,10 @@
+#include "calisim.h"
+
 void make_tree(const char *fname = "output.edm4hep.root", 
 	  const char*out_name = "output.root")
 {
     float MIP = 0.495*MeV;
-    const char * branch = "CALIHits";
+    const char * branch = "CALIRecHits";
     const char * prefix = "sim";
 
     TFile *fin = new TFile(fname, "read");
@@ -56,6 +58,7 @@ void make_tree(const char *fname = "output.edm4hep.root",
 	    }
 	}
 	tout->Fill();
+	cout << DEBUG << "Entry " << ei << ":\t" << hit_cellID.GetSize() << " vs " << hits.mul << endl;
     }
 
     fin->Close();

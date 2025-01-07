@@ -92,9 +92,9 @@
     <constant name="PCB_t"		    value="0.8*mm"/>
     <constant name="layer_t"		    value="absorber_t + cover_t + 2*ESR_t + scintillator_t + PCB_t"/>
 
-    <constant name="trigger12_x"	    value="7*cm" />
+    <constant name="trigger12_x"	    value="5*cm" />
     <constant name="trigger12_y"	    value="trigger12_x" />
-    <constant name="trigger34_x"	    value="3.5*cm" />
+    <constant name="trigger34_x"	    value="5*cm" />
     <constant name="trigger34_y"	    value="trigger34_x" />
     <constant name="trigger_t"		    value="cover_t + 2*ESR_t + scintillator_t + PCB_t"/>
     <constant name="trigger12_x_offset"	    value="0*cm"/>
