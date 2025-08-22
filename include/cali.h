@@ -17,7 +17,9 @@ namespace cali {
     const char* CALIROOT = (assert(getenv("CALIROOT") != NULL), true)
 	? getenv("CALIROOT")
 	: ".";
-    const char* backupDir = "/media/arratialab/CALI/BNL_test/";
+    const char* CALIBACKUP = (assert(getenv("CALIBAKCUP") != NULL), true)
+	? getenv("CALIBAKCUP")
+	: ".";
 
     // Run 2024
     const char* run24Start	= "2024-04-24";
@@ -329,7 +331,7 @@ namespace cali {
 	char dirs[3][1024];
 	sprintf(dirs[0], ".");
 	sprintf(dirs[1], "%s/data", CALIROOT);
-	sprintf(dirs[2], "%s/data", backupDir);
+	sprintf(dirs[2], "%s/data", CALIBAKCUP);
 	for (char* dir : dirs)
 	{
 	    sprintf(rootFile, "%s/%s", dir, fname);
@@ -337,7 +339,7 @@ namespace cali {
 		return rootFile;
 	}
 
-	cerr << FATAL << "can't find file: " << fname << endl;
+	cerr << ERROR << "can't find file: " << fname << endl;
 	return "";
     }
 

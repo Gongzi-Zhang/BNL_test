@@ -5,7 +5,9 @@
 void make_hist(const char *fname = "output.myrec.root", 
 	  const char*out_prefix = "output")
 {
-    float hit_energy_cut = 0.5;
+    float low_hit_energy_cut = 0.5;
+    float high_hit_energy_cut = 140;
+    double scale = 1.1;
     string unit = "MIP";
 
     TFile *fin = new TFile(fname, "read");
@@ -26,19 +28,19 @@ void make_hist(const char *fname = "output.myrec.root",
     string eRanges[] = {"100MIP", "100-150MIP", "150MIP", "150-300MIP", "300-600MIP", "600MIP"};
     map<string, const double> minEventEnergy = {
 	{"100MIP",	50},
-	{"100-150MIP",	50},
 	{"150MIP",	100},
 	{"150-300MIP",  100},
+	{"300",		250},
 	{"300-600MIP",  250},
 	{"600MIP",	550},
     };
     map<string, const double> maxEventEnergy = {
-	{"100MIP",	1000},
-	{"100-150MIP",	200}, 
-	{"150MIP",	1000},
+	{"100MIP",	1400},
+	{"150MIP",	1400},
 	{"150-300MIP",  350}, 
+	{"300MIP",	1400},
 	{"300-600MIP",  650}, 
-	{"600MIP",	1000},
+	{"600MIP",	1400},
     };                                 
     map<string, TFile*> fout;
     map<string, map<string, TH1F*>> h1;
@@ -46,16 +48,16 @@ void make_hist(const char *fname = "output.myrec.root",
 
     for (const string eRange : eRanges)
     {
-	fout[eRange] = new TFile(Form("%s_hit_%.1fMIP_event_%s_hist.root", out_prefix, hit_energy_cut, eRange.c_str()), "recreate");
+	fout[eRange] = new TFile(Form("%s_event_%s_hist.root", out_prefix, eRange.c_str()), "recreate");
 	fout[eRange]->cd();
 
-	h1[eRange]["hit_MIP"] = new TH1F("hit_MIP", "Hit Energy;MIP", 100, 0, 200);
-	h1[eRange]["hit_mul"] = new TH1F("hit_mul", "Hit Multiplicity", 100, 0, 100);
+	h1[eRange]["hit_MIP"] = new TH1F("hit_MIP", "Hit Energy;MIP", 50, 0, 150);
+	h1[eRange]["hit_mul"] = new TH1F("hit_mul", "Hit Multiplicity", 80, 0, 160);
 	h1[eRange]["hit_mul1"] = new TH1F("hit_mul1", "Hit Multiplicity (0.5 - 2 MIPs)", 100, 0, 100);
 	h1[eRange]["hit_mul2"] = new TH1F("hit_mul2", "Hit Multiplicity (2 - 5 MIPs)", 100, 0, 100);
 	h1[eRange]["hit_mul3"] = new TH1F("hit_mul3", "Hit Multiplicity (5 - 10 MIPs)", 100, 0, 100);
 	h1[eRange]["hit_mul4"] = new TH1F("hit_mul4", "Hit Multiplicity (> 10 MIPs)", 100, 0, 100);
-	h1[eRange]["event_MIP"] = new TH1F("event_MIP", "Event Energy;MIP", 100, minEventEnergy[eRange], maxEventEnergy[eRange]);
+	h1[eRange]["event_MIP"] = new TH1F("event_MIP", "Event Energy;MIP", 50, minEventEnergy[eRange], maxEventEnergy[eRange]);
 	h1[eRange]["event_x"] = new TH1F("event_x", "COG X;cm", 100, -10, 10);
 	h1[eRange]["event_y"] = new TH1F("event_y", "COG Y;cm", 100, -10, 10);
 	h1[eRange]["event_z"] = new TH1F("event_z", "COG Z;layer", 100, 0, cali::nLayers);
@@ -67,7 +69,7 @@ void make_hist(const char *fname = "output.myrec.root",
 	h1[eRange]["clu_nhits"] = new TH1F("clu_nhits", "Cluster Number of Hits", 50, 0, 50);
 	h1[eRange]["pi0_mass"] = new TH1F("pi0_mass", "Invariant Mass of Top Two Clusters;MeV", 50, 0, 1000);
 
-	h2[eRange]["hit_mul_vs_event_MIP"] = new TH2F("hit_mul_vs_event_MIP", "Hit mul vs event MIP", 100, minEventEnergy[eRange], maxEventEnergy[eRange], 100, 0, 100);
+	h2[eRange]["hit_mul_vs_event_MIP"] = new TH2F("hit_mul_vs_event_MIP", "Hit mul vs event MIP", 100, minEventEnergy[eRange], maxEventEnergy[eRange], 80, 0, 160);
 	h2[eRange]["eta_vs_event_MIP"] = new TH2F("eta_vs_event_MIP", "#eta vs event MIP", 100, minEventEnergy[eRange], maxEventEnergy[eRange], 100, 3, 3.5);
 	h2[eRange]["x_vs_y"] = new TH2F("x_vs_y", "X vs Y;cm;cm", 100, -10, 10, 100, -10, 10);
 	h2[eRange]["clu_x_vs_y"] = new TH2F("clu_x_vs_y", "Cluster X vs Y;cm;cm", 100, -10, 10, 100, -10, 10);
@@ -96,8 +98,8 @@ void make_hist(const char *fname = "output.myrec.root",
 	// Hits
 	for (int hi=0; hi<hit_e.GetSize(); hi++)
 	{
-	    e = hit_e[hi];
-	    if (e < hit_energy_cut)
+	    e = hit_e[hi]*scale;
+	    if (e < low_hit_energy_cut || e > high_hit_energy_cut)
 		continue;
 	    hit_mul++;
 	    event_e += e;
@@ -124,8 +126,8 @@ void make_hist(const char *fname = "output.myrec.root",
 
 	for (int hi=0; hi<hit_e.GetSize(); hi++)
 	{
-	    e = hit_e[hi];
-	    if (e < hit_energy_cut)
+	    e = hit_e[hi]*scale;
+	    if (e < low_hit_energy_cut || e > high_hit_energy_cut)
 		continue;
 
 	    x = hit_x[hi];
@@ -248,4 +250,10 @@ void make_hist(const char *fname = "output.myrec.root",
 	fout[eRange]->Write();
 	fout[eRange]->Close();
     }
+}
+
+void make_hist(const int run)
+{
+    string rootFile = cali::getFile(Form("Run%d.myrec.root", run));
+    make_hist(rootFile.c_str(), Form("Run%d", run));
 }

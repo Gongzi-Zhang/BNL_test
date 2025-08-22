@@ -1,7 +1,13 @@
+#!/bin/bash
+
 script=$(basename -- ${BASH_SOURCE[0]})
+if [ -z "${CALIROOT+x}" ]; then                                                 
+    source  ${script}/../setup.sh                                          
+fi  
 
 export SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
 
+# IO
 black="\033[30;20m"
 red="\033[31;20m"
 green="\033[32;20m"
@@ -24,11 +30,23 @@ logger()
     echo -e "($script:$LINENO) ${color[$level]}${level^^}$reset -" $@
 }
 
-test()
+logger_test()
 {
     logger debug "debug"
     logger info "info"
     logger warning "warning"
     logger error "error"
     logger fatal "fatal"
+}
+
+# File
+getFile() 
+{
+    for dir in "." "${CALIROOT}/data/" "${CALIBACKUP}/data/"; do
+	f="${dir}/${1}"
+	if [ -f "$f" ]; then
+	    echo $f
+	    break
+	fi
+    done
 }

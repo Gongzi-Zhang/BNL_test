@@ -1,3 +1,9 @@
+# 20250314
+    Found the KETEK (tile 2) I-limit is on, reset the voltage to 28.22 V to make
+    the light off
+    Also found tile 1 fails to trigger today, it was working yesterday. Resetting
+    its voltage to 29.14 V doesnot help, donot know what is the problem
+
 # 202401107
     (run 2839)
     Update (recompile) drs4eb, looks like it is affecting the trigger threshold

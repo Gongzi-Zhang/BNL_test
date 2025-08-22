@@ -1,9 +1,10 @@
+#include "utilities.h"
 #include "cali_style.h"
 
 const double Y1[] = {0.5, 0.7};
 const double height = 0.2;
 
-void compare(const char* f1, const char* f2, const char* name1 = "data", const char* name2 = "sim", const char *prefix = NULL, const char* title = "T1")
+void compare(const char* f1, const char* f2, const char* name1 = "data", const char* name2 = "sim", const char *prefix = NULL, const char* title = "T1", const char* fsys = NULL)
 {
     gROOT->SetBatch(1);
     cali_style();
@@ -23,6 +24,16 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
     {
 	cerr << "Can't open root file: " << name2 << endl;
 	exit(1);
+    }
+
+    if (fsys)
+    {
+	fin["sys"] = new TFile(fsys, "read");
+	if (!fin["sys"] || !fin["sys"]->IsOpen())
+	{
+	    cerr << "Can't open root file: " << fsys << endl;
+	    exit(1);
+	}
     }
 
     TCanvas* c = new TCanvas("c", "c", 800, 600);
@@ -53,7 +64,8 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
     };
 
     // 1D histograms
-    for (const char* var : {"hit_MIP", "event_MIP", "hit_mul", "hit_mul1", "hit_mul2", "hit_mul3", "hit_mul4", "event_x", "event_y", "event_z", "clu_mul", "clu_MIP", "clu_x", "clu_y", "clu_z", "clu_nhits", "pi0_mass"})
+    // for (const char* var : {"hit_MIP", "event_MIP", "hit_mul", "hit_mul1", "hit_mul2", "hit_mul3", "hit_mul4", "event_x", "event_y", "event_z", "clu_mul", "clu_MIP", "clu_x", "clu_y", "clu_z", "clu_nhits", "pi0_mass"})
+    for (const char* var : {"hit_MIP", "event_MIP", "hit_mul", "hit_mul1", "hit_mul2", "hit_mul3", "hit_mul4", "event_x", "event_y", "event_z"})
     {
 	c->Clear();
 	l->Clear();
@@ -74,6 +86,8 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    h[name]->SetLineColor(colors[i]);
 	    h[name]->SetLineWidth(2);
 	    h[name]->Scale(1/h[name]->Integral());
+	    if (strcmp(var, "hit_MIP") == 0)
+	        h[name]->GetXaxis()->SetRangeUser(0, 140);
 	    h[name]->GetXaxis()->SetTitleSize(0.07);
 	    h[name]->GetXaxis()->SetTitleOffset(0.8);
 	    h[name]->GetXaxis()->SetLabelSize(0.05);
@@ -83,10 +97,25 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    i++;
 	}
 
-	if (strcmp(var, "hit_mul") == 0 && h[name1]->GetMaximum() < 0.048)
-	    h[name1]->SetMaximum(0.048);
+	TH1F* hsys;
+	if (fsys)
+	{
+	    hsys = (TH1F*) fin["sys"]->Get(var);
+	    hsys->SetMarkerStyle(20);
+	    hsys->SetMarkerColor(colors[0]);
+	    hsys->SetLineColor(colors[0]);
+	    hsys->SetFillColor(colors[0]);
+	    hsys->SetFillStyle(3003);
+	}
+
+	if (strcmp(var, "hit_mul") == 0)
+	    h[name1]->GetYaxis()->SetRangeUser(0, 0.142);
 	else if (strcmp(var, "clu_mul") == 0)
 	    h[name1]->SetMaximum(h[name1]->GetMaximum()*1.16);
+	else if (strcmp(var, "hit_MIP") == 0)
+	    h[name1]->GetYaxis()->SetRangeUser(5e-6, 0.8);
+	else if (strcmp(var, "event_MIP") == 0)
+	    h[name1]->GetYaxis()->SetRangeUser(5e-6, 0.6);
 
 	// rebin pi0 mass histogram
 	// if (strcmp(var, "pi0_mass") == 0)
@@ -96,16 +125,14 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	// }
 
 	string name;
-	if (h[name1]->GetMaximum() > h[name2]->GetMaximum())
-	{
-	    h[name1]->Draw("P");
-	    h[name2]->Draw("HIST SAMES");
-	}
-	else
-	{
-	    h[name2]->Draw("HIST");
-	    h[name1]->Draw("P SAMES");
-	}
+	// double ymin = 0.9*(h[name1]->GetMinimum() < h[name2]->GetMinimum() ? h[name1]->GetMinimum() : h[name2]->GetMinimum());
+	// double ymax = 1.1*(h[name1]->GetMaximum() > h[name2]->GetMaximum() ? h[name1]->GetMaximum() : h[name2]->GetMaximum());
+	// h[name1]->GetYaxis()->SetRangeUser(ymin, ymax);
+	h[name1]->Draw("P");
+	h[name2]->Draw("HIST SAME");
+	h[name1]->Draw("PE SAME");
+	if (fsys)
+	    hsys->Draw("E2 SAME");
 	c->Update();
 
 	TPaveText* pt = (TPaveText*) c->GetPrimitive("title");
@@ -151,8 +178,9 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	{name1, "data"},
 	{name2, "sim"},
     };
-    for(const char* var : {"hit_mul_vs_event_MIP", "eta_vs_event_MIP", "clu_x_vs_y", "clu_x_vs_y_weighted", 
-	    "clu_e_vs_x", "clu_e_vs_y", "clu_e_vs_z"}) 
+    // for(const char* var : {"hit_mul_vs_event_MIP", "eta_vs_event_MIP", "clu_x_vs_y", "clu_x_vs_y_weighted", 
+    //         "clu_e_vs_x", "clu_e_vs_y", "clu_e_vs_z"}) 
+    for(const char* var : {"hit_mul_vs_event_MIP", "eta_vs_event_MIP"}) 
     {
 	size_t i = 0;
 	for (const char* name : {name1, name2})
@@ -209,8 +237,9 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	for (const char* name : {name1, name2})
 	{
 	    TH2F* h2 = (TH2F*) fin[name]->Get(var);
-	    h2->GetXaxis()->SetRangeUser(150, 700);
+	    // h2->GetXaxis()->SetRangeUser(150, 700);
 	    hp[name] = h2->ProfileX();
+	    hp[name]->GetXaxis()->SetRangeUser(150, 700);
 	    hp[name]->SetName(name);
 	    hp[name]->SetTitle(Form("%s;%s;%s", title, hp_title[var].first, hp_title[var].second));
 	    hp[name]->SetMaximum(85);
@@ -219,7 +248,6 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    hp[name]->SetMarkerColor(colors[i]);
 	    hp[name]->SetLineColor(colors[i]);
 	    hp[name]->SetLineWidth(2);
-	    // hp[name]->Scale(1/h[name]->Integral());
 	    hp[name]->GetXaxis()->SetTitleSize(0.07);
 	    hp[name]->GetXaxis()->SetTitleOffset(0.8);
 	    hp[name]->GetXaxis()->SetLabelSize(0.05);
@@ -229,16 +257,28 @@ void compare(const char* f1, const char* f2, const char* name1 = "data", const c
 	    i++;
 	}
 
-	if (hp[name1]->GetMaximum() > hp[name2]->GetMaximum())
+	TProfile* hpsys;
+	if (fsys)
 	{
-	    hp[name1]->Draw("P");
-	    hp[name2]->Draw("HIST SAMES");
+	    hpsys = (TProfile*) fin["sys"]->Get(Form("%s_profileX", var));
+	    // TH2F* hsys = (TH2F*) fin["sys"]->Get(var);
+	    // hpsys = hsys->ProfileX();
+	    hpsys->GetXaxis()->SetRangeUser(150, 700);
+	    hpsys->SetMarkerStyle(20);
+	    hpsys->SetMarkerColor(colors[0]);
+	    hpsys->SetLineColor(colors[0]);
+	    hpsys->SetFillColor(colors[0]);
+	    hpsys->SetFillStyle(3003);
 	}
-	else
-	{
-	    hp[name2]->Draw("HIST");
-	    hp[name1]->Draw("P SAMES");
-	}
+
+	// double ymin = (hp[name1]->GetMinimum() < hp[name2]->GetMinimum()) ? hp[name1]->GetMinimum() : hp[name2]->GetMinimum();
+	// double ymax = (hp[name1]->GetMaximum() > hp[name2]->GetMaximum()) ? hp[name1]->GetMaximum() : hp[name2]->GetMaximum();
+	// hp[name2]->GetYaxis()->SetRangeUser(ymin, ymax);
+	hp[name1]->Draw("P");
+	hp[name2]->Draw("HIST");
+	hp[name1]->Draw("PE SAME");
+	if (fsys)
+	    hpsys->Draw("E2 SAME");
 	c->Update();
 
 	TPaveText* pt = (TPaveText*) c->GetPrimitive("title");

@@ -5,6 +5,8 @@ void printSipmPos()
 {
     gROOT->SetBatch(1);
     setRun(1000);
+    nLayers = 15;
+    nChannels = 268;
     TCanvas *c[nLayers];
     pair<float, float> quaPos[] = {
 	{ 5,  6},

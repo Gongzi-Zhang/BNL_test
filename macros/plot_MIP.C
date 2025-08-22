@@ -1,4 +1,5 @@
 /* plot channel-by-channel MIP values and their ratio to pedestal */
+#include <nlohmann/json.hpp> 
 #include "db.h"
 #include "cali.h"
 #include "analysis.h"
@@ -25,6 +26,16 @@ void plot_MIP(const int run = 2580)
     ped_t ped;
     getPedestal(pedFile.c_str(), ped);
 
+    string HGvsLGFile = cali::getFile("HG_vs_LG.json");
+    ifstream fjson(HGvsLGFile);
+    auto ratio = nlohmann::json::parse(fjson);
+    fjson.close();
+    map<int, double> HG_vs_LG;
+    for (int ch=0; ch<calo::nChannels; ch++)
+    {
+	HG_vs_LG[ch] = ratio[to_string(ch)];
+    }
+
     map<int, vector<pair<int, int>>> ranges;
     ranges[0] = {{0, 6}, {35, 41}, {84, 90}, {98, 111}};
     ranges[1] = {{7, 34}, {42, 55}, {124, 127}};
@@ -36,53 +47,85 @@ void plot_MIP(const int run = 2580)
 	{2, "Hex tile; 1.3mm SiPM"},
 	{3, "Square tile; 3mm SiPM"},
     };
-    map<int, TGraph*> g1;
-    map<int, TGraph*> g2;
-    map<int, float> mean;
+    map<int, map<string, TGraph*>> g1;
+    map<int, map<string, TGraph*>> g2;
+    map<int, map<string, float>> mean;
 
     for (size_t i=0; i<4; i++)
     {
-	g1[i] = new TGraph();
-	g2[i] = new TGraph();
+	for (const char* gain : {"HG", "LG"})
+	{
+	    g1[i][gain] = new TGraph();
+	    g2[i][gain] = new TGraph();
+	}
 
-	float sum = 0;
-	int count = 0;
-	float mip_value;
+	map<string, float> sum;
+	map<string, int> count;
+	float HG_mip, LG_mip;
 	for (const auto [start, end] : ranges[i])
 	{
 	    for (int ch=start; ch<=end; ch++)
 	    {
-		mip_value = mip[ch]["HG"];
-		if (mip_value == 0)
+		HG_mip = mip[ch]["HG"];
+		if (HG_mip == 0)
 		    continue;
 
-		sum += mip_value;
-		g1[i]->SetPoint(count, ch, mip_value);
-		g2[i]->SetPoint(count, ch, mip_value/ped[ch]["HG"].rms);
-		count++;
+		sum["HG"] += HG_mip;
+		g1[i]["HG"]->SetPoint(count["HG"], ch, HG_mip);
+		g2[i]["HG"]->SetPoint(count["HG"], ch, HG_mip/ped[ch]["HG"].rms);
+		count["HG"]++;
+
+		if (HG_vs_LG[ch] == 0)
+		{
+		    cout << WARNING << ch << "\t" << HG_vs_LG[ch] << endl;
+		    continue;
+		}
+		LG_mip = HG_mip / HG_vs_LG[ch];
+		sum["LG"] += LG_mip;
+		g1[i]["LG"]->SetPoint(count["LG"], ch, LG_mip);
+		g2[i]["LG"]->SetPoint(count["LG"], ch, LG_mip/ped[ch]["LG"].rms);
+		count["LG"]++;
 	    }
 	}
-	mean[i] = sum/count;
+
+	for (const char* gain : {"HG", "LG"})
+	{
+	    mean[i][gain] = sum[gain]/count[gain];
+	    cout << DEBUG << i << "\t" << gain << "\t" << mean[i][gain] << endl;
+	}
     }
 
-    map<int, float> error;
+    map<int, map<string, float>> error;
     for (size_t i=0; i<4; i++)
     {
-	float mip_value;
+	float HG_mip, LG_mip;
 	for (const auto [start, end] : ranges[i])
 	{
 	    for (int ch=start; ch<=end; ch++)
 	    {
-		mip_value = mip[ch]["HG"];
-		if (mip_value == 0)
+		HG_mip = mip[ch]["HG"];
+		if (HG_mip == 0)
 		    continue;
 
-		double e = abs(mip_value - mean[i])/mean[i];
-		if (e > error[i])
-		    error[i] = e;
+		double e = abs(HG_mip - mean[i]["HG"])/mean[i]["HG"];
+		if (e > error[i]["HG"])
+		    error[i]["HG"] = e;
+
+		if (HG_vs_LG[ch] == 0)
+		{
+		    cout << WARNING << ch << "\t" << HG_vs_LG[ch] << endl;
+		    continue;
+		}
+
+		LG_mip = HG_mip / HG_vs_LG[ch];
+		e = abs(LG_mip - mean[i]["LG"])/mean[i]["LG"];
+		if (e > error[i]["LG"])
+		    error[i]["LG"] = e;
 	    }
 	}
-	cout << INFO << i << "\t" << error[i]*100 << endl;
+
+	for (const char* gain : {"HG", "LG"})
+	    cout << INFO << i << "\t" << gain << "\t" << error[i][gain]*100 << endl;
     }
     // plot
     TCanvas* c = new TCanvas("c", "c", 1600, 600);
@@ -92,48 +135,56 @@ void plot_MIP(const int run = 2580)
     TLegend *lg = new TLegend(0.12, 0.7, 0.58, 0.9);
     lg->SetTextSize(0.045);
 
-    c->cd(1);
-    for (size_t i=0; i<4; i++)
+    map<string, double> ymax = {
+	{ "LG", 260},
+	{ "HG", 7400},
+    };
+    for (const char* gain : {"HG", "LG"})
     {
-	g1[i]->SetMarkerStyle(markers[i]);
-	g1[i]->SetMarkerColor(colors[i]);
-	g1[i]->GetXaxis()->SetLimits(0, 200);
-	g1[i]->GetYaxis()->SetRangeUser(0, 5500);
+	lg->Clear();
 
-	if (0 == i)
+	c->cd(1);
+	for (size_t i=0; i<4; i++)
 	{
-	    g1[i]->SetTitle(";Ch;HG MIP [ADC]");
-	    g1[i]->GetYaxis()->SetRangeUser(0, 7400);
-	    g1[i]->GetYaxis()->SetTitleOffset(1.05);
-	    g1[i]->Draw("AP");
+	    g1[i][gain]->SetMarkerStyle(markers[i]);
+	    g1[i][gain]->SetMarkerColor(colors[i]);
+	    g1[i][gain]->GetXaxis()->SetLimits(0, 200);
+
+	    if (0 == i)
+	    {
+		g1[i][gain]->SetTitle(Form(";Ch;%s MIP [ADC]", gain));
+		g1[i][gain]->GetYaxis()->SetRangeUser(0, ymax[gain]);
+		g1[i][gain]->GetYaxis()->SetTitleOffset(1.05);
+		g1[i][gain]->Draw("AP");
+	    }
+	    else
+		g1[i][gain]->Draw("P SAME");
+
+	    TLine *l = new TLine(0, mean[i][gain], 200, mean[i][gain]);
+	    l->SetLineColor(colors[i]);
+	    l->Draw();
+
+	    lg->AddEntry(g1[i][gain], labels[i], "p");
 	}
-	else
-	    g1[i]->Draw("P SAME");
+	lg->Draw();
 
-	TLine *l = new TLine(0, mean[i], 200, mean[i]);
-	l->SetLineColor(colors[i]);
-	l->Draw();
-
-	lg->AddEntry(g1[i], labels[i], "p");
-    }
-    lg->Draw();
-
-    c->cd(2);
-    for (size_t i=0; i<4; i++)
-    {
-	g2[i]->SetMarkerStyle(markers[i]);
-	g2[i]->SetMarkerColor(colors[i]);
-	g2[i]->GetXaxis()->SetLimits(0, 200);
-	g2[i]->GetYaxis()->SetRangeUser(0, 33);
-
-	if (0 == i)
+	c->cd(2);
+	for (size_t i=0; i<4; i++)
 	{
-	    g2[i]->SetTitle(";Ch;HG MIP/Ped RMS");
-	    g2[i]->Draw("AP");
-	}
-	else
-	    g2[i]->Draw("P SAME");
-    }
+	    g2[i][gain]->SetMarkerStyle(markers[i]);
+	    g2[i][gain]->SetMarkerColor(colors[i]);
+	    g2[i][gain]->GetXaxis()->SetLimits(0, 200);
+	    g2[i][gain]->GetYaxis()->SetRangeUser(0, 33);
 
-    c->SaveAs(Form("Run%d_HG_MIP.pdf", run));
+	    if (0 == i)
+	    {
+		g2[i][gain]->SetTitle(Form(";Ch;%s MIP/Ped RMS", gain));
+		g2[i][gain]->Draw("AP");
+	    }
+	    else
+		g2[i][gain]->Draw("P SAME");
+	}
+
+	c->SaveAs(Form("Run%d_%s_MIP.pdf", run, gain));
+    }
 }

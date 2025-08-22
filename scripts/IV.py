@@ -41,6 +41,7 @@ for file in sorted(os.listdir(directory)):
 
 hep.style.use("CMS")
 plt.figure(figsize=(16,12))
+plt.subplots_adjust(left=0.08, right=0.98, bottom=0.09, top=0.91)
 # plt.title(f'Dark Current Monitor for Irradiated S14160 3015 SiPM')
 plt.xlabel('Date', fontsize=35)
 plt.ylabel(r'Dark Current [$\mu$A]', fontsize=35)

@@ -194,7 +194,7 @@ void calibrate::fillCorADC()
 		if (corADC[ch][gain] < 5*ped[ch][gain].rms)
 		    corADC[ch][gain] = 0;
 	    }
-	    if (corADC[ch]["LG"] > 0 && corADC[ch]["HG"] < 7900)
+	    if (corADC[ch]["LG"] > 0 && corADC[ch]["HG"] < 7600 && corADC[ch]["HG"] > 0)
 		h2[ch]->Fill(corADC[ch]["LG"], corADC[ch]["HG"]);
 	}
 	fillEvent(corADC, tcor);
@@ -211,9 +211,9 @@ void calibrate::getLGMIP()
     {
 	c->cd(ch+1);
 	TProfile * proX = h2[ch]->ProfileX(Form("ch%d_profileX", ch));
-	TF1 *fit = new TF1(Form("ch%d_fit", ch), "[0] + [1]*x", 0, 1000);
+	TF1 *fit = new TF1(Form("ch%d_fit", ch), "[0] + [1]*x", 0, 300);
 	fit->SetParameters(0, 30);
-	proX->Fit(fit, "q");
+	proX->Fit(fit, "q R ROB=0.95");
 	if (h2[ch]->GetEntries() > 300)
 	    mip[ch]["LG"] = mip[ch]["HG"] / fit->GetParameter(1);
 

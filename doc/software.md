@@ -22,7 +22,7 @@ globalprotect connect -p campusvpn.ucr.edu
 
 # installation
 # drsosc
-## drs4eb
+## drs4ebp -- discarded
 * fetch drs4eb source code from [git repository](https://bitbucket.org/ritt/drs4eb.git) 
 ```
 git clone https://bitbucket.org/ritt/drs4eb.git .
@@ -34,6 +34,11 @@ cd build
 cmake ..
 make install
 ```
+
+```
+sudo apt install drs4eb
+```
+
 
 ## drs-5.0.6 doesn't work on Ubuntu-22.04
 drs-5.0.6 requires libwx_gtk2u_adv-3.0, wxWidgets

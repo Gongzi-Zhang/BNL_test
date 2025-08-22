@@ -1,4 +1,5 @@
 export CALIROOT=$(realpath -- $(dirname -- ${BASH_SOURCE[0]}))
+export CALIBACKUP="/media/arratialab/CALI/BNL_test/"
 if ! [[ "$PATH" =~ "$CALIROOT" ]]; then
     export PATH=$PATH:${CALIROOT}/bin
 fi

@@ -9,7 +9,8 @@ void plot_ch_HG2LG(const int run=2019)
     gROOT->SetBatch(1);
     cali_style();
 
-    const int channels[] = {25, 62, 100, 160};
+    // const int channels[] = {25, 62, 100, 160};
+    const int channels[] = {160};
     const int nChannels = sizeof(channels)/sizeof(channels[0]);
 
     caliDB db;
@@ -52,9 +53,9 @@ void plot_ch_HG2LG(const int run=2019)
     }
 
     // plot and fit
-    TCanvas* c = new TCanvas("c", "c", 600*nChannels, 600);
+    TCanvas* c = new TCanvas("c", "c", 800*nChannels, 600);
     c->SetMargin(0, 0, 0, 0);
-    c->Divide(4, 1, 0, 0);
+    // c->Divide(4, 1, 0, 0);
     for (size_t i=0; i<nChannels; i++)
     {
 	c->cd(i+1);
@@ -84,7 +85,8 @@ void plot_ch_HG2LG(const int run=2019)
 	latex->SetTextSize(0.06);
 	latex->SetTextAlign(22);
 	latex->SetTextColor(kRed);
-	latex->DrawLatexNDC(0.65, 0.3, Form("#splitline{Ch %d}{Slope = %.2f}", ch, fit->GetParameter(1)));
+	latex->DrawLatexNDC(0.65, 0.38, Form("Ch %d", ch));
+	latex->DrawLatexNDC(0.65, 0.3, Form("Slope = %.2f #pm %.2f", fit->GetParameter(1), fit->GetParError(1)));
         latex->SetTextColor(kRed);
         latex->Draw();
     }

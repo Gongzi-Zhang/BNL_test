@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     sprintf(rootFile, "%s/data/Run%d.root", cali::CALIROOT, run);
     if (!fileExists(rootFile))
     {
-	sprintf(rootFile, "%s/data/Run%d.root", cali::backupDir, run);
+	sprintf(rootFile, "%s/data/Run%d.root", cali::CALIBACKUP, run);
 	if (!fileExists(rootFile))
 	{
 	    cerr << FATAL << "can't find the root file" << endl;

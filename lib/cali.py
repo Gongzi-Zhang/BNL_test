@@ -11,7 +11,7 @@ if 'CALIROOT' not in os.environ:
     exit(4)
 
 CALIROOT=os.environ['CALIROOT']
-backupDir = '/media/arratialab/CALI/BNL_test/'
+CALIBACKUP = os.environ['CALIBACKUP']
 
 # constants
 '''
@@ -238,7 +238,7 @@ def getSipmXYZ(ch):
     return pos.x, pos.y, z
 
 def getFile(file):
-    for d in [".", f'{CALIROOT}/data', f'{backupDir}/data']:
+    for d in [".", f'{CALIROOT}/data', f'{CALIBACKUP}/data']:
         fullPath = f'{d}/{file}'
         if (os.path.exists(fullPath)):
             return fullPath

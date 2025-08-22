@@ -63,7 +63,7 @@ class convert:
         ''' variables '''
         self.listFile = f'{cali.CALIROOT}/data/Run{run}_list.txt'
         if not os.path.isfile(self.listFile):
-            self.listFile =  f'{cali.backupDir}/data/Run{run}_list.txt'
+            self.listFile =  f'{cali.CALIBACKUP}/data/Run{run}_list.txt'
             if not os.path.isfile(self.listFile):
                 logger.fatal(f'no list file found for run {run}')
                 exit(4)
