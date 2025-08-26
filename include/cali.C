@@ -125,9 +125,9 @@ int main(int argc, char *argv[])
     }
     else if (command == "QA")
     {
-	if (runType != "data")
+	if (runType != "data" && runType != "cmdata")
 	{
-	    cerr << ERROR << "not a data run: " << run << endl;
+	    cerr << ERROR << "not a data/cmdata run: " << run << endl;
 	    exit(1);
 	}
 

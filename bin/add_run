@@ -69,13 +69,20 @@ Length=-1
 Vbias=0
 
 if [ -f $info_file ]; then
-    StartTime=$(grep '\<Start Time\>' $info_file | cut -d ':' -f2-)
+    StartTime=$(grep '\<Start Time\>' $info_file | cut -d ':' -f2- | sed 's/\r$//')
     StartTime=$(extract_datetime "$StartTime")
-    StopTime=$(grep '\<Stop Time\>' $info_file | cut -d ':' -f2-)
+    StopTime=$(grep '\<Stop Time\>' $info_file | cut -d ':' -f2- | sed 's/\r$//')
     StopTime=$(extract_datetime "$StopTime")
     Length=$(grep '\<Elapsed time\>' $info_file | cut -d ' ' -f4)
     Length=$(perl -e "printf(\"%d\", $Length/60)")
+    HG=$(grep 'HG_Gain' $info_file | awk '{print $2}')
+    LG=$(grep 'LG_Gain' $info_file | awk '{print $2}')
+    Ped=$(grep 'Ped' $info_file | awk '{print $2}')
     Vbias=$(grep 'HV_Vbias' ${info_file} | awk '{print $2}')
+else
+    LG=$(grep '\<LG\>' ${config} | cut -d':' -f2)
+    HG=$(grep '\<HG\>' ${config} | cut -d':' -f2)
+    Ped=$(grep '\<Ped\>' ${config} | cut -d':' -f2)
 fi
 
 Geometry=$(grep '\<Geometry\>' ${config} | cut -d':' -f2)
@@ -97,9 +104,7 @@ if [ -f $sync_file ]; then
 	let i++
     done
 fi
-LG=$(grep '\<LG\>' ${config} | cut -d':' -f2)
-HG=$(grep '\<HG\>' ${config} | cut -d':' -f2)
-Ped=$(grep '\<Ped\>' ${config} | cut -d':' -f2)
+
 Size=$(ls -lh --block-size=1MiB $list_file | awk '{print $5}')
 PedRun=$(grep '\<PedRun\>' ${config} | cut -d':' -f2)
 if [ "$run_type" = "ptrg" ]; then
@@ -158,6 +163,9 @@ ${ROOT}/bin/parse ${latestId}
 pushd ${ROOT}
 sqlite3 -header -csv database/BNL_test.db "SELECT * FROM runs;" > db.csv && mv db.csv database/
 git add database/BNL_test.db database/db.csv
-scp database/BNL_test.db weibin@cali:public/cali/BNL_test/
+scp database/BNL_test.db weibin@gpu:public/cali/BNL_test/
+if [ $Size -gt 1024 ]; then
+    mv data/Run${latestId}_list.txt ${CALIBACKUP}/data
+fi
 popd
 exit 0

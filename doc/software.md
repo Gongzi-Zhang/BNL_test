@@ -17,7 +17,8 @@ python3 JanusPy.pyw &
 ```
 
 # GlobalProtect
-globalprotect connect -p campusvpn.ucr.edu
+* Download globalprotect installer for linux on UCR VPN webpage
+> globalprotect connect -p campusvpn.ucr.edu
 
 
 # installation

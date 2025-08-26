@@ -64,9 +64,9 @@ makeEdm4eic: makeEdm4eic.C
 	# g++ -o edm4hep edm4hep.cpp -I../EDM4hep/install/include/ -I../podio/install/include/ -I/home/weibin/local/root/include -L../DEM4hep/install/lib/ -ledm4hep -L../podio/install/lib -lpodio -lpodioRootIO
 	mv $@ bin/
 
-# $(Dict): $(caliType) LinkDef.h
-# 	cd include
-# 	rootcling -f $@ -c $^
+$(Dict): $(caliType) LinkDef.h
+	cd include
+	rootcling -f $@ -c $^
 
 makeRecTree: makeRecTree.C $(Dict)
 	g++ $(CXXFLAGS) -o $@ $^ $(cali_libs) $(sqlite3_libs) $(root_libs)

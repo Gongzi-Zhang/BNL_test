@@ -17,18 +17,18 @@ do
     if [ "$run_type" = "ptrg" ]; then
 	${ROOT}/bin/parse_ptrg $run
     elif [ "$run_type" = "mip" ]; then
-	${ROOT}/bin/convert $run
+	${ROOT}/bin/cali convert $run
 	${ROOT}/bin/MIP_analysis $run
-	${ROOT}/bin/MIP $run
+	${ROOT}/bin/cali MIP $run
     elif [ "$run_type" = "data" ] || [ "$run_type" = "cmdata" ]; then
-	${ROOT}/bin/convert $run
-	${ROOT}/bin/calibrate $run
-	${ROOT}/bin/QA $run
+	${ROOT}/bin/cali convert $run
+	${ROOT}/bin/cali calibrate $run
+	${ROOT}/bin/cali QA $run
     fi
     if [ $? -ne 0 ]; then
 	${ROOT}/bin/caliDB update --run $run --field Flag --value bad
     else
-	scp -qr ${ROOT}/figures/${run}/ weibin@cali:public/cali/BNL_test/figures/
+	scp -qr ${ROOT}/figures/${run}/ weibin@gpu:public/cali/BNL_test/figures/
     fi
     shift
 done

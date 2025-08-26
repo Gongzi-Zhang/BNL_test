@@ -296,60 +296,92 @@ void eventBuilder::addBoard(boardReadout* b)
 
 void eventBuilder::getTimeDiff()
 {
-    map<int, pair<double, double>> tdRange = {
-	{1, {17.5*ms, 24.5*ms}},
-       	{2, {36*ms, 44.5*ms}},
-    };
-    vector<int> ei;
+    timeDiff[0] = 0;
+
+    pair<double, double> tdRange = {10*ms, 55*ms};
+    vector<int> ei; // event index
     for (int ci=0; ci<calo::nCAENs; ci++)
 	ei.push_back(0);
 
-    while (ei[0] < boards[0].size())
+    bool findEvent = true;
+    map<double, int> timeDiff_buf[calo::nCAENs];
+    for (int ci=1; ci<calo::nCAENs; ci++)
     {
-	double ts0 = TS[0][ei[0]];
-	bool findEvent = true;
-	for (int ci=1; ci<calo::nCAENs; ci++)
-	{
-	    bool findMatch = false;
-	    while (ei[ci] < boards[ci].size())
+	ei[ci] = 0;
+	ei[ci-1] = 0;
+        while (ei[ci-1] < boards[ci-1].size() && ei[ci] < boards[ci].size())
+        {
+            double pre_ts = TS[ci-1][ei[ci-1]];
+            double ts = TS[ci][ei[ci]];
+            double diff = pre_ts - ts;
+	    if (abs(diff) > 60*s) // abnormal values
 	    {
-		double ts = TS[ci][ei[ci]];
-		if (ts > ts0)
-		{
-		    if (ts > ts0*1000)	// some insane values
-		    {
-			ei[ci]++;
-			continue;
-		    }
-		    else
-			break;
-		}
-		double diff = ts0 - ts;
-		if (tdRange[ci].first <= diff and diff <= tdRange[ci].second)
-		{
-		    findMatch = true;
-		    break;
-		}
-		ei[ci]++;
+		if (pre_ts > ts)
+		    ei[ci-1]++;
+		else
+		    ei[ci]++;
+		continue;
 	    }
 
-	    if (not findMatch)
+	    if (diff > tdRange.second)
+		ei[ci]++;
+	    else 
 	    {
-		findEvent = false;
-		break;
+		ei[ci-1]++;
+
+		if (diff >= tdRange.first)
+		    timeDiff_buf[ci][diff]++;
 	    }
-	}
-	if (findEvent)
+        }
+
+	if (timeDiff_buf[ci].size() == 0)
 	{
-	    for (int ci=0; ci<calo::nCAENs; ci++)
-	    {
-		timeDiff[ci] = ts0 - TS[ci][ei[ci]];
-		cout << INFO << "first event at CAEN unit " << ci << ": " << TS[ci][ei[ci]]
-		    << ", time difference to unit 0: " << timeDiff[ci]/us << endl;
-	    }
-	    break;
+	    // no valid time diff found
+	    cerr << ERROR << "can't find time difference for board " << ci << endl;
+	    return;
 	}
-	ei[0]++;
+
+	// vote for the most probable time diff
+	int max = 0;
+	vector<double> diff_buf;
+        for(const auto &pair : timeDiff_buf[ci])
+        {
+	    double diff = pair.first;
+	    int count = pair.second;
+
+            if (count > max)
+	    {
+		max = count;
+		diff_buf.clear();
+		diff_buf.push_back(diff);
+	    }
+	    else if (count == max)
+	    {
+		diff_buf.push_back(diff);
+	    }
+        }
+
+	timeDiff[ci] = diff_buf[0];
+	if (diff_buf.size() > 1)    // more than 1 MPV
+	{
+	    if (1 == ci)
+		continue;
+	    else
+	    {
+		// choose the one most closed to timeDiff[1]
+		for (auto const & diff : diff_buf)
+		{
+		    if (abs(diff - timeDiff[1]) < abs(timeDiff[ci] - timeDiff[1]))
+			timeDiff[ci] = diff;
+		}
+	    }
+	}
+	timeDiff[ci] += timeDiff[ci-1];
+    }
+
+    for (int ci=0; ci<calo::nCAENs; ci++)
+    {
+	cout << INFO << "Time difference of CAEN unit " << ci << " to unit 0: " << timeDiff[ci]/us << " us" << endl;
     }
 }
 

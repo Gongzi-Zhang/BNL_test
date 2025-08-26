@@ -55,15 +55,13 @@ class parsePtrg:
         self.h1 = {}
         self.gPed = {}
         self.gPedRms = {}
-        self.func = {}
-        xmax = {'LG': 500, 'HG': 1000}
+        self.xmax = {'LG': 500, 'HG': 1000}
         for gain in {'LG', 'HG'}:
-            self.func[gain] = ROOT.TF1(gain, "gaus", 0, xmax[gain])
             self.gPed[gain] = ROOT.TGraphErrors()
             self.gPedRms[gain] = ROOT.TGraph()
             for ch in range(0, calo.nChannels):
                 hname = f'Ch_{ch}_{gain}'
-                self.h1[hname] = ROOT.TH1F(hname, hname, 250, 0, xmax[gain])
+                self.h1[hname] = ROOT.TH1F(hname, hname, 250, 0, self.xmax[gain])
 
         ROOT.gROOT.SetBatch(1)
 
@@ -104,17 +102,39 @@ class parsePtrg:
         ped = {}
         for gain in {'LG', 'HG'}:
             ped[gain] = {}
-            f = self.func[gain]
             ipoint = 0
             for ch in range(0, calo.nChannels):
                 name = f'Ch_{ch}_{gain}'
                 h = self.h1[name]
-                f.SetParameters(h.GetMaximum(), h.GetMean(), h.GetRMS())
-                h.Fit(f, "q")
-                mean = f.GetParameter(1)
-                rms  = f.GetParameter(2)
-                if (mean < 50):
-                    logger.warning(f"low pedestal mean in channel {ch}: {mean}")
+                h.SetBinContent(1, 0)
+                maxBin = h.GetMaximumBin()
+                mpv = h.GetBinCenter(maxBin)
+                mpy = h.GetBinContent(maxBin)
+                mean = h.GetMean()
+                meanBin = h.FindBin(mean)
+
+                if (mpy > 3*h.GetBinContent(meanBin) and mean > 2*mpv) or (mpy > 50*h.GetBinContent(meanBin)):
+                    logger.warning(f'abnormal channel: {ch}\t{gain}')
+                    meanBin = h.FindBin(mean)
+                    f = ROOT.TF1(f"{ch}-{gain}", "gaus(0) + gaus(3)", 0, self.xmax[gain])
+                    f.SetParameters(h.GetMaximum(), mpv, 10, h.GetBinContent(meanBin), mean, h.GetRMS())
+                    f.SetParLimits(4, mean-100, mean+100)
+                    f.SetParLimits(5, 0, 2*h.GetRMS())
+                    h.Fit(f, "qR", "", 0, self.xmax[gain])
+                    mean = f.GetParameter(4)
+                    rms  = f.GetParameter(5)
+                else:
+                    f = ROOT.TF1(f'{ch}-{gain}', "gaus", 0, self.xmax[gain])
+                    f.SetParameters(h.GetMaximum(), h.GetMean(), h.GetRMS())
+                    f.SetParLimits(1, 0, mean+100)
+                    h.Fit(f, "qR", "", 0, self.xmax[gain])
+                    mean = f.GetParameter(1)
+                    rms  = f.GetParameter(2)
+
+                if (mean < 10 or rms > 1000):
+                    logger.warning(f"abnormal pedestal value in channel {ch}: {mean} +- {rms}")
+                    mean = 0
+                    rms = 0
 
                 # ped[gain][ch] = {"m": mean, "r": rms}
                 ped[gain][ch] = [mean, rms]
@@ -124,7 +144,7 @@ class parsePtrg:
                 ipoint += 1
 
         with open(self.pedFile, 'w') as f:
-            f.write(json.dumps(ped))
+            json.dump(ped, f, indent=2, separators=(',', ': '))
 
     def write(self):
         fout = ROOT.TFile.Open(self.outFile, "recreate")

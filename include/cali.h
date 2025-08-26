@@ -17,8 +17,8 @@ namespace cali {
     const char* CALIROOT = (assert(getenv("CALIROOT") != NULL), true)
 	? getenv("CALIROOT")
 	: ".";
-    const char* CALIBACKUP = (assert(getenv("CALIBAKCUP") != NULL), true)
-	? getenv("CALIBAKCUP")
+    const char* CALIBACKUP = (assert(getenv("CALIBACKUP") != NULL), true)
+	? getenv("CALIBACKUP")
 	: ".";
 
     // Run 2024
@@ -331,7 +331,7 @@ namespace cali {
 	char dirs[3][1024];
 	sprintf(dirs[0], ".");
 	sprintf(dirs[1], "%s/data", CALIROOT);
-	sprintf(dirs[2], "%s/data", CALIBAKCUP);
+	sprintf(dirs[2], "%s/data", CALIBACKUP);
 	for (char* dir : dirs)
 	{
 	    sprintf(rootFile, "%s/%s", dir, fname);

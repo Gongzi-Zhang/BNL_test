@@ -637,7 +637,7 @@ void MIPfinder::write()
 	    fmip[gain][to_string(ch)] = MIP[ch][gain];
 
     ofstream fout(mipOut.c_str());
-    fout << fmip;
+    fout << fmip.dump(2);
     fout.close();
 }
 #endif
