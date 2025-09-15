@@ -10,8 +10,7 @@ from matplotlib.pyplot import cm
 
 breakV = 38.74096661764706
 CALIROOT = os.getenv("CALIROOT")
-directory = os.path.expanduser(f'{CALIROOT}/work/labview/')
-# directory = os.path.expanduser('~/labview/data')
+directory = os.path.expanduser(f'{CALIROOT}/IV/')
 Voltage = []
 Current = []
 date = []
@@ -37,7 +36,7 @@ for file in sorted(os.listdir(directory)):
     day = yyyymmdd[6]+yyyymmdd[7]
     hour = file.split('UTC_')[1].split('.txt')[0].split('__')[1].split('_')[0]
     minute = file.split('UTC_')[1].split('.txt')[0].split('__')[1].split('_')[1]   
-    date.append(datetime(2024, int(month), int(day), int(hour), int(minute), tzinfo=timezone.utc) + timedelta(hours=-4))    # use NY time
+    date.append(datetime(2025, int(month), int(day), int(hour), int(minute), tzinfo=timezone.utc) + timedelta(hours=-4))    # use NY time
 
 hep.style.use("CMS")
 plt.figure(figsize=(16,12))
@@ -56,9 +55,9 @@ for i in range(6):
     plt.errorbar(date, np.array(Current)[:,index], label=f'OV = {np.average(np.array(Voltage)[:,index])-breakV:.1f} V', fmt='--o' if np.average(np.array(Voltage)[:,index])-breakV > 0 else '-^')
 
 beamOffDates = {
-        datetime(2024, 10,  1, 0,  0): "PP Ends", 
-        datetime(2024, 10,  7, 0,  0): "AuAu Starts", 
-        datetime(2024, 10, 21, 8, 30): "AuAu Ends",
+        # datetime(2025, 10,  1, 0,  0): "PP Ends", 
+        # datetime(2024, 10,  7, 0,  0): "AuAu Starts", 
+        # datetime(2024, 10, 21, 8, 30): "AuAu Ends",
 }
 for dt, label in beamOffDates.items():
     plt.axvline(x=dt, color='red', linestyle='--')

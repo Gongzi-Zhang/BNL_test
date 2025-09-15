@@ -164,8 +164,6 @@ pushd ${ROOT}
 sqlite3 -header -csv database/BNL_test.db "SELECT * FROM runs;" > db.csv && mv db.csv database/
 git add database/BNL_test.db database/db.csv
 scp database/BNL_test.db weibin@gpu:public/cali/BNL_test/
-if [ $Size -gt 1024 ]; then
-    mv data/Run${latestId}_list.txt ${CALIBACKUP}/data
-fi
+find data -type f -size +100M -exec mv {} ${CALIBACKUP}/data \;
 popd
 exit 0

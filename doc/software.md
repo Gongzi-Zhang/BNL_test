@@ -71,21 +71,9 @@ sudo udevadm trigger
 ```
 
 #labview
-**make sure you use the same account for downloading and activating labview**
-otherwise it will fail activation.
-
-download labview package: 
-    * ni-labview-2024-community-24.1.1-zip
-    * NILinux2024Q1Drivers.zip
-```
-unzip ni-labview-2024-community-24.1.1-zip NILinux2024Q1Drivers.zip
-sudo dpkg --install ./ni-labview-2024-community-24.1.1.49154-0+f2-ubuntu2204_all.deb
-sudo dpkg --install NILinux2024Q1Drivers/ni-ubuntu2204-drivers-stream.deb
-sudo apt update
-sudo apt grade
-sudo apt install ni-labview-2024-community
-sudo apt install ni-visa ni-488.2
-```
+## installation
+### windows
+* https://systems.engr.ucr.edu/software/labview
 
 
 # Singularity for eic-shell
