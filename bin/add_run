@@ -32,6 +32,7 @@ config=${CALIROOT}/data/config.cfg
 info_file=$1; shift
 list_file=${info_file/Info/list}
 sync_file=${info_file/Info/sync}
+serv_file=${info_file/Info/ServiceInfo}
 if ! [ -f $list_file ]; then
     logger fatal "no list file for run $info_file" >&2
     exit 4
@@ -39,7 +40,7 @@ fi
 nline=$(wc -l < $list_file)
 if [ $nline -lt 100 ]; then
     logger warning "no event recorded in run $info_file, skip it" >&2
-    mv $info_file $list_file $sync_file $ROOT/work
+    mv $info_file $list_file $sync_file $serv_file $ROOT/work
     exit 0
 fi
 
