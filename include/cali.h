@@ -34,6 +34,12 @@ namespace cali {
     const int	run24PPEndRun	= 2235;
     const int   run24AuAuStartRun = 2324;
     const int   run24AuAuEndRun	= 2587;
+    const int   run25AuAuStartRun = 3089;
+    const int   run25AuAuEndRun	= 4426;
+    const int	run25AuAu3CAENsStartRun = 3089;
+    const int	run25AuAu3CAENsEndRun = 3973;
+    const int	run25AuAu4AENsStartRun = 3974;
+    const int	run25AuAu4CAENsEndRun = 4426;
 
 	  int   run = 1000;
 
@@ -139,6 +145,7 @@ namespace cali {
 	    nSqaChannels = 64;
 	    calo::setnCAENChannels({64, 64, 48});
 	}
+	// else if (run <= 3973)
 	else
 	{
             nCAENs = 3;
@@ -151,6 +158,18 @@ namespace cali {
 	    nSqaChannels = 80;
 	    calo::setnCAENChannels({64, 64, 64});
 	}
+	// else 
+	// {
+        //     nCAENs = 4;
+	//     nChannels = 256;
+	//     nHexLayers = 4;
+	//     nHexBoards = 16;
+	//     nHexChannels = 112;
+	//     nSqaLayers = 11;
+	//     nSqaBoards = 36;
+	//     nSqaChannels = 144;
+	//     calo::setnCAENChannels({64, 64, 64, 64});
+	// }
     }
 
     typedef struct {

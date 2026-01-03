@@ -5,8 +5,8 @@ import matplotlib.dates as mdates
 import scipy
 import mplhep as hep
 from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 from matplotlib.pyplot import cm
-
 
 breakV = 38.74096661764706
 CALIROOT = os.getenv("CALIROOT")
@@ -18,7 +18,7 @@ OV = [-0.5, 0.5, 1.0, 1.5, 2.0, 2.5]
 II = [[],[],[],[],[],[]]
 for file in sorted(os.listdir(directory)):
     file = f'{directory}/{file}'
-    if os.stat(file).st_size == 0:
+    if os.path.isdir(file) or os.stat(file).st_size == 0:
         continue
     with open(file) as f:
         lines = f.read().split(',')
@@ -31,12 +31,12 @@ for file in sorted(os.listdir(directory)):
         II[i].append(current[np.argmin(abs(Voltage[0]-breakV-OV[i]))])
 
     timestamp = file.split('UTC_')[1].split('.txt')[0]
-    yyyymmdd = list(timestamp.split('__')[0])
-    month = yyyymmdd[4]+yyyymmdd[5]
-    day = yyyymmdd[6]+yyyymmdd[7]
-    hour = file.split('UTC_')[1].split('.txt')[0].split('__')[1].split('_')[0]
-    minute = file.split('UTC_')[1].split('.txt')[0].split('__')[1].split('_')[1]   
-    date.append(datetime(2025, int(month), int(day), int(hour), int(minute), tzinfo=timezone.utc) + timedelta(hours=-4))    # use NY time
+    dt = datetime.strptime(timestamp, "%Y%m%d__%H_%M")
+    dt = dt.replace(tzinfo=timezone.utc)
+    # convert to New York time
+    dt = dt.astimezone(ZoneInfo("America/New_York"))
+    date.append(dt)
+
 
 hep.style.use("CMS")
 plt.figure(figsize=(16,12))
@@ -46,8 +46,6 @@ plt.xlabel('Date', fontsize=35)
 plt.ylabel(r'Dark Current [$\mu$A]', fontsize=35)
 plt.xticks(fontsize=25)
 plt.yticks(fontsize=25)
-
-#timestamps = [datetime.strptime(ts, '%m/%d/%Y %I:%M:%S %p') for ts in date]
 
 for i in range(6):
     index = np.argmin(abs(Voltage[-1]-breakV-OV[i]))
@@ -73,7 +71,7 @@ plt.savefig(f'{fdir}/IV.pdf')
 
 # benchmark IV curve
 plt.clf()
-path = os.path.expanduser(f'{CALIROOT}/doc/Davis_test/')
+path = os.path.expanduser(f'{CALIROOT}/IV/Davis_test/')
 files = ['Hex_3015A8_UTC_20240724__23_44.txt','Hex_3015A9_UTC_20240725__00_04.txt','Hex_3015A10_UTC_20240725__16_55.txt','Hex_3015A11_UTC_20240725__17_35.txt','Hex_3015A12_UTC_20240724__18_12.txt','Hex_3015A13_UTC_20240725__20_03.txt']
 OV = [-0.5, 0.5, 1.0, 1.5, 2.0, 2.5]
 fluence = [8, 9, 10, 11, 12, 13]

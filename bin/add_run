@@ -90,7 +90,9 @@ Geometry=$(grep '\<Geometry\>' ${config} | cut -d':' -f2)
 Channels=$(grep '\<Channels\>' ${config} | cut -d':' -f2)
 Trigger=$(grep '\<Trigger\>' ${config} | cut -d':' -f2)
 if [ "$run_type" = "ptrg" ]; then
-    Trigger=0
+    Trigger=-1
+elif [ "$run_type" = "mip" ]; then
+    Trigger=-2
 fi
 T1=$(grep '\<T1\>' ${config} | cut -d':' -f2)
 T2=$(grep '\<T2\>' ${config} | cut -d':' -f2)
@@ -165,6 +167,6 @@ pushd ${ROOT}
 sqlite3 -header -csv database/BNL_test.db "SELECT * FROM runs;" > db.csv && mv db.csv database/
 git add database/BNL_test.db database/db.csv
 scp database/BNL_test.db weibin@gpu:public/cali/BNL_test/
-find data -type f -size +100M -exec mv {} ${CALIBACKUP}/data \;
+find data -type f -size +10M -exec mv {} ${CALIBACKUP}/data \;
 popd
 exit 0

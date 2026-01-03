@@ -23,7 +23,7 @@ quadrant:   quadrant count in a layer: 0-3
 sipm:       SiPM count in a PCB: 0-6
 '''
 run = -1
-nCAENs = 3
+nCAENs = 4
 nCAENChannels = 64
 nChannels = nCAENs*nCAENChannels
 layerMax = 20
@@ -83,8 +83,26 @@ def setRun(r):
         nSqaBoards = 16
         nSqaChannels = 64
         calo.setnCAENChannels([64, 64, 48])
-    else:
+    elif run <= 3973:
+        nCAENs = 3
+        nChannels = 192
+        nHexLayers = 4
+        nHexBoards = 16
+        nHexChannels = 112
+        nSqaLayers = 6
+        nSqaBoards = 20
+        nSqaChannels = 80
         calo.setnCAENChannels([64, 64, 64])
+    else:
+        nCAENs = 4
+        nChannels = 256
+        nHexLayers = 4
+        nHexBoards = 16
+        nHexChannels = 112
+        nSqaLayers = 11
+        nSqaBoards = 36
+        nSqaChannels = 144
+        calo.setnCAENChannels([64, 64, 64, 64])
     # elif (run > 5000):
     #     nCAENs = 4
     #     nChannels = nCAENs*nCAENChannels

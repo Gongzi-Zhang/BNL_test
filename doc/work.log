@@ -1,3 +1,10 @@
+# 20251112
+    Switch from T0-IN to T1-IN, because T0-IN is not working on CAEN unit 0 and 1 
+
+# 20251029
+    Replace the old 3 UCR CAEN units with the ORNL ones, and add another UCR CAEN unit, 4 CAEN units in total now
+    All three KETEK units I-limit is on
+
 # 20250314
     Found the KETEK (tile 2) I-limit is on, reset the voltage to 28.22 V to make
     the light off

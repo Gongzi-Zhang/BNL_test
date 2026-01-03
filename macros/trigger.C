@@ -11,7 +11,7 @@ void trigger()
     map<int, map<float, map<float, map<float, int>>>> eventNumber;
     
     // for (int run=cali::run24PPStartRun; run<=cali::run24PPEndRun; run++)    // PP 
-    for (int run=cali::run24AuAuStartRun; run<=cali::run24AuAuEndRun; run++)    // AuAu 
+    for (int run=cali::run25AuAuStartRun; run<=cali::run25AuAuEndRun; run++)    // AuAu 
     {
 	if (db.getRunType(run) != "data" || db.getRunFlag(run) != "good")
 	    continue;
